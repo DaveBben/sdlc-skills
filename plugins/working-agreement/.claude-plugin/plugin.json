@@ -1,0 +1,9 @@
+{
+  "name": "working-agreement",
+  "version": "1.0.0",
+  "description": "Optional house rules for how the agent works with you: keep it simple, look facts up instead of asking, one decision per question that yes accepts, and explanations that lead with what a thing means for you and a concrete case before the mechanism and its name. One hook adds them at session start.",
+  "license": "MIT",
+  "author": {
+    "name": "DaveBben"
+  }
+}

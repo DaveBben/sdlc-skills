@@ -1,0 +1,44 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "sdlc-skills",
+  "owner": {
+    "name": "DaveBben"
+  },
+  "description": "One plugin for coding agents: xp takes a change from a story you agree to a reviewed pull request, in pair mode or on autopilot, and keeps a short AGENTS.md. An optional second, working-agreement, sets how the agent works with you.",
+  "plugins": [
+    {
+      "name": "xp",
+      "source": "./plugins/xp",
+      "description": "Extreme Programming with an agent: you decide what gets built, as user stories with acceptance criteria you agree, spikes, bug tickets, chores, specs and decision records, then build it in pair mode, taking turns at the wheel, or on autopilot, with failing tests first, a blind test challenger and one fresh review, to a pull request you merge, and keep a short AGENTS.md. At session start, hooks print a routing list and the ADR index.",
+      "version": "1.0.0",
+      "license": "MIT",
+      "skills": [
+        "./skills/story",
+        "./skills/spike",
+        "./skills/bug",
+        "./skills/chore",
+        "./skills/tracker",
+        "./skills/adr",
+        "./skills/spec",
+        "./skills/build",
+        "./skills/red-tests",
+        "./skills/review",
+        "./skills/refactor",
+        "./skills/onboard"
+      ],
+      "author": {
+        "name": "DaveBben"
+      }
+    },
+    {
+      "name": "working-agreement",
+      "source": "./plugins/working-agreement",
+      "description": "Optional house rules for how the agent works with you: keep it simple, look facts up instead of asking, one decision per question that yes accepts, and explanations that lead with what a thing means for you and a concrete case before the mechanism and its name. One hook adds them at session start.",
+      "version": "1.0.0",
+      "license": "MIT",
+      "author": {
+        "name": "DaveBben"
+      }
+    }
+  ]
+}

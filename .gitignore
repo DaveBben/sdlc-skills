@@ -1,0 +1,24 @@
+.DS_Store
+
+# build-like-an-engineer: the task list is per-change scratch, never committed
+
+# build-like-an-engineer: throwaway fixture repos built by tools/gauge.py
+.gauge-fixtures/
+.gauge-fixtures-routing/
+
+__pycache__/
+*.pyc
+
+# handoff: session handoffs are private working state, never committed
+docs/agents/handoff/
+.claude/context/handoff/
+.agents/handoff/
+docs/handoffs/
+
+.mypy_cache/
+
+# research: source material and design history, kept local and never published
+research/
+
+# retro: retros from other projects, kept local
+retro/

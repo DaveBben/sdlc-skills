@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Edit|Write|MultiEdit",
+      "hooks": [{"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/size_guard.py"}]
+    }],
+    "PostToolUse": [{
+      "matcher": "Bash",
+      "hooks": [{"type": "command", "if": "Bash(*.md*)", "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/size_guard.py"}]
+    }]
+  }
+}

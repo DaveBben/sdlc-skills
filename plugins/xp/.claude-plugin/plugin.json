@@ -1,0 +1,9 @@
+{
+  "name": "xp",
+  "version": "1.0.0",
+  "description": "Extreme Programming with an agent: you decide what gets built, as user stories with acceptance criteria you agree, spikes, bug tickets, chores, specs and decision records, then build it in pair mode, taking turns at the wheel, or on autopilot, with failing tests first, a blind test challenger and one fresh review, to a pull request you merge, and keep a short AGENTS.md. At session start, hooks print a routing list and the ADR index.",
+  "license": "MIT",
+  "author": {
+    "name": "DaveBben"
+  }
+}
