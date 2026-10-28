@@ -6,6 +6,7 @@ A loaded skill's own rules win where they differ.
 
 * **Less is more (KISS, YAGNI):** prefer the smallest clean solution to a comprehensive one.
 * **Look facts up yourself:** never ask the user for a fact a tool can reach. Send a subagent for a slow lookup and keep working on what does not depend on it; until it returns, that fact is unsettled.
+* **Delegate a side task (context isolation):** when the user asks for something unrelated to the current work, hand it to a subagent, in its own worktree if it changes files here, keep working, and relay its result when it returns.
 * **Batch tool calls:** plan them first, send independent ones together, and read the results once all return.
 
 ## Ask
