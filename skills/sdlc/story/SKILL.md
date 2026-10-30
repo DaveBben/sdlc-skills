@@ -17,7 +17,7 @@ A story is one thing a person can do once a change ships, with numbered acceptan
 * **Subtasks** for an existing story: [references/subtasks.md](references/subtasks.md).
 * **Next story:** list the ready ones in build order for the user to pick: with criteria, and no open question, blocker, pull request or subtask assigned to a person.
 * **Build** an agreed story: the `build` skill.
-* **Measure** a story with a `Measure:` line once its date passes: write the value and the date on `Result:`, say whether it met the target. A miss becomes new stories; a merged story never reopens.
+* **Measure** a story with a `Measure:` line once its date passes: write the value and the date on `Result:`, say whether it met the target. A miss becomes new stories; a merged story never reopens. A result that contradicts a PRD goal or metric is a change to the PRD, by the `prd` skill.
 * **Resume:** read the story with its comments; continue at the first step not done.
 
 ## Questions

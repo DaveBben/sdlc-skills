@@ -9,4 +9,5 @@ For a request to change software, load the skill that fits first:
 * **An agreed story, ticket or triaged bug to build or pair on:** the `build` skill.
 * **How an agreed story gets built:** the `spec` skill.
 * **A decision costly to reverse,** one a revert cannot undo: the `adr` skill, before any code.
+* **A new product, or its vision, goals, users or non-goals:** the `prd` skill.
 * **Otherwise, a change to what the product does:** the `story` skill.
