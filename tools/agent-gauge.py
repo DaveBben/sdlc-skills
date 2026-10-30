@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Score each xp agent's description by whether a session launches it unprompted.
+"""Score each sdlc agent's description by whether a session launches it unprompted.
 
 The skills describe a step ("have a fresh subagent challenge the tests blind")
 without naming an agent, so the harness must pick the agent from its
@@ -11,7 +11,7 @@ harness's own scouts (Explore, Plan), and stops the session there.
 
 Cases live in a JSON file written blind to the descriptions:
 {"train": [{"q", "want", "fixture"}], "holdout": [...]}, want null for a
-negative, which passes when no xp agent launches before a skill loads or the
+negative, which passes when no sdlc agent launches before a skill loads or the
 session ends.
 
 Usage:

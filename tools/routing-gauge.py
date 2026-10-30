@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Measure routing accuracy for the xp and setup skills against ten
+"""Measure routing accuracy for the sdlc skills against ten
 misroute scenarios: solution-as-requirement, story-as-contract, incident-as-
 patch, received-spec-as-contract, trivial-bypass, greenfield-as-feature,
 boilerplate-renovation, deadline-as-1:1-port, removal-as-subtraction, and
@@ -27,7 +27,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PLUGIN_DIRS = [os.path.join(REPO, "plugins", p) for p in ("xp",)]
+PLUGIN_DIRS = [os.path.join(REPO, "plugins", p) for p in ("sdlc",)]
 TURNS = 14
 TIMEOUT = 480
 

@@ -15,13 +15,13 @@ From your shell:
 
 ```bash
 claude plugin marketplace add DaveBben/sdlc-skills
-claude plugin install xp@sdlc-skills
+claude plugin install sdlc@sdlc-skills
 claude plugin install working-agreement@sdlc-skills   # optional
 ```
 
-Then start a new session, or run `/reload-plugins` in one that's open. Inside a session you can also run `/plugin marketplace add DaveBben/sdlc-skills`, then `/plugin install xp@sdlc-skills`.
+Then start a new session, or run `/reload-plugins` in one that's open. Inside a session you can also run `/plugin marketplace add DaveBben/sdlc-skills`, then `/plugin install sdlc@sdlc-skills`.
 
-Other agents: run `npx skills add DaveBben/sdlc-skills --all`, register `skills/xp/agents/` as subagents if your agent supports them, and paste `plugins/xp/hooks/route.md` into your `AGENTS.md`.
+Other agents: run `npx skills add DaveBben/sdlc-skills --all`, register `skills/sdlc/agents/` as subagents if your agent supports them, and paste `plugins/sdlc/hooks/route.md` into your `AGENTS.md`.
 
 ## How to use it
 
@@ -32,7 +32,7 @@ Just ask for what you want. A routing hook at session start picks the skill.
 - "The export times out past 10k orders" reproduces and fixes a bug.
 - "Review my branch" runs a review.
 
-Skills: story, spec, spike, bug, chore, tracker, adr, build, red-tests, review, refactor and onboard. More detail in [plugins/xp](plugins/xp/README.md).
+Skills: story, spec, spike, bug, chore, tracker, adr, build, red-tests, review, refactor and onboard. More detail in [plugins/sdlc](plugins/sdlc/README.md).
 
 working-agreement is optional. It adds house rules for how the agent works with you, like one question at a time and plain explanations. See [plugins/working-agreement](plugins/working-agreement/README.md).
 

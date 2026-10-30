@@ -4,11 +4,11 @@
   "owner": {
     "name": "DaveBben"
   },
-  "description": "One plugin for coding agents: xp takes a change from a story you agree to a reviewed pull request, in pair mode or on autopilot, and keeps a short AGENTS.md. An optional second, working-agreement, sets how the agent works with you.",
+  "description": "One plugin for coding agents: sdlc takes a change from a story you agree to a reviewed pull request, in pair mode or on autopilot, and keeps a short AGENTS.md. An optional second, working-agreement, sets how the agent works with you.",
   "plugins": [
     {
-      "name": "xp",
-      "source": "./plugins/xp",
+      "name": "sdlc",
+      "source": "./plugins/sdlc",
       "description": "Extreme Programming with an agent: you decide what gets built, as user stories with acceptance criteria you agree, spikes, bug tickets, chores, specs and decision records, then build it in pair mode, taking turns at the wheel, or on autopilot, with failing tests first, a blind test challenger and one fresh review, to a pull request you merge, and keep a short AGENTS.md. At session start, hooks print a routing list and the ADR index.",
       "version": "1.0.0",
       "license": "MIT",
