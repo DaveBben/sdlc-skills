@@ -10,7 +10,7 @@ Delete when: every Promote item is ticked, as the story closes.
 1. Disciplines affected: each team as owner, consumer, supplier or not affected, and what that means here.
 2. Interface contracts: each endpoint, message, event or schema added or changed, with its success, its errors and what a client shows. Promote: to the contract's home, such as the OpenAPI file.
 3. Where each criterion is enforced: per AC, the one place that enforces it and what clients only reflect.
-4. Data and state: tables, keys and indexes; consistency, such as read-your-writes; caches; what happens to existing data; deletion of personal data.
+4. Data and state: tables, keys and indexes; consistency, such as read-your-writes; caches; what happens to existing data; deletion of personal data. Promote: the `Boundaries:` line of `AGENTS.md`, by the `onboard` skill, when this adds a store, system or repository or changes who writes one.
 5. Failure handling: per failure, what the system does.
 6. Compatibility and rollout: old clients and versions in the field, the feature flag and its off state, the rollout steps, and the rollback.
 7. Constraints and budgets: latency, payload, rate limits, capacity, privacy.

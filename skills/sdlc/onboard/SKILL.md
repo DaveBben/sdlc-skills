@@ -11,7 +11,7 @@ metadata:
 
 ## What goes in
 
-* **Boundaries:** one `Boundaries:` line naming each system the product reads, writes or runs inside, and who writes each store it reads.
+* **Boundaries:** a `Boundaries:` line that draws the system on one page: each system, store and repository the product reads, writes or runs inside, in the order data flows, the repository that owns each step, and who writes each store it reads. When it outgrows 5 lines, stop and redraw it with the user before the next story.
 * **Project tracker:** the issue tracker's URL, when the team uses one.
 * **Commands** the repository does not make obvious, exact and copy-pasteable:
   * `Check:` runs at turn end, `Full check:` before a pull request, `Setup:` the install step a fresh checkout needs, and `Scheduled check:` the slow check a scheduled job runs.
@@ -26,7 +26,8 @@ Keep the `Check:`, `Full check:`, `Setup:`, `Scheduled check:`, `Build:`, `Sensi
 ## What stays out
 
 * **What a check enforces,** such as formatter, lint and type rules. A rule a program could check but none does: propose the check, and keep the line until one holds it.
-* **What the repository already says:** its purpose, stack, directory map, features and architecture.
+* **What the repository already says:** its purpose, stack, directory map, features and architecture past the `Boundaries:` line.
+* **Session state:** plans, handoff notes, status and superseded designs. The branch, the issues and the PRD hold them; offer to delete any found.
 
 Order the file `Boundaries:`, the tracker, then only the headings with content: Commands, Constraints, Traps, Pointers. A module's conventions go in a nested `AGENTS.md`. Link `CLAUDE.md`, and any other instructions-file name the repository uses, to `AGENTS.md`.
 

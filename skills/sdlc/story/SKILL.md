@@ -1,6 +1,6 @@
 ---
 name: story
-description: "Use first for any request to add, change or remove what users see or the product does, however small, such as a UI tweak, a timing, a colour or a new field, for writing or judging user stories and acceptance criteria, and for what to build next, unless the person wants to pair or build together or an agreed story is being built or designed: agrees acceptance criteria with the person before any code is written."
+description: "Use first for any request to add, change or remove what users see or the product does, however small, such as a UI tweak, a timing, a colour or a new field, for writing or judging user stories and acceptance criteria, and for what to build next, unless the person wants to pair or build together, an agreed story is being built or designed, or the person is still finding out what to build: agrees acceptance criteria with the person before any code is written."
 license: MIT
 metadata:
   version: "1.0.0"
@@ -11,7 +11,7 @@ A story is one thing a person can do once a change ships, with numbered acceptan
 
 ## Paths
 
-* **Create** one: [references/create.md](references/create.md). More than one path, variation or outcome: split it first by [references/split.md](references/split.md).
+* **Create** one: [references/create.md](references/create.md). Too big for one pull request a person can review: split it first by [references/split.md](references/split.md).
 * **Refine** an agreed story that is not built yet: [references/refine.md](references/refine.md).
 * **Review** stories someone wrote: check each against INVEST by create.md's and split.md's rules, and for a duplicate story or an abuse case that no criterion states. Change nothing without its owner's yes to that finding, and report `<story>: <rule broken> — "<quoted text>" — <fix>`, then `Ready to build: <stories with no finding>`.
 * **Subtasks** for an existing story: [references/subtasks.md](references/subtasks.md).

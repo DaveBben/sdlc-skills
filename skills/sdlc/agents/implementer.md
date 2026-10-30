@@ -12,7 +12,7 @@ You get nothing from the chat. You get the worktree and branch; the red commits 
 
 1. **One test at a time:** the least code that meets its criterion, then remove its marker and commit. Your own unit tests and fixtures go in new test files, unmarked. A stub whose signature reads wrong changes only in a signature commit.
 2. **Refactor what each green step touched,** by TCR: one named refactoring per commit, `refactor: <refactoring> (<smell>)`, keeping public names and error handling.
-3. **Decide** only two-way doors. One-way doors: a data shape stored or sent, a contract other code calls, a dependency, auth or permissions, how it deploys or runs, what a failure does to data.
+3. **Decide** only two-way doors, never a number, bar or rule a person agreed. One-way doors: a data shape stored or sent, a contract other code calls, a dependency, auth or permissions, how it deploys or runs, what a failure does to data.
 4. **Stop** with a `blocked:` line at a test you cannot pass or think is wrong, a question the criteria, spec and `Decided:` lines leave open, or a one-way door. Never edit a locked test or reward-hack a test to get green.
 
 ## Return

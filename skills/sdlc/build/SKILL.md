@@ -16,7 +16,7 @@ Build one ticket, a story, bug, chore or plain request, to a pull request that a
 5. **Check.** Run the check command, the `Full check:` or `Check:` line of `AGENTS.md`, else what CI runs. Then run `python3 ../red-tests/scripts/locked_tests.py <merge target> <each red commit>`, which checks the locked tests: each test in a red commit and each from before the branch. Each `refused` line is a stop: undo that change, or remake it by the `red-tests` skill once a person agrees.
 6. **Review** by the `review` skill, given the ticket, the merge target, the red commits, the check command, the locked-tests lines, the surviving and no-coverage mutants and the design: the spec and every `Decided` line. A behaviour fault or test gap gets a test that fails on it, in a new test file, committed alone as a red commit, then the fix. Ask each question. Then redo step 5, and the review's reading list, on the final diff.
 7. **Pull request** into main, titled `[<key>] <title>`. Its body: the review's tier and reading list first; `Build: pair` or `Build: autopilot`; `Decided by people:` and `Decided by the agent:`, one line per choice; the test lists; the locked-tests lines; how to verify it by hand.
-8. **Ship.** Fix each CI failure this branch causes as step 6 fixes a finding, and update the pull request body; then wait for the person. Never merge or push to main. Once the merge reaches production, observe each criterion there, reading only. Close the ticket, closing its spec first by the `spec` skill, or hand a criterion that fails to the `bug` skill.
+8. **Ship.** Fix each CI failure this branch causes as step 6 fixes a finding, and update the pull request body; then wait for the person. Never merge or push to main. Once merged, remove its worktree and delete its branch. Once the merge reaches production, observe each criterion there, reading only. Close the ticket, closing its spec first by the `spec` skill, or hand a criterion that fails to the `bug` skill.
 9. **Retro,** as an After Action Review. Answer each in a line or two, citing what showed it; "nothing" is an answer. Then offer each answer worth keeping in one multi-select question: a fact for `AGENTS.md` by the `onboard` skill, or a check for this repository.
    * **Surprised:** what did you assume about this project that turned out wrong, and what showed you?
    * **Corrected:** what did the person have to correct, repeat or supply that the repository did not tell you?
@@ -24,8 +24,8 @@ Build one ticket, a story, bug, chore or plain request, to a pull request that a
 
 ## Questions
 
-* **Decide** a choice a later edit undoes for free, and list it: `Decided: <choice>, because <reason>`.
-* **Ask** what the criteria leave open, and every choice costly to reverse: a data shape stored or sent, a contract other code calls, a dependency, auth or permissions, how it deploys or runs, what a failure does to data. Build nothing the answer could change until it comes.
+* **Decide** a choice a later edit undoes for free and no person agreed, and list it: `Decided: <choice>, because <reason>`.
+* **Ask** what the criteria leave open, and every choice costly to reverse: a data shape stored or sent, a contract other code calls, a dependency, auth or permissions, how it deploys or runs, what a failure does to data. Ask a change to any number, bar or rule a person agreed, such as a criterion's value or a spike's bar, as `<name>: <A> → <B>, because <reason>`, however cheap the edit. Build nothing the answer could change until it comes.
 * **How:** one decision per question, multiple-choice where the tool allows, with the options as equals and none recommended. Once answered, give your pick in one line if it differs.
 * **Stuck:** a test you cannot pass, or a locked test you think is wrong, is a question, never a workaround.
 * **Record** an answer costly to reverse by the `adr` skill.

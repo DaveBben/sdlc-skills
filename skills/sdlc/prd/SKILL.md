@@ -20,7 +20,7 @@ A product requirements document (PRD) states why a product exists and what succe
 * **Create** one: by "Create" below.
 * **Review** a PRD: check each section against "Write it" and "Failure modes", and report `<section>: <failure mode> — "<quoted text>" — <fix>`, then `Sound: <sections with no finding>`. Change nothing without the Owner's yes to that finding, else the user's.
 * **Change** a section when a problem, user, goal, metric or scope changes: propose the edit like Create's step 3, with what made it change, and commit it on a yes. List the open stories it now contradicts.
-* **Check** a story or request against it: name each goal it serves, or the non-goal or constraint it breaks. One that serves no goal is a question for the user, a change to the PRD or no story, never a silent refusal.
+* **Check** a story, spike, chore or request against it: name the goal question it helps answer, or the non-goal or constraint it breaks. One that helps answer none is a question for the user: drop it, or swap a goal by the Change path. Never add a fourth goal, and never refuse silently.
 * **Resume:** read the PRD and continue Create at the first section of the form missing from it.
 * **No person in the session:** create or change nothing; report the question and what waits on it.
 
@@ -43,7 +43,7 @@ When the user says "just write it", draft every section with each item marked `(
 Vision: For <target user> who <need>, <product> is a <category> that <key benefit>. Unlike <current alternative>, it <differentiator>.
 Problem: <who has it, what they do today, what it costs them, the evidence and its source>
 Users: <role: the context they use it in and the job it does for them>, primary first
-Goals: <an outcome for a user or the business, naming no feature>
+Goals: 1 to 3, each a question the finished product must answer, naming no feature: <question> → <the decision or action its answer drives>; e.g. <one answer in real values>
 Non-goals: <what it will not do>, because <reason>
 Success metrics: <metric: where to read it, baseline or "none yet, first read <date>", target, date>, a leading and a lagging one per goal
 Constraints: <appetite, deadline, budget, regulation or platform it must fit>, each with its source
@@ -59,6 +59,7 @@ Owner: <who agrees a change>
 ## Failure modes
 
 * **Solution first:** a problem or goal that names a feature, or a goal that restates the vision.
+* **A feeling:** a goal no finished product could fail, such as "a personal Google Trends", or an answer that drives no decision. Ask what it must answer and what the user would do with the answer.
 * **Unmeasurable:** a goal with no metric, or a metric with no target, date, or baseline or first-read date.
 * **No boundary:** no non-goals, or one with no reason.
 * **Invented evidence:** a user quote, number or need no person gave or confirmed, unmarked. Mark it `(assumption)` and list it under Assumptions.
