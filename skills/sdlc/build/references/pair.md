@@ -28,4 +28,4 @@ Once the check passes and every criterion holds, have a fresh subagent challenge
 
 ## Teach-back
 
-Before the review, ask the person, in prose, to walk the data flow from where the change starts to its result and give each decision with its reason. Show no walk of yours first, and offer no skip. If they skip it, the pull request body says `Teach-back: skipped`. Then name each step they missed or got wrong, with its `file:line`, and each decision no criterion asks for. Fix a gap in the code before the review. Their decisions go under `Decided by people`.
+Before the review, ask the person, in prose, to walk the data flow from where the change starts to its result, then the failure path of each criterion with a failure example, and give each decision with its reason. Show no walk of yours first, and offer no skip. If they skip it, the pull request body says `Teach-back: skipped`. Then name each step they missed or got wrong, with its `file:line`, and each decision no criterion asks for. Fix a gap in the code before the review. Their decisions go under `Decided by people`.
