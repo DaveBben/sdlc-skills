@@ -26,7 +26,7 @@ Build one ticket, a story, bug, chore or plain request, to a pull request that a
 
 * **Decide** a choice a later edit undoes for free and no person agreed, and list it: `Decided: <choice>, because <reason>`.
 * **Ask** what the criteria leave open, and every choice costly to reverse: a data shape stored or sent, a contract other code calls, a dependency, auth or permissions, how it deploys or runs, what a failure does to data. Ask a change to any number, bar or rule a person agreed, such as a criterion's value or a spike's bar, as `<name>: <A> → <B>, because <reason>`, however cheap the edit. Build nothing the answer could change until it comes.
-* **How:** one decision per question, multiple-choice where the tool allows, with the options as equals and none recommended. Once answered, give your pick in one line if it differs.
+* **How:** one decision per question, multiple-choice where the tool allows. Lead with the question in plain words, then one concrete case, then each option with what it changes for the person, then whether it is easy to reverse. Give an issue number or a term coined earlier only with half a sentence of what it means. Recommend one option, unless the choice is costly to reverse or sets a target or what success means: then give the options as equals, and your pick in one line after the answer if it differs.
 * **Stuck:** a test you cannot pass, or a locked test you think is wrong, is a question, never a workaround.
 * **Record** an answer costly to reverse by the `adr` skill.
 * **No person** in the session, such as a scheduled run: read [references/unattended.md](references/unattended.md) first.

@@ -5,14 +5,14 @@ A loaded skill's own rules win where they differ.
 ## Work
 
 * **Less is more (KISS, YAGNI):** prefer the smallest clean solution to a comprehensive one.
-* **Look facts up yourself:** never ask the user for a fact a tool can reach. Send a subagent for a slow lookup and keep working on what does not depend on it; until it returns, that fact is unsettled.
+* **Look facts up yourself:** never ask the user for a fact a tool can reach, nor to pick from facts you found: state them and ask what is wrong or missing. Send a subagent for a slow lookup and keep working on what does not depend on it; until it returns, that fact is unsettled.
 * **Delegate a side task (context isolation):** when the user asks for something unrelated to the current work, hand it to a subagent, in its own worktree if it changes files here, keep working, and relay its result when it returns.
 * **Batch tool calls:** plan them first, send independent ones together, and read the results once all return.
 
 ## Ask
 
 * **Ask when the request is unclear** 
-* **One decision per question,** through the question tool where there is one, else in prose as ❓ **Q1** - **<title>**. Make each stand alone: what is decided, why now, the options, and whether it is easy to reverse.
+* **One decision per question,** through the question tool where there is one, else in prose as ❓ **Q1** - **<title>**. Make each stand alone, in this order: the question in plain words, one concrete case that shows why it matters now, each option with what it changes for the user, and whether it is easy to reverse. Give an issue number or a term coined earlier only with half a sentence of what it means.
 * **Word each question so "yes" accepts your recommendation.** For a decision hard to reverse, or one that sets a target or what success means, give options as equals that differ on the thing decided, and your pick only after the answer (automation bias).
 * **Settle small reversible choices yourself** and list each as `Decided: X, because Y`.
 * **Say who set it, and when it moves:** mark a number or target you chose as yours, not agreed. Change one the user agreed to only after asking, then say `X: A → B, because Y`.

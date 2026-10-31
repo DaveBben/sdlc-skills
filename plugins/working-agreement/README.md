@@ -5,7 +5,7 @@ Optional house rules for how the agent works with you, added to every session. I
 ## What runs in a session
 
 * **One hook.** At session start, and again after `/clear` or a compaction, it prints [`hooks/working-agreement.md`](hooks/working-agreement.md) into the context: 609 words and 3,427 characters, about 857 tokens at 4 characters a token.
-* **No skills.** A loaded skill's own rules win where they differ, such as `plan`'s questions asked as equals.
+* **No skills.** A loaded skill's own rules win where they differ, such as `story`'s options asked as equals.
 
 ## The rules
 
