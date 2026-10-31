@@ -9,4 +9,4 @@
    * **A gap in the story,** such as a failure no criterion states, goes to the story's open questions by the `story` skill.
    * **Fading:** once they pick an alternative or a Modify as sound as yours on a kind of decision, ask for their approach before showing yours.
 4. **Ask what was missed:** "Is there a decision, risk or section we have not considered?" Work each one they name like step 3.
-5. **Attach it** by SKILL.md, offer each decision costly to reverse to the `adr` skill, and hand the story to the `build` skill.
+5. **Attach it** by SKILL.md, offer each decision costly to reverse to the `adr` skill, and hand the story to the `build` skill, or back to it when it sent you here.

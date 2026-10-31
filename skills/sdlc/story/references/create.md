@@ -28,4 +28,4 @@ Measure: <the number that shows the `so that`: where to read it, now, target, da
 
 6. **Ask what was missed:** "Is there a criterion we have not considered?" Propose each one they name like step 3.
 7. **Review it blind:** have a fresh subagent, given only the story, the titles of the stories already filed, this file, split.md and SKILL.md's Review path, review it by that path and return its report; it changes nothing. Read each quote before keeping its finding, then propose each kept fix like step 3.
-8. **Agree it:** show its `Decided:` lines, and ask each part no answer settled, such as `so that` or `Measure:`. File it by SKILL.md, then offer the `spec` skill to work out how it gets built.
+8. **Agree it:** show its `Decided:` lines, and ask each part no answer settled, such as `so that` or `Measure:`. File it by SKILL.md. Its spec waits until the `build` skill picks it up.
