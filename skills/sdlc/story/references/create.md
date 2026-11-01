@@ -3,7 +3,7 @@
 1. **Find the need:** ask why until the goal names no solution. Offer a cheaper way to it as an option. Where the product has a PRD, check the request against it by the `prd` skill's Check path.
 2. **Ask** by SKILL.md's "Questions", in rounds of product questions, until you and the user would write the same criteria. One the user will research goes under `Open questions`.
 3. **Propose each criterion,** one at a time: the criterion with its examples, why it may be needed, and the source of that why: the user's words, a rule they stated, a `file:line`, an ADR, or `(guess)`. Ask it as Accept, Reject or Modify. Each `then` comes from the user's words or a rule they stated, never from what the code does today, which carries its bugs into the tests.
-4. **Failure examples:** a criterion whose action saves data or calls another system gets an example of that failing, proposed the same way: what the person sees and what is saved. An invariant, such as `a card is never charged twice`, is its own criterion.
+4. **Failure examples:** a criterion whose action saves data or calls another system gets an example of that failing, proposed the same way: what the person sees and what is saved. A scheduled job or batch also gets one where every outside call it makes fails: what it reports and its exit status. An invariant, such as `a card is never charged twice`, is its own criterion.
 5. **Write it** in this form, leaving out empty sections:
 
 ```text

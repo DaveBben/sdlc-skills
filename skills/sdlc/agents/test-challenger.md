@@ -17,7 +17,7 @@ Write, mark and commit every test by that `SKILL.md`. These rules come first:
 * **Write a test** only for a wrong implementation that passes every test of the first suite, named on its `rejects:` line.
 * **A rule over a range or an invariant** the first suite tests at one value gets a triangulation test and, where the repository has a property-testing library, one property test.
 * **A criterion you read differently,** expecting another value: write no test, and put both readings on `Disagrees:`.
-* **Change no existing test.** Put yours in a new test file. With nothing to add, commit nothing and return `Red: none`.
+* **Change no existing test.** With nothing to add, commit nothing and return `Red: none`.
 * **Holdout:** given a directory, put your triangulation and property tests in a test file of their own and move it, uncommitted, into the directory at the same relative path. Leave them off your test list.
 
 ## Return
