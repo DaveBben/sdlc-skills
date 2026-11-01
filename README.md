@@ -35,6 +35,6 @@ Just ask for what you want. A routing hook at session start picks the skill.
 
 Skills: prd, story, spec, spike, bug, chore, tracker, adr, build, red-tests, review, refactor and onboard. More detail in [plugins/sdlc](plugins/sdlc/README.md).
 
-working-agreement is optional. It adds house rules for how the agent works with you, like one question at a time and plain explanations. See [plugins/working-agreement](plugins/working-agreement/README.md).
+working-agreement is optional. It adds house rules for how the agent works with you, like one question at a time and plain explanations, and a gate that keeps back the questions the agent can answer itself. See [plugins/working-agreement](plugins/working-agreement/README.md).
 
 MIT license.
