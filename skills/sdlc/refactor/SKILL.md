@@ -34,7 +34,7 @@ Leave code alone when no change touches it, it is due for deletion, its duplicat
 * **Green first:** run the tests. Code with no test gets characterization tests first, committed alone; kill one hand-made mutant to prove each can fail.
 * **One named refactoring per step,** by TCR, using the editor's or language server's rename, extract and move where they exist. After each step, re-read for the smell it targeted; still there means the wrong refactoring: revert it.
 * **Two hats:** never change behaviour in a step. A bug found mid-refactoring is finished or reverted, then reported, by the `bug` skill.
-* **Keep** public names and signatures (migrate them by parallel change), error handling, assertions, logging and comments that explain why. Read each commit's diff for deleted lines.
+* **Keep** public names and signatures (migrate them by parallel change), error handling, assertions, logging and comments that explain why. A comment that restates the code, a criterion or a ticket is the Comments smell: rename or extract until the code says it, then delete the comment. Read each commit's diff for deleted lines.
 * **Commits:** each refactoring alone, `refactor: <refactoring> (<smell>)`, such as `refactor: inline _classify (Middle Man)`, never mixed with a behaviour change.
 * **Large:** a change that cannot be one pull request: [references/large.md](references/large.md).
 * **On its own:** build it by the `build` skill as a refactoring.

@@ -28,7 +28,8 @@ Skip what CI already checks, such as formatting, secret scanning and static anal
    * No sensitive data in logs or URLs.
    * Each new dependency is justified, maintained and pinned.
 8. **Can the next person change it?**
-   * Names are clear, comments explain why, and the docs it affects are updated.
+   * Names are clear, and the docs it affects are updated.
+   * A comment says only what the code and its tests cannot: why, a limit set from outside, or a trap. None restates the code, a criterion or a test, or cites a ticket or review; git holds that history. A docstring is one summary line, plus arguments, return value and errors for a public interface.
 9. **Will it hold up in production?**
    * No N+1 query, unbounded loop or unbounded result set.
    * Connections, files and locks are released.
