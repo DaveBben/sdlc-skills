@@ -14,7 +14,7 @@ You get the review directory, the tree (the code at the change's head), `diff.pa
 
 * **Sensitive:** a hunk touching auth, untrusted input, private data, money, an outside service, a schema or migration, configuration, test or check configuration, or error handling that catches, retries, falls back or defaults; and each hunk in `floor.txt`. Error handling whose failure and result a `story.md` example states and a test drives is not sensitive, even in `floor.txt`; list it.
 * **Surviving mutant:** a hunk holding one from `mutants.txt`, no-coverage included, with `Check:` naming it.
-* **Changed locked test:** each line of `locked.txt` other than `marker`, `undone` and `adds to existing`, with `Check: git show <commit> -- <file>`: did a person agree, and does the criterion still hold? Each `adds to existing` line, with the same check: does an added line run inside an existing test or change what one reads?
+* **Changed locked test:** each line of `locked.txt` other than `marker` and `undone`, with `Check: git show <commit> -- <file>`: did a person agree, and does the criterion still hold?
 * **Key decision:** a hunk making a choice `story.md` does not state, such as a new type, stored shape, dependency or condition, or carrying a decision of `design.md`. With none, the hunk that delivers criterion 1.
 
 ## Pick the tier

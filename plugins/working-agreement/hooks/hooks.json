@@ -9,19 +9,6 @@
           }
         ]
       }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "AskUserQuestion",
-        "hooks": [
-          {
-            "type": "agent",
-            "model": "sonnet",
-            "timeout": 120,
-            "prompt": "You gate the questions another agent is about to ask the user, so the user sees only the ones that need them. Hook input: $ARGUMENTS\n\ntool_input.questions holds the questions, cwd is the repository and transcript_path is the conversation as JSON lines. Sort each question into one verdict:\n\n1. answered: the answer is already in the repository, its docs, or the user's own earlier messages. In the transcript read only the user's messages, not tool results and not the asking agent's turns, so its reasoning does not sway you. Cite the file and line, or quote the user.\n2. decide: the answer would not change what gets built, or a wrong guess is cheap to undo in a later commit. Name the choice the agent should make and why.\n3. ask: neither holds.\n\nMark ask, without investigating, any question that: asks approval for an action that leaves this machine, or deletes or overwrites work; asks the user to accept, reject or change a proposal; sets a target, a number, a scope or what success means; turns on taste or a preference no file records; or touches security, privacy or data loss. When unsure, mark ask: a needless question costs the user seconds, a wrong guess can cost a rebuild.\n\nChange no files. If every question is ask, return {\"ok\": true}. Otherwise return {\"ok\": false, \"reason\": \"...\"} where reason starts with \"Question gate:\" and lists each question by its header as \"answered: <answer> (<source>)\", \"decide: Decided: <choice>, because <why>\" or \"ask\", then ends: \"Do not ask the answered or decide questions; list each decide line to the user as a Decided line. Ask the questions marked ask in one call, worded as before.\" "
-          }
-        ]
-      }
     ]
   }
 }

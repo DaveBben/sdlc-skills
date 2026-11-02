@@ -4,8 +4,7 @@ Optional house rules for how the agent works with you, added to every session. I
 
 ## What runs in a session
 
-* **The rules.** At session start, and again after `/clear` or a compaction, a hook prints [`hooks/working-agreement.md`](hooks/working-agreement.md) into the context: 609 words and 3,427 characters, about 857 tokens at 4 characters a token.
-* **The question gate.** Before each `AskUserQuestion` call, a Sonnet subagent with read-only tools sorts every question: *answered* from the repository or your own earlier messages, with its source; *decide*, when the answer would not change what gets built or is cheap to undo, returned as a `Decided:` line; or *ask*. Only *ask* questions reach you. Approvals, proposals to accept or reject, targets, taste and security always reach you, and an unsure verdict is *ask*. Each question costs a subagent run and up to 2 minutes; questions written in plain text skip the gate.
+* **One hook.** At session start, and again after `/clear` or a compaction, it prints [`hooks/working-agreement.md`](hooks/working-agreement.md) into the context: 609 words and 3,427 characters, about 857 tokens at 4 characters a token.
 * **No skills.** A loaded skill's own rules win where they differ, such as `story`'s options asked as equals.
 
 ## The rules
@@ -21,4 +20,4 @@ claude plugin marketplace add DaveBben/sdlc-skills
 claude plugin install working-agreement@sdlc-skills
 ```
 
-Other agents: paste `hooks/working-agreement.md` into your `AGENTS.md` or global instructions file. The question gate is a Claude Code hook and has no equivalent there.
+Other agents: paste `hooks/working-agreement.md` into your `AGENTS.md` or global instructions file.

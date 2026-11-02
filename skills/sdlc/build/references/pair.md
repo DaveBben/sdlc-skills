@@ -8,7 +8,7 @@ When they hand it to you:
 
 1. **Commit their saved work** before any edit of yours. First each change to a locked test, alone, its message naming the test, its file, the criterion and `agreed: the person's own edit`. Then each test file they added, alone, as a red commit. Then the rest.
 2. **State the intent** in one line. Where no example covers code they wrote, give its Given and When in real values and ask "then what?". Never fill the Then from their code. Add their answer to the criteria.
-3. **Drive test-first** to the next example. Commit its failing test alone, by the `red-tests` skill, under the framework's strict expected-fail marker where it has one, as a red commit; then the code that passes it, removing the marker.
+3. **Drive test-first** to the next example. Commit its failing test alone, under the framework's strict expected-fail marker where it has one, as a red commit; then the code that passes it, removing the marker. Put your tests and fixtures in new test files.
 
 ## Handing it back
 
