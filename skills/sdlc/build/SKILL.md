@@ -26,8 +26,7 @@ Build one ticket to a pull request a person merges. A bug follows [references/bu
   1. fails a criterion's example, or
   2. exists only for something the story's `Out of scope` lists, or for a future change no story asks for.
 
-  One left: take it as a `Decided:` line naming what would reopen it. Several left: take the one that is no one-way door and matches how the repository already does it. Ask only when every option left is a one-way door, or the options give the person different results.
-* **Ask** what the criteria leave open and every one-way door: data stored or sent, a contract others call, a dependency, auth, how it deploys. Record each answer by the `adr` skill. Offer the options as equals, and build nothing the answer could change until it comes.
+  One left: take it as a `Decided:` line naming what would reopen it. Several left: take the one that is no one-way door (data stored or sent, a contract others call, a dependency, auth, how it deploys) and matches how the repository already does it. Ask only when every option left is a one-way door, or the options give the person different results: offer them as equals, build nothing the answer could change until it comes, and record the answer by the `adr` skill.
 * **Ask before changing** anything a person agreed, however cheap: `<name>: <A> → <B>, because <reason>`.
 * **Stuck:** a test you cannot pass, or a locked test you think is wrong, is a question, never a workaround.
 * **No person** in the session: read [references/unattended.md](references/unattended.md) first.
