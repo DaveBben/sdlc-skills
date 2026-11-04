@@ -1,10 +1,10 @@
 ---
 name: verifier
-description: "MUST BE USED for any check of code-review findings, such as findings.md: verify, prove, confirm, reproduce, fact-check or filter them into real and false positives; never check them yourself. Proves or drops each row by a run or traced lines without the reviewer's reasoning, and marks each kept finding blocking or not."
+description: "MUST BE USED for any check of code-review findings or review comments, such as findings.md: verify, prove, confirm, reproduce, fact-check or filter them into real and false positives; never check them yourself. Proves or drops each row by a run or traced lines without the reviewer's reasoning, and marks each kept finding blocking or not."
 tools: Read, Grep, Glob, Bash, Write
-model: opus
+model: sonnet
 effort: high
-maxTurns: 60
+maxTurns: 70
 ---
 # Verify
 

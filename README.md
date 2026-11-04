@@ -7,7 +7,7 @@ Agent skills that built on Extreme Programming (XP): stories, test-first, pairin
 - You write 3 to 5 acceptance criteria before any code is written. The agent first tells you how the existing code and decisions affect the change, then critiques what you wrote.
 - A small change with one visible result, such as a colour, skips the story: you write one `Done when:` line.
 - Tests come first, from your examples, and the agent can't change them to make its code pass.
-- Two ways to build: pair mode, where you take turns at the wheel, or autopilot, where the agent builds it alone.
+- Two ways to work: pair programming, where you steer each turn and the agent coaches, or autopilot, where the agent builds a story alone.
 - A fresh review of every change, each finding proved by a verifier before you see it.
 
 ## Install
@@ -30,11 +30,10 @@ Just ask for what you want. A routing hook at session start picks the skill.
 
 - "Write a PRD for an order-tracking app" agrees the north star every story is checked against.
 - "Add a CSV export to the orders page" starts a story.
-- "Let's pair on PAY-12" or "just build PAY-12" builds it.
+- "Let's pair on the billing calls" starts pair programming; "just build PAY-12" builds it on autopilot.
 - "The export times out past 10k orders" reproduces and fixes a bug.
-- "Review my branch" runs a review.
 
-Skills: prd, story, spec, spike, bug, chore, tracker, adr, build, red-tests, refactor and onboard. More detail in [plugins/sdlc](plugins/sdlc/README.md).
+Skills: prd, story, spec, spike, bug, chore, tracker, adr, build, pair-programming, tdd, refactor and onboard. More detail in [plugins/sdlc](plugins/sdlc/README.md).
 
 working-agreement is optional. It adds house rules for how the agent works with you, like one question at a time and plain explanations. See [plugins/working-agreement](plugins/working-agreement/README.md).
 

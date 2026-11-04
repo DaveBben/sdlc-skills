@@ -156,7 +156,7 @@ PHRASES = {
         "fix this regression in exportOrders",
         "the order count on the dashboard is wrong",
     ],
-    "red-tests": [
+    "tdd": [
         "write the failing tests for docs/stories/cancel-order.md",
         "write the tests first for cancelling an order",
         "red tests for the cancel order story",

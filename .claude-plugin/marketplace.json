@@ -4,13 +4,13 @@
   "owner": {
     "name": "DaveBben"
   },
-  "description": "One plugin for coding agents: sdlc takes a change from a story you agree to a reviewed pull request, in pair mode or on autopilot, and keeps a short AGENTS.md. An optional second, working-agreement, sets how the agent works with you.",
+  "description": "One plugin for coding agents: sdlc takes a change from a story you agree to a reviewed pull request, by pair programming or on autopilot, and keeps a short AGENTS.md. An optional second, working-agreement, sets how the agent works with you.",
   "plugins": [
     {
       "name": "sdlc",
       "source": "./plugins/sdlc",
-      "description": "Extreme Programming with an agent: you decide what gets built, as a PRD that holds the north star, user stories with acceptance criteria you agree, spikes, bug tickets, chores, specs and decision records, then build it in pair mode, taking turns at the wheel, or on autopilot, with failing tests first, a blind test challenger and one fresh review, to a pull request you merge, and keep a short AGENTS.md. At session start, a hook prints a routing list.",
-      "version": "1.4.0",
+      "description": "Extreme Programming with an agent: you decide what gets built, as a PRD that holds the north star, user stories with acceptance criteria you agree, spikes, bug tickets, chores, specs and decision records, then pair-program it with you steering, or build it on autopilot with failing tests first and a blind test challenger, through one fresh review to a pull request you merge, and keep a short AGENTS.md. At session start, a hook prints a routing list.",
+      "version": "1.5.0",
       "license": "MIT",
       "skills": [
         "./skills/prd",
@@ -22,7 +22,8 @@
         "./skills/adr",
         "./skills/spec",
         "./skills/build",
-        "./skills/red-tests",
+        "./skills/pair-programming",
+        "./skills/tdd",
         "./skills/refactor",
         "./skills/onboard"
       ],

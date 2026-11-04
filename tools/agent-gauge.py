@@ -30,7 +30,7 @@ from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gauge
 
-TARGET = 0.85
+TARGET = 0.90
 AGENTS = {"reviewer", "verifier", "test-challenger", "implementer"}
 SKILLS = False
 SCOUTS = {"Explore", "Plan", "claude-code-guide", "statusline-setup"}
@@ -79,13 +79,17 @@ def add_extras(mid):
     files = {
         "diff.patch": diff,
         "story.md": "# Cursor pagination\n\n1. Given 120 orders, when I export page 1, then I get 50 and nextCursor order_50.\n",
+        "locked.txt": "ok tests/orders.test.js unchanged\n",
         "findings.md": "1|orders.js|bug|src/orders.js:3|page undefined|query with ''|default cursor|none\n",
     }
     for rel, body in files.items():
         with open(os.path.join(review, rel), "w") as fh:
             fh.write(body)
-    gauge._git(mid, "add", "-A")
+    # keep src/orders.js uncommitted, and put the work on a branch off main, so there is a diff to review
+    gauge._git(mid, "add", "issues", "docs", ".review")
     gauge._git(mid, "commit", "-qm", "issues, ADRs, review directory")
+    gauge._git(mid, "checkout", "-qb", "story/101-cursor-pagination")
+    gauge._git(mid, "branch", "-f", "main", "HEAD~2")
 
 
 def run_one(case):

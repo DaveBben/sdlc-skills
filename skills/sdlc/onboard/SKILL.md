@@ -16,7 +16,7 @@ metadata:
 * **Commands** the repository does not make obvious, exact and copy-pasteable:
   * `Check:` runs at turn end, `Full check:` before a pull request, `Setup:` the install step a fresh checkout needs, and `Scheduled check:` the slow check a scheduled job runs.
   * How to run one test, and tool choices the agent would get wrong.
-* **Lines only a person writes:** `Build:`, the standing choice of pair mode or autopilot for the paths it names, such as `Build: pair for src/billing; otherwise autopilot`; and `Sensitive:`, the paths a person reads in every review, such as `Sensitive: src/billing/, migrations/`. Never draft or propose either. When `Sensitive:` is missing, ask once which paths, with no suggestions.
+* **A line only a person writes:** `Sensitive:`, the paths a person reads in every review, such as `Sensitive: src/billing/, migrations/`. Never draft or propose it. When `Sensitive:` is missing, ask once which paths, with no suggestions.
 * **Constraints no program checks,** each as its mechanism and what breaks: "the pool has 5 workers and a full pool returns 502 to every user", not "keep the pool safe".
 * **Traps,** one line each.
 * **Pointers:** a document the agent would not find, and when to read it, such as `Cross-repository ADRs:` or `docs/glossary.md`, read before naming code or tests.

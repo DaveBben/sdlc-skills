@@ -10,7 +10,7 @@ Write the body for a person who saw none of the build: nothing outside the repos
 ```markdown
 ## Why
 <2 to 4 sentences: the problem, why this approach, what it costs. Link the ticket, the spec and any ADR.>
-Built: <paired with a person | by the agent alone> · Person walked it back: <done | skipped, paired builds only>
+Built: <paired with a person | by the agent alone>
 
 ## Shortcomings
 - <gap>: fixed | filed #<n> | see Needs you
@@ -27,7 +27,7 @@ Built: <paired with a person | by the agent alone> · Person walked it back: <do
 ## Tests
 <n> added in <n> files. `<check command>` passes (<n> tests, <n>% coverage).
 Real check: `<command>` on <input>: <result> against <bar>, or none, <reason>.
-Tests from before the branch or written before the code, changed with a person's agreement: <hash> <file>: <why>, or none.
+Tests from before the branch or written before the code, changed with a person's agreement or by an unlock: <hash> <file>: <why>, or none.
 
 <details><summary>Agent decisions, test names, results of the check on changed tests</summary>
 

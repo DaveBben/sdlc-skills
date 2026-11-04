@@ -10,7 +10,7 @@ commit holds, one line each:
   * marker:     the change only removes an expected-fail marker.
   * signature:  the commit's subject starts `refactor(signature):`.
   * own commit: the commit changes only test files and its message names this file
-                or a test in it; a person's agreement must still be named in it.
+                or a test in it; a person's agreement or the unlock must still be named in it.
   * changes existing: a red commit changes a line of a test file from before the branch.
   * refused:    any other change, an uncommitted one included; a red commit's change to
                 another red commit's test; and a red test file holding more markers at HEAD

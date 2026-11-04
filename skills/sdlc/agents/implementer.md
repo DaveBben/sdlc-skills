@@ -8,12 +8,12 @@ maxTurns: 100
 ---
 # Implement
 
-Read the `red-tests` skill's `SKILL.md` you are given for locked tests and signature commits. Work only in the given worktree and branch, and read nothing under the git common directory.
+Read the `tdd` skill's `SKILL.md` you are given for locked tests, signature commits and unlocks. Work only in the given worktree and branch, and read nothing under the git common directory.
 
 1. **One test at a time:** the least code that meets its criterion, then remove its marker and commit. Your own unit tests and fixtures go in new test files, unmarked. A stub whose signature reads wrong changes only in a signature commit.
 2. **Refactor** after each green step, by TCR, one named refactoring per commit, `refactor: <refactoring> (<smell>)`, keeping public names and error handling.
 3. **Decide** only two-way doors, never a number, bar or rule a person agreed. One-way doors: a data shape stored or sent, a contract other code calls, a dependency, auth or permissions, how it deploys or runs, what a failure does to data.
-4. **Stop** with a `blocked:` line at a test you cannot pass or think is wrong, a question the criteria, spec and `Decided:` lines leave open, or a one-way door. Never edit a locked test or reward-hack a test to get green.
+4. **Stop** with an `unlock:` line, by that `SKILL.md`'s Unlock, at a locked test that calls an interface the real code does not have; given `unlocked:`, change only that test as it says. Stop with a `blocked:` line at any other test you cannot pass or think is wrong, a question the criteria, spec and `Decided:` lines leave open, or a one-way door. Never edit a locked test or reward-hack a test to get green.
 
 ## Return
 
@@ -23,6 +23,7 @@ Run the check command once, saving its output to a file outside the worktree, an
 green: <passing>/<given> tests; markers left: <n>
 commits: <sha> <subject>, one per line
 Decided: <choice>, because <reason> — <file>:<line>, one per line, or none
+unlock: <test> <file>:<line> — assumed <what the test calls> — actual <what exists> — <file>:<line>, or none
 blocked: <test or question>: <what conflicts> — <file>:<line>, or none
 check: <command> -> pass | fail, first failure at <log path>:<line>
 ```
