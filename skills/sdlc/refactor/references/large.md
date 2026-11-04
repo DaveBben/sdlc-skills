@@ -6,4 +6,3 @@ Keep the build releasable at every step by trunk-based development: each step it
 * **Branch by abstraction** for a dependency.
 * **Strangler fig** for a subsystem.
 * **The Mikado method** when the prerequisites are unknown.
-* **Hundreds of mechanical edits:** write a codemod or script, not hand edits.

@@ -1,14 +1,14 @@
 # Split work into stories
 
-For a request too big for one pull request a person can review, or a PRD with several outcomes.
+For a request too big for one reviewable pull request, or a PRD with several outcomes.
 
-1. **Read it all** first, with every document it links: the roles, outcomes, activities a person goes through in order, business rules, kinds of data, non-functional requirements, and non-goals. A gap or a contradiction is a question.
-2. **Map it** as a user story map, each step's must-have story first. Each gets a title and an outcome line.
-3. **Slice it:**
-   * **First story:** the thinnest path a real person can use end to end. For something new, the walking skeleton.
-   * **Too big:** split by the first of Lawrence's story-splitting patterns that works: workflow steps, operations, business rule variations, variations in data, interface variations, simple/complex. An unknown that blocks every pattern is a spike, by the `spike` skill.
-   * **Not too thin:** one medium story beats 5 thin ones, because each split adds a ticket, a review and a handoff. Split only what one reviewable pull request cannot hold, and merge slices no person would use apart.
-   * **Vertical slices only:** a story that only adds a table or an endpoint is not one. A non-functional requirement, an enabler or hardening is a criterion on the story that needs it.
-4. **Keep them independent:** block a story only by its feature's first story and what it truly waits on, with the reason; never for order alone. Two stories that would both need rewriting if one changed share a rule: give it to one.
+1. **Read it all,** with every document it links. A gap or a contradiction is a question.
+2. **Map it** as a user story map, each story a title and an outcome line.
+3. **Slice it** vertically:
+   * **First story:** the thinnest path a real person can use end to end; for something new, the walking skeleton.
+   * **Too big:** split by the first of Lawrence's story-splitting patterns that works. An unknown that blocks every pattern is a spike, by the `spike` skill.
+   * **Not too thin:** one medium story beats 5 thin ones. Split only what one reviewable pull request cannot hold, and merge slices no person would use apart.
+   * **A non-functional requirement, enabler or hardening** is a criterion on the story that needs it.
+4. **Keep them independent:** block a story only by its feature's first story and what it truly waits on, with the reason, never for order alone. A rule two stories share goes to one.
 5. **Check coverage:** map each requirement to a story, a criterion, an `Out of scope` line or an open question, and show the leftovers.
-6. **Agree it:** show the map, then ask the first story and each dependency with its reason, one question each, before filing them. Write criteria for the first story only, by create.md; each later one gets them by refine.md when it starts.
+6. **Agree it:** show the map, then ask the first story and each dependency with its reason, one question each, before filing. The first story gets its criteria now by create.md; each later one by refine.md when it starts.

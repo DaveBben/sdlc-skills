@@ -1,12 +1,13 @@
 # Create a spec
 
-1. **Read the ground:** the story with its criteria and comments, through the `tracker` skill when it is an issue; the code it lands on and its tests; each ADR in force under `docs/adr/`; and `AGENTS.md`.
+The person designs; you show them what affects the design and critique it.
+
+1. **Show what affects it:** read the story, the code it lands on, its tests, each ADR in force and `AGENTS.md`. Tell the person in plain sentences how what is already built or decided shapes the design, each with its `file:line`. Effects only, never an approach.
 2. **Size it** by SKILL.md, as a `Decided:` line.
-3. **Map the decisions as a tree (IBIS):** start with the decisions the others hang on, such as the interface contract or the unit stored. Each settled answer opens the decisions that hang off it; take those next, and close a branch once only minor, easily reversible choices remain. Write each answer into its section of full.md, in the sections the size keeps. After each answer, show the tree: each decision under the one it hangs off, marked settled, open or `Decided:`.
-   * **Show your suggestion first,** as a worked example: the lines you would write, why they fit, and the source of each why: the story or their words, a `file:line`, an ADR, or `(guess)`.
-   * **Ask** each decision, one per question, through the question tool, such as AskUserQuestion: your suggestion, one or two real alternatives each with its trade-off, and Modify. When they pick another, say in one line what it changes.
-   * **Decide** a choice that is easy to reverse and the code settles, and write it as `Decided: <choice>, because <reason>` instead of asking.
-   * **A gap in the story,** such as a failure no criterion states, goes to the story's open questions by the `story` skill.
-   * **Fading:** once they pick an alternative or a Modify as sound as yours on a kind of decision, ask for their approach before showing yours.
-4. **Ask what was missed:** "Is there a decision, risk or section we have not considered?" Work each one they name like step 3.
-5. **Attach it** by SKILL.md, offer each decision costly to reverse to the `adr` skill, and hand the story to the `build` skill, or back to it when it sent you here.
+3. **Map the decisions as an IBIS tree,** those the others hang on first, such as the contract or the unit stored. Close a branch once only easily reversible choices remain. Write each answer into its section of full.md, and after each, show the tree marked settled, open or `Decided:`.
+   * **Their approach first:** for each decision costly to reverse, ask the person for theirs, one per question. A part they cannot answer yet they write as `unknown:`; give it 2 or 3 real options with their trade-offs, as equals.
+   * **Critique it:** what it breaks among the facts from step 1, a failure it leaves unhandled, code it duplicates, a criterion it misses, a decision it leaves open, each with its source: a criterion, a `file:line`, an ADR or `(guess)`. They revise until none remain.
+   * **Decide** a choice that is easy to reverse and the code settles: `Decided: <choice>, because <reason>`.
+   * **A gap in the story,** such as a failure no criterion states, goes to its open questions by the `story` skill.
+4. **Ask what was missed,** and work each one they name like step 3.
+5. **Attach it** by SKILL.md, record each decision costly to reverse by the `adr` skill, then hand the story to the `build` skill.

@@ -22,14 +22,14 @@ Say "let's pair on X" or "just build X", or write a `Build:` line in `AGENTS.md`
 | Step | Who | What happens |
 |---|---|---|
 | Route | the routing list | It is a change to what the product does, so `story` |
-| Criteria | you decide | Each criterion, one at a time, as Accept, Reject or Modify, with the agent's reason and its source; then whether any was missed |
-| Spec | you decide | Its size, then each decision as a tree, the ones others hang on first, the agent's suggestion shown beside the alternatives |
+| Criteria | you write | The agent says how the existing login code and ADRs affect the story. You write 3 to 5 criteria; it critiques them until no finding remains, then asks whether any was missed |
+| Spec | you design | Its size, then each costly decision as a tree, the ones others hang on first: your approach, then the agent's critique. `unknown:` gets options |
 | Build | agent at the wheel | Branches, writes a failing test for the 5th failed login, makes it pass, commits |
 | You take it | you | The agent gives `Changed:`, `Decided:` and `Next:`. You add an unlock after 15 minutes, with no test |
 | It takes it back | agent | No criterion covers the unlock, so it asks `Intent: given 5 failed logins, the last at 10:00, when the right password is entered at 10:15, then what?`. Your answer joins the criteria |
 | Challenge | test challenger | Without reading the code, adds a test that 5 failed logins on one account leave another account open |
 | Teach-back | you | You walk a login from the route to the counter. The agent names the step you skipped: a successful login resets the counter |
 | Review | router, 3 reviewers, verifier | Authentication is sensitive, so 3 reviewers. Your reading list opens on the counter's hunk |
-| Pull request | you merge | `Build: pair`, and your decisions under `Decided by people` |
+| Pull request | you merge | `Built: paired with a person`, and your decisions under `Decided by people` |
 
 `review`, `red-tests`, `refactor`, `adr` and `onboard` also work installed alone. `review` and `red-tests` need the 6 agents installed as subagents: the skills name none, so the harness picks each by its description.

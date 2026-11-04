@@ -1,12 +1,11 @@
 # Pull request body
 
-Write the body for a person who saw none of the build. It says what changed and why, what the change gives up, what the person must do and what to read first. It names nothing outside the repository and the pull request, such as review rows, mutant numbers or a story's line numbers, and no term this plugin coins, such as red commit, marker or holdout.
+Write the body for a person who saw none of the build: nothing outside the repository and the pull request, and no term this plugin coins, such as red commit, marker or holdout.
 
-* **Each fact once:** another section points to it instead of repeating it.
 * **Under 40 lines outside `<details>`:** when it cannot fit, ask the person whether to split the change.
 * **Rewrite, never append:** at every push, rewrite the body against the final diff. A person's answer replaces the line it reverses.
 * **Each shortcoming ends one of three ways:** fixed, filed by the `bug` skill with its issue number, or asked under `Needs you`.
-* **Read first:** at most 8 of the review's reading-list hunks, riskiest first. The full list goes in `<details>`.
+* **Read first:** at most 8 reading-list hunks, riskiest first; the rest in `<details>`.
 * **Decided by people:** only choices that change the ticket, a locked test, or something costly to reverse. The agent's `Decided:` lines go in `<details>`.
 
 ```markdown
@@ -23,7 +22,7 @@ Write the body for a person who saw none of the build. It says what changed and 
 - [ ] After deploy: <check, with its pass bar>
 
 ## Read first
-Tier: <short-read | full-read | split, n lines> · Build: <pair | autopilot> · Teach-back: <done | skipped, pair only>
+Reading: <the hunks below suffice | read the whole change | split it first>, <n> lines · Built: <paired with a person | by the agent alone> · Person walked it back: <done | skipped, paired builds only>
 1. `<file>:<lines>`: <what to confirm, and what happens if it is wrong>
 
 ## Decided by people
@@ -31,9 +30,10 @@ Tier: <short-read | full-read | split, n lines> · Build: <pair | autopilot> · 
 
 ## Tests
 <n> added in <n> files. `<check command>` passes (<n> tests, <n>% coverage).
-Locked tests changed with a person's agreement: <hash> <file>: <why>, or none.
+Real check: `<command>` on <input>: <result> against <bar>, or none, <reason>.
+Tests from before the branch or written before the code, changed with a person's agreement: <hash> <file>: <why>, or none.
 
-<details><summary>Full reading list, agent decisions, test names, locked-tests lines</summary>
+<details><summary>Full reading list, agent decisions, test names, results of the check on changed tests</summary>
 
 <each as given>
 </details>

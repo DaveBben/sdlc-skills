@@ -7,23 +7,23 @@ metadata:
 ---
 # Spec
 
-A spec says how one agreed story gets built: the decisions, contracts, failure handling and rollout its criteria leave open. It never restates the story; it cites criteria by number, such as AC2.
+A spec says how one agreed story gets built: the decisions, contracts, failure handling and rollout its criteria leave open. It cites criteria by number, such as AC2, and never restates them.
 
 ## Size it to the story
 
-Use risk-driven design. Estimate the lines of code the story produces, then pick the smallest size that holds:
+Risk-driven design: estimate the lines of code the story produces, then pick the smallest size that holds:
 
-* **None:** no section holds a decision or a risk, such as one module following the pattern beside it. Write `Spec: none, <reason>` on the story.
-* **Short:** only the sections of [references/full.md](references/full.md) that hold a decision or a risk, a few lines each, and its `Promote before delete` list. It stays shorter than the code it produces: longer is a red flag, so cut it.
+* **None:** no section holds a decision or a risk. Write `Spec: none, <reason>` on the story.
+* **Short:** only the sections of [references/full.md](references/full.md) that hold a decision or a risk, and its `Promote before delete` list, shorter than the code it produces.
 * **Full:** every section of full.md, where `N/A, <reason>` is a complete answer. Required for a story that changes a contract another team or outside client consumes, migrates existing data, or ships in stages behind a flag, once its code would run longer than a full spec.
 
 ## Paths
 
 * **Create** one with the person: [references/create.md](references/create.md).
-* **Review** a spec someone wrote: check it against the rules above and each section against full.md, then report `<section>: <gap> — "<quoted text>" — <fix>`, a gap the story owns as a question for the story, and `Ready to build` when none remain. Change nothing without its owner's yes to that finding.
-* **Close** when the story closes: move each item on its `Promote before delete` list to its home, a decision record by the `adr` skill, tick it, then delete the spec.
+* **Review** a spec someone wrote against the rules above and full.md. Report `<section>: <gap> — "<quoted text>" — <fix>`, a gap the story owns as a question for it, and `Ready to build` when none remain. Change nothing without its owner's yes.
+* **Close** when the story closes: move each `Promote before delete` item to its home, a decision by the `adr` skill, tick it, then delete the spec.
 
 ## Where it lives
 
-* **With a tracker:** one comment on the story's issue headed `## Spec`, edited in place, through the `tracker` skill.
+* **With a tracker:** one comment on the story's issue headed `## Spec`, edited in place, by the `tracker` skill.
 * **Without one:** a `## Spec` block in `docs/stories/<slug>.md`.

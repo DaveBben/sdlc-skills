@@ -7,11 +7,11 @@ metadata:
 ---
 # ADR
 
-An ADR records one decision costly to reverse, one a revert cannot undo, in one Markdown file: what was decided, why, and what it gave up. Write it when the decision is made.
+An ADR records one decision costly to reverse, one a revert cannot undo.
 
-* **Where:** `docs/adr/<decision-name>.md`, short and kebab-case, using the term from `docs/glossary.md` where there is one. A decision across repositories: ask the user where it goes every time, offering as an equal option the home a `Cross-repository ADRs:` line in an affected repository's `AGENTS.md` names, and add that line to each affected repository.
+* **Where:** `docs/adr/<decision-name>.md`, using the term from `docs/glossary.md` where there is one. Across repositories: ask where it goes every time, offering as an equal option the home an affected repository's `AGENTS.md` names on a `Cross-repository ADRs:` line, and add that line to each affected repository.
 * **In force:** committed, with no `Superseded by:` line and no `Status:` of rejected or deprecated. Read the titles of those in force before writing.
-* **Reasons are the user's:** never record a reason the user has not given, confirmed or deferred to. One a person wrote down, such as in a spec, counts: quote it. With no user in the session, ask on the work's issue through the `tracker` skill.
+* **Reasons are the user's:** never record one the user has not given, confirmed or deferred to; one a person wrote down counts: quote it. With no user in the session, ask on the work's issue by the `tracker` skill.
 * **Commit each ADR alone** on the current branch; on the default branch, create `adr/<decision-name>` first.
 
 ## Record a decision
@@ -20,11 +20,11 @@ By [references/create.md](references/create.md).
 
 ## Supersede a decision
 
-An accepted ADR is never rewritten; fix only a broken link in place. A changed, reversed or dropped decision gets a new ADR by create.md with `**Supersedes:** <old path>`, and the old one gains `**Superseded by:** <new path>` and nothing else. The new ADR's fitness function says whether the old one is replaced, kept or removed; change that test with the code change that breaks it, not in the ADR's commit.
+An accepted ADR is immutable but for a broken link. A changed, reversed or dropped decision gets a new ADR by create.md with `**Supersedes:** <old path>`; the old one gains only `**Superseded by:** <new path>`. Change the old fitness function with the code change that breaks it, not in the ADR's commit.
 
 ## Review ADRs
 
-Read those the user names, else every one in force. Past 10, have fresh subagents in parallel map them to one sourced row each, 5 ADRs per subagent with the code root, for the decision in one sentence, the components it touches, its `Supersedes:` and `Superseded by:` lines, and each finding below that needs only that ADR. Find contradictions and broken chains across the rows yourself, and read each quote before keeping its finding. Change nothing without the user's yes to that finding. Keep a finding only when quoted text or a `file:line` shows it:
+Read those the user names, else every one in force; past 10, map them in parallel, 5 per subagent with the code root, for the decision in one sentence, the components it touches, its supersede lines and each single-ADR finding below. Find contradictions and broken chains across the rows yourself. Keep a finding only when quoted text or a `file:line` shows it, and change nothing without the user's yes:
 
 * **No reasons,** or a why that restates the decision, or no rejected alternative.
 * **No working fitness function:** none, or a test or rule that does not exist.

@@ -8,7 +8,7 @@ maxTurns: 60
 ---
 # Verify
 
-You get nothing from the chat and no reasoning behind a row. You get the check command and the paths of `findings.md`, the tree (the code at the change's head), `diff.patch`, `story.md` and the checklist. Each row reads `<id>|<section>|<type>|<file>:<line>|<trigger>|<wrong>|<fix>|<support>`. Edit nothing in the tree and commit nothing; read no `design.md`; to run a changed version, use a worktree beside `findings.md`.
+You get no reasoning behind a row. Each row of `findings.md` reads `<id>|<section>|<type>|<file>:<line>|<trigger>|<wrong>|<fix>|<support>`. Edit nothing in the tree and commit nothing; read no `design.md`; to run a changed version, use a worktree beside `findings.md`.
 
 ## Check every row
 

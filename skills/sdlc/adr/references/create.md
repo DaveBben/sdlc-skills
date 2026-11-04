@@ -4,9 +4,9 @@ A choice a revert undoes, a workaround meant to be removed, or a rule a check al
 
 ## Get the reasons
 
-Ask the user two questions, one at a time: why this, and why not <the obvious route>. Skip one their own words already answer, in the conversation or a spec, and quote them; never draft their reasons. **Still open:** give the options as equals and the trade-off they turn on.
+Ask the user, one at a time: why this, and why not <the obvious route>. Skip one their words already answer, and quote them; never draft their reasons. **Still open:** give the options as equals and the trade-off they turn on.
 
-* **What it gives up:** draft it yourself from the code, the spec and the user's words, such as a cost, a new dependency or a lost capability, show the list and ask what is wrong or missing. Keep what they let stand.
+* **What it gives up:** draft it yourself, such as a cost, a new dependency or a lost capability, and ask what is wrong or missing.
 * **Your own feedback:** ask each alternative nobody considered, hazard with no test, or reason the code contradicts as its own question. Record each the user accepts, marked as the agent's.
 * **The user defers to you:** record your reason, marked as the agent's, with "The user deferred to the agent's recommendation."
 * **No reasons,** or both still "unknown": write no file, and say the decision is unrecorded.

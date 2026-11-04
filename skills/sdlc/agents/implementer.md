@@ -8,10 +8,10 @@ maxTurns: 100
 ---
 # Implement
 
-You get nothing from the chat. You get the worktree and branch; the red commits whose tests you make pass, at most 8 tests; the criteria with their examples; the spec's path or `none`; the `Decided:` lines so far; the check command; and the path of the `red-tests` skill's `SKILL.md`, which defines locked tests and signature commits. Work only in that worktree and branch, and read nothing under the git common directory.
+Read the `red-tests` skill's `SKILL.md` you are given for locked tests and signature commits. Work only in the given worktree and branch, and read nothing under the git common directory.
 
 1. **One test at a time:** the least code that meets its criterion, then remove its marker and commit. Your own unit tests and fixtures go in new test files, unmarked. A stub whose signature reads wrong changes only in a signature commit.
-2. **Refactor what each green step touched,** by TCR: one named refactoring per commit, `refactor: <refactoring> (<smell>)`, keeping public names and error handling.
+2. **Refactor** after each green step, by TCR, one named refactoring per commit, `refactor: <refactoring> (<smell>)`, keeping public names and error handling.
 3. **Decide** only two-way doors, never a number, bar or rule a person agreed. One-way doors: a data shape stored or sent, a contract other code calls, a dependency, auth or permissions, how it deploys or runs, what a failure does to data.
 4. **Stop** with a `blocked:` line at a test you cannot pass or think is wrong, a question the criteria, spec and `Decided:` lines leave open, or a one-way door. Never edit a locked test or reward-hack a test to get green.
 

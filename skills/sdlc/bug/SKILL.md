@@ -7,15 +7,14 @@ metadata:
 ---
 # Bug
 
-A bug is shipped behaviour that contradicts what the code was built to do: an acceptance criterion, a documented contract, a crash, an error the caller cannot act on, lost or exposed data, or a slowdown past a stated limit. A defect on a story's unmerged branch is unfinished work there; behaviour nobody built is a story. A bug is reproduced, filed and decided; it never waits open "for later".
+A bug is shipped behaviour that contradicts what the code was built to do, such as a criterion, a documented contract, a crash or lost data. A defect on an unmerged branch is unfinished work there; behaviour nobody built is a story. A bug is reproduced, filed and decided, never left open "for later".
 
 * **Contain first** when it loses or exposes data, or blocks a path for every user in production: tell the user at once, and ask, as equals, which step stops the harm: revert, turn off its flag or roll back.
 * **The reporter's guess:** when a person reports it here, ask once, as optional, for their guess at the cause, and start reproducing meanwhile.
-* **Issues** are read and written through the `tracker` skill.
 
 ## Report a bug
 
-1. **Reproduce** it at the lowest level that shows it, and record the exact output. Force an intermittent one's timing, seed or clock until it fails every run, and shrink a large input. Find the commit it entered by `git log -S` or `git bisect run` where cheap. Cannot reproduce: never fix blind; ask for the missing fact by name and stop.
+1. **Reproduce** it at the lowest level that shows it, with the exact output. Make an intermittent one deterministic and shrink a large input (delta debugging). Find the commit it entered by `git log -S` or `git bisect run` where cheap. Cannot reproduce: never fix blind; ask for the missing fact by name and stop.
 2. **Decide:**
    * **Fix now,** the default: the fix needs no answer from the user.
    * **Story,** by the `story` skill: the fix needs a product decision or changes more than the reproduction. Close the bug as `became #N`.
@@ -36,7 +35,7 @@ Escape: <by references/escape.md>
 ```
 
 4. **Find why it escaped** by [references/escape.md](references/escape.md), before the fix.
-5. **Fix** it, when decided fix now, with the `build` skill; else the ticket is the hand-off.
+5. **Fix now** by the `build` skill; else the ticket is the hand-off.
 
 ## Triage a backlog
 

@@ -31,7 +31,7 @@ The check command is the one a calling skill gives, else the `Full check:` or `C
 
 Run each step below but the merge in a fresh subagent, given only the paths and values listed, never this conversation.
 
-1. **Route the change,** before any reviewer, into a review tier and the person's reading list: the review directory, the tree, `diff.patch` and `story.md`. The author never grades its own risk. Drop none of its `reading-list.md`. For a file or module, the tier is `full-read` and the list is the file.
+1. **Route the change,** before any reviewer, into a review tier and the person's reading list: the review directory, the tree, `diff.patch` and `story.md`. Drop none of its `reading-list.md`. For a file or module, the tier is `full-read` and the list is the file.
 2. **Review it against the checklist:** one reviewer for a short read, else three at once. Give each its number, its order of the sections of [references/checklist.md](references/checklist.md) (`1,2,3,4,5,6,7,8,9`, `9,8,7,6,5,4,3,2,1`, `7,8,9,1,6,2,5,3,4`), the tree, `diff.patch`, `story.md`, the review directory, the checklist's path, the merge target and the red commits.
 3. **Merge** their `findings-<n>.md` into `findings.md`: rows naming the same line and wrong result become one; keep every other row; number them.
 4. **Verify the findings:** `findings.md`, the tree, `diff.patch`, `story.md`, the checklist's path and the check command.
