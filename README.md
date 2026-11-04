@@ -8,7 +8,7 @@ Agent skills that built on Extreme Programming (XP): stories, test-first, pairin
 - A small change with one visible result, such as a colour, skips the story: you write one `Done when:` line.
 - Tests come first, from your examples, and the agent can't change them to make its code pass.
 - Two ways to build: pair mode, where you take turns at the wheel, or autopilot, where the agent builds it alone.
-- A fresh review of every change, with a short reading list of the code you actually need to read before you merge.
+- A fresh review of every change, each finding proved by a verifier before you see it.
 
 ## Install
 
@@ -34,7 +34,7 @@ Just ask for what you want. A routing hook at session start picks the skill.
 - "The export times out past 10k orders" reproduces and fixes a bug.
 - "Review my branch" runs a review.
 
-Skills: prd, story, spec, spike, bug, chore, tracker, adr, build, red-tests, review, refactor and onboard. More detail in [plugins/sdlc](plugins/sdlc/README.md).
+Skills: prd, story, spec, spike, bug, chore, tracker, adr, build, red-tests, refactor and onboard. More detail in [plugins/sdlc](plugins/sdlc/README.md).
 
 working-agreement is optional. It adds house rules for how the agent works with you, like one question at a time and plain explanations. See [plugins/working-agreement](plugins/working-agreement/README.md).
 

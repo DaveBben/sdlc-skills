@@ -17,7 +17,7 @@ session ends.
 Usage:
     python3 tools/agent-gauge.py CASES.json                  # train split
     python3 tools/agent-gauge.py CASES.json --split holdout
-    python3 tools/agent-gauge.py CASES.json --only mapper,none --jobs 12
+    python3 tools/agent-gauge.py CASES.json --only reviewer,none --jobs 12
 """
 import argparse
 import json
@@ -31,7 +31,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gauge
 
 TARGET = 0.85
-AGENTS = {"router", "reviewer", "verifier", "test-challenger", "implementer", "mapper"}
+AGENTS = {"reviewer", "verifier", "test-challenger", "implementer"}
 SKILLS = False
 SCOUTS = {"Explore", "Plan", "claude-code-guide", "statusline-setup"}
 
@@ -79,11 +79,8 @@ def add_extras(mid):
     files = {
         "diff.patch": diff,
         "story.md": "# Cursor pagination\n\n1. Given 120 orders, when I export page 1, then I get 50 and nextCursor order_50.\n",
-        "reading-list.md": "tier: full-read\nsrc/orders.js:2-6: criterion 1\nCheck: the cursor query on an empty page\n",
         "findings.md": "1|orders.js|bug|src/orders.js:3|page undefined|query with ''|default cursor|none\n",
     }
-    for n in (1, 2, 3):
-        files[f"findings-{n}.md"] = f"{n}|orders.js|bug|src/orders.js:3|page undefined|query with ''|default cursor|none\n"
     for rel, body in files.items():
         with open(os.path.join(review, rel), "w") as fh:
             fh.write(body)

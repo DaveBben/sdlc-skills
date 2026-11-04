@@ -5,10 +5,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/skills/adr/scripts/adr_index.py\"; [ -f \"$f\" ] && command -v python3 >/dev/null 2>&1 || exit 0; python3 \"$f\""
-          },
-          {
-            "type": "command",
             "command": "cat \"${CLAUDE_PLUGIN_ROOT}/hooks/route.md\""
           }
         ]

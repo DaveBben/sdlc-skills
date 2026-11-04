@@ -5,12 +5,12 @@ Write the body for a person who saw none of the build: nothing outside the repos
 * **Under 40 lines outside `<details>`:** when it cannot fit, ask the person whether to split the change.
 * **Rewrite, never append:** at every push, rewrite the body against the final diff. A person's answer replaces the line it reverses.
 * **Each shortcoming ends one of three ways:** fixed, filed by the `bug` skill with its issue number, or asked under `Needs you`.
-* **Read first:** at most 8 reading-list hunks, riskiest first; the rest in `<details>`.
 * **Decided by people:** only choices that change the ticket, a locked test, or something costly to reverse. The agent's `Decided:` lines go in `<details>`.
 
 ```markdown
 ## Why
 <2 to 4 sentences: the problem, why this approach, what it costs. Link the ticket, the spec and any ADR.>
+Built: <paired with a person | by the agent alone> · Person walked it back: <done | skipped, paired builds only>
 
 ## Shortcomings
 - <gap>: fixed | filed #<n> | see Needs you
@@ -21,10 +21,6 @@ Write the body for a person who saw none of the build: nothing outside the repos
 - [ ] Before deploy: <step>
 - [ ] After deploy: <check, with its pass bar>
 
-## Read first
-Reading: <the hunks below suffice | read the whole change | split it first>, <n> lines · Built: <paired with a person | by the agent alone> · Person walked it back: <done | skipped, paired builds only>
-1. `<file>:<lines>`: <what to confirm, and what happens if it is wrong>
-
 ## Decided by people
 - <person>: <decision>
 
@@ -33,7 +29,7 @@ Reading: <the hunks below suffice | read the whole change | split it first>, <n>
 Real check: `<command>` on <input>: <result> against <bar>, or none, <reason>.
 Tests from before the branch or written before the code, changed with a person's agreement: <hash> <file>: <why>, or none.
 
-<details><summary>Full reading list, agent decisions, test names, results of the check on changed tests</summary>
+<details><summary>Agent decisions, test names, results of the check on changed tests</summary>
 
 <each as given>
 </details>
