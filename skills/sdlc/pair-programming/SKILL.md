@@ -28,4 +28,4 @@ You are the senior engineer in the pair. The goal is that they become a better e
 
 ## Ship
 
-When they want the change shipped, ask them for one `Done when:` line, then hand the branch to the `build` skill, which takes it from its check through review to a pull request.
+When they want the change shipped, hand the branch to the `build` skill with the ticket the session started from, else one `Done when:` line they write. `build` takes it from its check through review to a pull request.

@@ -1,6 +1,6 @@
 ---
 name: build
-description: "Use when agreed work such as a story file, a ticket or a triaged bug must be built, or a pair-programming branch shipped, such as 'implement story PAY-12' or 'just build X': builds it alone on autopilot, test-first, through one fresh review to a pull request."
+description: "Use when agreed work such as a story file, a ticket or a triaged bug must be built, or a pair-programming branch shipped, such as 'implement story PAY-12' or 'just build X': asks whether to pair or run autopilot unless told, then builds it test-first through one fresh review to a pull request."
 license: MIT
 metadata:
   version: "1.0.0"
@@ -10,7 +10,7 @@ metadata:
 Build one ticket to a pull request a person merges. A bug follows [references/bug.md](references/bug.md), a chore or refactoring [references/chore.md](references/chore.md), over any step below.
 
 1. **Criteria:** with neither criteria nor a `Done when:` line, the person writes them by the `story` skill.
-2. **From pairing:** a branch the `pair-programming` skill hands over, with its `Done when:` line, goes straight to step 5.
+2. **Mode:** from the request, else the ticket's comments, else `AGENTS.md`'s `Build:` line, else ask whether to pair or run autopilot, with no pick. To pair, run the `pair-programming` skill on the ticket. A branch it hands back goes straight to step 5.
 3. **Branch:** a worktree from main, `<story|bug|chore|refactor>/<key>-<title-words>`. Move its issue through In progress, In review and Testing.
 4. **Build** by [references/autopilot.md](references/autopilot.md).
 5. **Check:** run `AGENTS.md`'s `Full check:` or `Check:` line, else what CI runs. Except on a branch from pairing, run `python3 ../tdd/scripts/locked_tests.py <merge target> <each red commit>`; each `refused` line is a stop. Where the change reads real data or calls a real service, run it once on the newest real input, writing nothing live, against each criterion's bar.
@@ -22,6 +22,11 @@ Build one ticket to a pull request a person merges. A bug follows [references/bu
 ## Questions
 
 * **Decide** what a later edit undoes for free: `Decided: <choice>, because <reason>`.
+* **Before you ask, strike every option that:**
+  1. fails a criterion's example, or
+  2. exists only for something the story's `Out of scope` lists, or for a future change no story asks for.
+
+  One left: take it as a `Decided:` line naming what would reopen it. Several left: take the one that is no one-way door and matches how the repository already does it. Ask only when every option left is a one-way door, or the options give the person different results.
 * **Ask** what the criteria leave open and every one-way door: data stored or sent, a contract others call, a dependency, auth, how it deploys. Record each answer by the `adr` skill. Offer the options as equals, and build nothing the answer could change until it comes.
 * **Ask before changing** anything a person agreed, however cheap: `<name>: <A> → <B>, because <reason>`.
 * **Stuck:** a test you cannot pass, or a locked test you think is wrong, is a question, never a workaround.

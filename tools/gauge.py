@@ -55,7 +55,7 @@ PLUGIN_DIRS = [os.path.join(REPO, "plugins", p) for p in ("sdlc",)]
 TURNS = 12
 MODEL = None  # set from --model; None leaves the harness default
 OURS = {"prd", "onboard", "adr", "spike", "story", "bug", "refactor", "tdd",
-        "tracker", "review", "spec", "chore", "build"}
+        "tracker", "spec", "chore", "build", "pair-programming"}
 TARGET = 0.80  # suite passes at 80% or better
 
 FILES = {
@@ -222,11 +222,11 @@ def tuning_cases(fresh, mid, bare):
         ("Test whether switching the importer to async actually makes it faster.", "spike", fresh),
         ("I want to evaluate which embedding model fits our articles best.", "spike", fresh),
         ("Let's trial the pydantic library before we adopt it.", "spike", fresh),
-        # review: code, whoever wrote it
-        ("Review PR 412.", "review", fresh),
-        ("Is this merge request ready to merge?", "review", fresh),
-        ("Review my code in src/export.py.", "review", fresh),
-        ("Do a security review of this branch.", "review", fresh),
+        # code review left sdlc in 1.4.0: no sdlc skill may take it
+        ("Review PR 412.", None, fresh),
+        ("Is this merge request ready to merge?", None, fresh),
+        ("Review my code in src/export.py.", None, fresh),
+        ("Do a security review of this branch.", None, fresh),
         # chore: work nobody will notice
         ("Bump express to version 5.", "chore", fresh),
         ("Migrate our CI from Travis to GitHub Actions.", "chore", fresh),
@@ -243,17 +243,17 @@ def tuning_cases(fresh, mid, bare):
         ("Are these the right stories?", "story", fresh),
         ("Break story PAY-12 into subtasks for the team.", "story", fresh),
         # near-misses for the experiment wording: a known change, or a question
-        ("Refactor the export handlers to use a factory pattern.", "deliver", fresh),
+        ("Refactor the export handlers to use a factory pattern.", "refactor", fresh),
         ("What is the factory pattern?", None, fresh),
         # agile: any request to write, change or remove code in a system
-        ("I want to add rate limiting to the export endpoint.", "deliver", fresh),
-        ("I want to remove the order export module.", "deliver", fresh),
-        ("Add code to validate the order payload.", "deliver", fresh),
-        ("Modify the code so the export paginates with cursors.", "deliver", fresh),
-        ("Implement the CSV import feature.", "deliver", fresh),
-        ("Implement the CSV export story.", "deliver", fresh),
-        ("Build the next slice.", "deliver", mid),
-        ("Fix the bug where placeOrder ignores quantity.", "deliver", fresh),
+        ("I want to add rate limiting to the export endpoint.", "story", fresh),
+        ("I want to remove the order export module.", "story", fresh),
+        ("Add code to validate the order payload.", "story", fresh),
+        ("Modify the code so the export paginates with cursors.", "story", fresh),
+        ("Implement the CSV import feature.", "story", fresh),
+        ("Implement the CSV export story.", "build", fresh),
+        ("Build the next slice.", "build", mid),
+        ("Fix the bug where placeOrder ignores quantity.", "bug", fresh),
         # handoff: the session itself is the subject
         ("Create a handoff.", None, mid),
         ("Make a handoff.", None, mid),
@@ -301,11 +301,11 @@ def validation_cases(fresh, mid, bare):
         ("I want to try and see if I can find the best model for this approach", "spike", fresh),
         ("I want to test if adopting a factory pattern improves readability", "spike", fresh),
         ("Let's do a spike on the best approach to modeling the dataset", "spike", fresh),
-        ("can you look over the diff on my branch before i open the MR", "review", fresh),
-        ("take a look at !971 and tell me if its good to merge", "review", fresh),
+        ("can you look over the diff on my branch before i open the MR", None, fresh),
+        ("take a look at !971 and tell me if its good to merge", None, fresh),
         ("sanity check the stories under the export epic before we start", "story", fresh),
-        ("can you look over the diff on my branch before i open the MR", "review", fresh),
-        ("take a look at !971 and tell me if its good to merge", "review", fresh),
+        ("can you look over the diff on my branch before i open the MR", None, fresh),
+        ("take a look at !971 and tell me if its good to merge", None, fresh),
         ("sanity check the stories under the export epic before we start", "story", fresh),
         # chore
         ("node 18 goes end of life soon, get us onto 22 before then", "chore", fresh),
@@ -317,9 +317,9 @@ def validation_cases(fresh, mid, bare):
          "that hold up?", "spec", fresh),
         # agile
         ("the retry loop in src/db.js gives up after 3 tries, make it exponential "
-         "backoff with jitter capped at 30s", "deliver", fresh),
-        ("deleting a user leaves orphaned sessions lying around. sort it out", "deliver", fresh),
-        ("we need csv upload in the admin panel, my PM has been asking for weeks", "deliver", fresh),
+         "backoff with jitter capped at 30s", "story", fresh),
+        ("deleting a user leaves orphaned sessions lying around. sort it out", "bug", fresh),
+        ("we need csv upload in the admin panel, my PM has been asking for weeks", "story", fresh),
         # handoff
         ("im knackered, stopping for the day. capture where we got to including "
          "the two approaches that didnt work", None, mid),
