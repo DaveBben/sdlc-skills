@@ -15,9 +15,9 @@ Build one ticket to a pull request a person merges. A bug follows [references/bu
 4. **Build** by [references/autopilot.md](references/autopilot.md).
 5. **Check:** run `AGENTS.md`'s `Full check:` or `Check:` line, else what CI runs. Except on a branch from pairing, run `python3 ../tdd/scripts/locked_tests.py <merge target> <each red commit>`; each `refused` line is a stop. Where the change reads real data or calls a real service, run it once on the newest real input, writing nothing live, against each criterion's bar.
 6. **Review:** commit, then make a review directory, `<temp>/review-<timestamp>/`, holding `diff.patch` (`git diff --no-color <merge target>...HEAD`), `story.md` (the ticket and its criteria) and, except from pairing, `locked.txt` (step 5's locked-tests lines). Have one fresh subagent review it, given only the review directory, the worktree, the merge target and the red commits. Then have another verify its findings, given only its `findings.md`, the worktree, `diff.patch`, `story.md` and the check command. Fix each kept finding test-first, redo step 5 on the final diff, and remove the review directory.
-7. **Pull request** into main, titled `[<key>] <what it does, imperative>`, body by [references/pull-request.md](references/pull-request.md). Fix CI failures the same way, then wait. Never merge or push to main.
+7. **Pull request** into main, titled `[<key>] <what it does, imperative>`, body by [references/pull-request.md](references/pull-request.md). Fix CI failures the same way.
 8. **After merge:** remove the worktree and branch. Once in production, observe each criterion, read-only; close the ticket, its spec first by the `spec` skill, or hand a failure to the `bug` skill.
-9. **Retro** (After Action Review), each answer citing its evidence: what you assumed wrongly, what the person had to correct or supply, what cost the most time and which check would have caught it. Offer the ones worth keeping, in one multi-select question, as `AGENTS.md` facts by the `onboard` skill or as checks.
+9. **Retro** (After Action Review), each answer citing its evidence: what you assumed wrongly, what the person had to correct or supply, what cost the most time and which check would have caught it.
 
 ## Questions
 

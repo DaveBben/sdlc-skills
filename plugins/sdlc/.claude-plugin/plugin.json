@@ -1,6 +1,6 @@
 {
   "name": "sdlc",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "Extreme Programming with an agent: you decide what gets built, as a PRD that holds the north star, user stories with acceptance criteria you agree, spikes, bug tickets, chores, specs and decision records, then pair-program it with you steering, or build it on autopilot with failing tests first and a blind test challenger, through one fresh review to a pull request you merge, and keep a short AGENTS.md. At session start, a hook prints a routing list.",
   "license": "MIT",
   "author": {
