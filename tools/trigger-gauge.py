@@ -383,6 +383,18 @@ PHRASES = {
         "speed up CI, it takes 12 minutes",
         "replace the deprecated url.parse calls before node removes them",
     ],
+    "design": [
+        "write a design doc for the new analyzer service",
+        "I forgot the design we were building toward yesterday, what was it?",
+        "how should the new transcript analyzer fit with the tracker?",
+        "let's design the notifications system before we write any stories",
+        "review my design doc: docs/design/notifications.md",
+        "I want to sketch the architecture for the reporting pipeline first",
+        "we keep changing our minds on the sync service design, write it down",
+        "what parts would a multi-tenant version need and how do they connect?",
+        "help me think through the design for moving exports to a background worker",
+        "pick up the design doc for the search project where we left off",
+    ],
     "spec": [
         "write the spec for the cancel order story",
         "spec out docs/stories/cancel-order.md",

@@ -33,7 +33,7 @@ Just ask for what you want. A routing hook at session start picks the skill.
 - "Let's pair on the billing calls" starts pair programming; "just build PAY-12" builds it on autopilot.
 - "The export times out past 10k orders" reproduces and fixes a bug.
 
-Skills: prd, story, spec, spike, bug, chore, tracker, adr, build, pair-programming, tdd, refactor and onboard. More detail in [plugins/sdlc](plugins/sdlc/README.md).
+Skills: prd, story, design, spec, spike, bug, chore, tracker, adr, build, pair-programming, tdd, refactor and onboard. More detail in [plugins/sdlc](plugins/sdlc/README.md).
 
 working-agreement is optional. It adds house rules for how the agent works with you, like one question at a time and plain explanations. See [plugins/working-agreement](plugins/working-agreement/README.md).
 
