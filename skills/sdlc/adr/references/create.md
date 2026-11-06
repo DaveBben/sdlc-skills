@@ -1,14 +1,14 @@
 # Record a decision
 
-A choice a revert undoes, a workaround meant to be removed, or a rule a check already enforces is not an ADR unless the user asks: say so and write nothing. One decision per file.
+A choice a later edit undoes for free, a workaround meant to be removed, or a rule a check already enforces is not an ADR unless the user asks: say so and write nothing. One decision per file.
 
 ## Get the reasons
 
-Ask the user, one at a time: why this, and why not <the obvious route>. Skip one their words already answer, and quote them; never draft their reasons. **Still open:** give the options as equals and the trade-off they turn on.
+First state how the ADRs in force and the code constrain this decision, each with its `file:line`. Then ask the user, one at a time: why this, and why not <the obvious route>. Skip one their words already answer, and quote them; never draft their reasons. **Still open:** give the options as equals and the trade-off they turn on.
 
-* **What it gives up:** draft it yourself, such as a cost, a new dependency or a lost capability, and ask what is wrong or missing.
+* **What it gives up:** ask. Then add each cost the repository shows, with its `file:line`, as a critique.
 * **Your own feedback:** ask each alternative nobody considered, hazard with no test, or reason the code contradicts as its own question. Record each the user accepts, marked as the agent's.
-* **The user defers to you:** record your reason, marked as the agent's, with "The user deferred to the agent's recommendation."
+* **The user defers to you:** record your reason, marked as the agent's, with "The user deferred to the agent's recommendation.", once they say yes to the recorded text.
 * **No reasons,** or both still "unknown": write no file, and say the decision is unrecorded.
 
 ## Write it
@@ -30,4 +30,5 @@ Match this example's sections and density, and record only alternatives and fact
 ```
 
 * **Fitness function:** for a rejected alternative code could bring back, such as an import, a lint rule that fails on it. When nothing can detect it, write `none` and what to watch instead.
-* **Revisit when:** only for a decision resting on a guess or an unmeasured number: the observation that reopens it. One that accepts a hazard or follows an incident also gets `## The problem` and `## What it buys` sections.
+* **Revisit when:** only for a decision resting on a guess or an unmeasured number: the observation that reopens it. One that accepts a hazard opens its Decision with the problem in one sentence.
+* **One sentence** is enough for one alternative and one cost: "In the context of <situation>, facing <concern>, we decided for <option> and against <alternative>, to achieve <quality>, accepting <cost>. Fitness function: <check>."

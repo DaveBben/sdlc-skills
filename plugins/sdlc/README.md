@@ -9,8 +9,8 @@ Say "let's pair on X" or "just build X", or write a `Build:` line in `AGENTS.md`
 
 ## What runs in a session
 
-* **One hook.** At session start, [`hooks/route.md`](hooks/route.md) prints the routing list and when each engineering doc is due, 400 words, which sends each change request to `prd`, `bug`, `refactor`, `chore`, `spike`, `pair-programming`, `build`, `design`, `spec`, `adr` or `story`.
-* **Descriptions:** 14 skills and 4 agents, 6,933 characters, about 1,733 tokens at 4 characters a token. A skill's body loads only when a request matches it.
+* **One hook.** At session start, [`hooks/route.md`](hooks/route.md) prints the routing list and when each engineering doc is due, 458 words, which sends each change request to `prd`, `bug`, `refactor`, `chore`, `spike`, `pair-programming`, `build`, `design`, `spec`, `adr` or `story`.
+* **Descriptions:** 14 skills and 4 agents, 6,946 characters, about 1,736 tokens at 4 characters a token. A skill's body loads only when a request matches it.
 * **Rules read:** a pair-programming session reads 474 words of skill text in 16 lines. Autopilot's reads 1,899 words, or 2,307 when a choice costly to reverse also loads the `adr` skill.
 * **Subagents:** at review, 1 reviewer (Opus) and a verifier (Opus) that keeps only the findings it can prove. On autopilot, the test challenger (Sonnet) runs before the code, and an implementer (Sonnet) makes the failing tests pass, one launch at a time, and never sees the held-out tests. When a locked test calls an interface that turns out different, the session checks the implementer's unlock request, allows it in a commit of its own and re-locks the test, without asking you. Past 10 issues or ADRs, read-only subagents read them in parallel and return one sourced row each.
 * **With no person in the session,** such as a scheduled job, autopilot alone runs. Questions go to the story's contacts on its issue.

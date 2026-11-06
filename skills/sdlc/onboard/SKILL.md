@@ -11,7 +11,7 @@ metadata:
 
 ## What goes in
 
-* **Boundaries:** a `Boundaries:` line: each system, store and repository the product reads, writes or runs inside, in data-flow order, who owns each step and who writes each store it reads. Past 5 lines, redraw it with the user before the next story.
+* **Boundaries:** a `Boundaries:` line: each system, store and repository the product reads, writes or runs inside, in data-flow order, who owns each step and who writes each store it reads. Draft the systems and stores from the code, giving the user each one's `file:line`; the user names each owner. Edit it when a system, store or owner is added, removed or changes. Past 5 lines, or about 10,000 lines of code, move it with the user to a one-page `docs/ARCHITECTURE.md`, a codemap, its invariants and at most one diagram, and leave a Pointer.
 * **Project tracker:** the issue tracker's URL, when the team uses one.
 * **Commands** the repository does not make obvious, exact and copy-pasteable:
   * `Check:` runs at turn end, `Full check:` before a pull request, `Setup:` the install step a fresh checkout needs, and `Scheduled check:` the slow check a scheduled job runs.

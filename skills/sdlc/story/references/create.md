@@ -53,7 +53,7 @@ Measure: <the number that shows the `so that`>, read in <where>, now <value>, ta
 * **Terms:** each term the story coins or the reader may not know, defined once there, then used by that one name. Each new one the user confirms goes in `docs/glossary.md`.
 * **Examples:** the fewest rows that show the rule, one action each. A column per value that varies; a value every row shares goes in the criterion. Give results, not the arithmetic behind them. Boundaries go to the tests; missing data and ties get a one-line rule, not rows. `(checked by the user)` ends a result only an eye can judge; `changes: <old behaviour>` marks a changed one.
 * **Output:** a criterion about what the person sees shows one sample of it, such as a row of the list.
-* **Context:** what the reader needs to judge the story, never how it was found.
+* **Context:** what the reader needs to judge the story, never how it was found, and a link to the design doc it comes from.
 
 6. **Ask what was missed,** and critique each one they add like step 4.
 7. **Review it blind:** a fresh subagent, given only the story, the titles of stories already filed, and the Review path with this file and split.md, reviews it and changes nothing. Check each quote before giving its finding to the user to fix.

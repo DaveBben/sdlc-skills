@@ -16,7 +16,7 @@ Build one ticket to a pull request a person merges. A bug follows [references/bu
 5. **Check:** run `AGENTS.md`'s `Full check:` or `Check:` line, else what CI runs. Except on a branch from pairing, run `python3 ../tdd/scripts/locked_tests.py <merge target> <each red commit>`; each `refused` line is a stop. Where the change reads real data or calls a real service, run it once on the newest real input, writing nothing live, against each criterion's bar.
 6. **Review:** commit, then make a review directory, `<temp>/review-<timestamp>/`, holding `diff.patch` (`git diff --no-color <merge target>...HEAD`), `story.md` (the ticket and its criteria) and, except from pairing, `locked.txt` (step 5's locked-tests lines). Have one fresh subagent review it, given only the review directory, the worktree, the merge target and the red commits. Then have another verify its findings, given only its `findings.md`, the worktree, `diff.patch`, `story.md` and the check command. Fix each kept finding test-first, redo step 5 on the final diff, and remove the review directory.
 7. **Pull request** into main, titled `[<key>] <what it does, imperative>`, body by [references/pull-request.md](references/pull-request.md). Fix CI failures the same way.
-8. **After merge:** remove the worktree and branch. Once in production, observe each criterion, read-only; close the ticket, its spec first by the `spec` skill, or hand a failure to the `bug` skill.
+8. **After merge:** remove the worktree and branch. Once in production, observe each criterion, read-only; close the ticket, its spec first by the `spec` skill, and the design doc it links by the `design` skill's Built rule when it was the last story left, or hand a failure to the `bug` skill.
 9. **Retro** (After Action Review), each answer citing its evidence: what you assumed wrongly, what the person had to correct or supply, what cost the most time and which check would have caught it.
 
 ## Questions
@@ -26,7 +26,7 @@ Build one ticket to a pull request a person merges. A bug follows [references/bu
   1. fails a criterion's example, or
   2. exists only for something the story's `Out of scope` lists, or for a future change no story asks for.
 
-  One left: take it as a `Decided:` line naming what would reopen it. Several left: take the one that is no one-way door (data stored or sent, a contract others call, a dependency, auth, how it deploys) and matches how the repository already does it. Ask only when every option left is a one-way door, or the options give the person different results: offer them as equals, build nothing the answer could change until it comes, and record the answer by the `adr` skill.
+  One left: take it as a `Decided:` line naming what would reopen it. Several left: take the one that is no one-way door (data stored or sent, a contract others call, a dependency, auth, how it deploys, how the parts are split) and matches how the repository already does it. Ask only when every option left is a one-way door, or the options give the person different results: offer them as equals, build nothing the answer could change until it comes, and record a one-way-door answer by the `adr` skill, any other on the story.
 * **Ask before changing** anything a person agreed, however cheap: `<name>: <A> → <B>, because <reason>`.
 * **Stuck:** a test you cannot pass, or a locked test you think is wrong, is a question, never a workaround.
 * **No person** in the session: read [references/unattended.md](references/unattended.md) first.
