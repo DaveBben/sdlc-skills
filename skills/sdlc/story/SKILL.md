@@ -15,14 +15,14 @@ A story is one thing a person can do once a change ships, with 3 to 5 numbered a
 * **Refine** an agreed story not built yet: [references/refine.md](references/refine.md).
 * **Review** stories someone wrote against INVEST by create.md and split.md, and for a duplicate story or an abuse case no criterion states. Change nothing without its owner's yes, and report `<story>: <rule broken> — "<quoted text>" — <fix>`, then `Ready to build: <stories with no finding>`.
 * **Subtasks:** [references/subtasks.md](references/subtasks.md).
-* **Next story:** list the ready ones for the user to pick: with a tracker, by the `tracker` skill's Next story; without one, in build order, each with criteria and no open question, blocker, pull request or subtask assigned to a person.
+* **Next story:** list the ready ones, the first as your pick: with a tracker, by the `tracker` skill's Next story; without one, in build order, each with criteria and no open question, blocker, pull request or subtask assigned to a person.
 * **Measure** a story's `Measure:` line once its date passes: write the value and date on `Result:` and whether it met the target. A miss becomes new stories; a merged story never reopens. A result that contradicts a PRD goal is a change to the PRD, by the `prd` skill.
 
 ## Questions
 
 * **Easy to reverse,** such as who the contacts are: decide it as `Decided: <choice>, because <reason>`.
-* **Everything else that shapes the story** is the user's: the need, what a person can and cannot do, the business rules and each expected result.
-* **Ask** one decision per question, multiple-choice, options as equals and "I need to research this" last. Once they answer, give your pick in one line when it differs.
+* **Everything else that shapes the story** is the user's to write: the need, what a person can and cannot do, the business rules and each expected result. A concern about one they wrote is a critique, never a question.
+* **Ask** only what their words leave open, once, all of it in one message, each multiple-choice with "I need to research this" last. Lead with your pick; for a one-way door, such as stored data or a contract others call, give the options as equals and your pick after they answer.
 
 ## Where stories live
 

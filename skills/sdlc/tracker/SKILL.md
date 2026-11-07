@@ -8,15 +8,15 @@ metadata:
 # Tracker
 
 * **Find it** from the git remote, a tracker URL in `AGENTS.md` or the README, or the user's link; ask when none names one. Check an operation is supported before promising it; a read proves no write access.
-* **Credentials:** never ask for a token in chat or print one. Use the CLI's stored login (`gh auth status`, `glab auth status`, `tea login list`), an environment variable, or a macOS Keychain item the user names or approves, loaded into a variable. None found: name the scope needed and how to store it, then stop.
+* **Credentials:** never ask for a token in chat or print one. Use the CLI's stored login (`gh auth status`, `glab auth status`, `tea login list`), an environment variable, or a macOS Keychain item the user names or approves, loaded into a variable. None found: name the scope needed and how to store it, then stop. A token pasted in chat: use none of it, and note it is exposed and should be rotated.
 * **Per tracker,** its blocking relation, subtask relation, board placement and states: [references/github.md](references/github.md), [references/gitlab.md](references/gitlab.md), [references/gitea.md](references/gitea.md), [references/jira.md](references/jira.md). Read only the one in use.
 
 ## File an issue
 
-* **One issue** per story, bug, chore, spike or refactor. No epics or tracking issues: a feature is only its issues. The one child allowed is a subtask, by the tracker's subtask relation.
+* **One issue** per story, bug, chore, spike or refactor. No epics or tracking issues unless asked; asked, file one and note that a feature is only its issues, since an epic goes stale. The one child allowed is a subtask, by the tracker's subtask relation. A story with no criteria, or too big for one branch: file it and note why, by INVEST.
 * **Title and body:** the item's `Title:`, and its text minus what another field shows.
 * **Label** each with its kind, `story`, `bug`, `spike`, `refactor` or `chore`, created when missing, or the tracker's own bug or task type where it has one.
-* **Order and blocking:** file a feature's issues in build order. Block an issue by the tracker's relation, never prose, only on what it truly waits on, with the reason in a comment; never for order alone.
+* **Order and blocking:** file a feature's issues in build order. Block an issue by the tracker's relation, never prose, only on what it truly waits on, with the reason in a comment; asked to block for order alone, link it and note that build order is the filing order. A cycle, or a blocker filed after the issue it blocks, is a mistake: stop and say which.
 * **Boards:** never place an issue through a web route with session cookies.
 
 ## Read
@@ -29,7 +29,7 @@ metadata:
 
 ## Set a state
 
-Stories move through Draft, Todo, In progress, In review, Testing and Done. Map them to the team's flow by the `Story states:` line in `AGENTS.md`, such as `Story states: Draft=Backlog, Todo=Selected, In review=Code Review, Testing=QA, Done=Done`. Without one, map them to the tracker's statuses, columns or labels, ask about any with no match, and add the line, `-` for a state the flow lacks. Keep one state at a time; Done closes the issue. Change no workflow, column or shared label without the user's request.
+Stories move through Draft, Todo, In progress, In review, Testing and Done. Map them to the team's flow by the `Story states:` line in `AGENTS.md`, such as `Story states: Draft=Backlog, Todo=Selected, In review=Code Review, Testing=QA, Done=Done`. Without one, map them to the tracker's statuses, columns or labels, map any with no match to `-` as a `Decided:` line, and add the line. Keep one state at a time; Done closes the issue. Change no workflow, column or shared label without the user's request.
 
 ## Every write
 

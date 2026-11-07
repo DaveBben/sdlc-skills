@@ -18,7 +18,7 @@ metadata:
 1. **Name** the tests in `docs/glossary.md`'s terms where it exists. Run that area's tests once.
 2. **List** one test per example row, plus one each side of each boundary a criterion's rule states, and no other: `<n>. <criterion> — <test name> — <fixture values> — rejects: <a plausible wrong implementation this fixture fails>`.
 3. **Write** each through the interface, at the lowest level that shows its result. Never invent a public name.
-   * **Expected values** come from the criterion's words, never from what the code does now.
+   * **Expected values** come from the criterion's words, never from what the code does now. An example that contradicts its criterion's rule goes on `Questions:`, quoting both.
    * **Sociable tests** on production's database engine: double only an outside service, the clock and randomness, preferring the repository's own fake.
    * **Fixtures a wrong implementation fails:** several items with the odd one in the middle, a distinct value per field, no identity values such as quantity 1 or discount 0, unsorted input, more rows than a page, and a unique key per test. An error test asserts the state left behind, not only the raise. Poll with a deadline; never sleep.
    * **Assertions** on exact values a caller sees.
@@ -29,7 +29,7 @@ metadata:
 
 ## Challenge
 
-Have a fresh subagent challenge the tests blind, given the criteria, the worktree and branch, the interface commit or `none`, the red commit, this file's path and, before any code exists, the holdout directory `<git common dir>/holdout/<branch>/`. Ask each `Disagrees:` line as which reading holds, giving both.
+Have a fresh subagent challenge the tests blind, given the criteria, the worktree and branch, the interface commit or `none`, the red commit, this file's path and, before any code exists, the holdout directory `<git common dir>/holdout/<branch>/`. Settle each `Disagrees:` line the criterion's words or examples decide, as a note. Ask only one both readings fit, your pick first.
 
 * **Holdout:** never read that directory before the whole suite passes. Then copy its files in at the same paths, commit them alone as a red commit, run them, and remove each marker as its test passes. A failure is a fault in the code.
 
@@ -37,7 +37,7 @@ Have a fresh subagent challenge the tests blind, given the criteria, the worktre
 
 An implementer that meets a locked test calling an interface the real code does not have returns `unlock: <test> <file>:<line> — assumed <what the test calls> — actual <what exists> — <file:line showing it>`. Settle it yourself; the person is not asked.
 
-1. **Check it deserves it:** grant only when the criterion and every expected value, assertion and fixture value stay as written, and only how the test reaches the code changes: a name, a signature, an import, an argument's shape or a fixture's setup. The evidence must be code from before the branch, the spec or an ADR. When it is code the branch wrote, the code changes to fit the test. Anything else is a `blocked:` line.
+1. **Check it deserves it:** grant only when the criterion and every expected value, assertion and fixture value stay as written, and only how the test reaches the code changes: a name, a signature, an import, an argument's shape or a fixture's setup. The evidence must be code from before the branch, the spec, an ADR, or a release note for a call or setup change a dependency upgrade forces. When it is code the branch wrote, the code changes to fit the test. Anything else is a `blocked:` line.
 2. **Allow:** launch the implementer again with `unlocked: <test> <file>`. It changes only that test's call or setup, alone in a commit whose subject is `test(unlock): <test> — <assumed> → <actual>` and whose message names the file and `agreed: unlock, <evidence file:line>`.
 3. **Re-lock:** read that commit's diff: no expected value, assertion or fixture value changed, and no test removed, skipped or marked. Run `python3 scripts/locked_tests.py <merge target> <each red commit>`; the commit must read `own commit`. The test is locked again from the next commit. When either check fails, revert the commit and treat the request as a `blocked:` line.
 
@@ -48,5 +48,5 @@ Red: <hash>; tests: <paths>; <n> failing, <n> already passing; marker: <marker, 
 Tests: <the numbered list>
 Changes existing: <test — criterion>, or "none"
 Doubles: <each double and why the real one cannot run>, or "none"
-Questions: <criterion — what must be decided>, or "none"
+Questions: <criterion — what must be decided — your pick>, or "none"
 ```

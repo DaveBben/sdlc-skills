@@ -3,7 +3,7 @@
 A chore's criteria are its done-when and every existing test passing unchanged.
 
 * **No interface, red tests or challenge.** Run the check command first and note any test already failing on main. Where no test covers code the chore can affect, commit characterization tests first, alone: the chore's red commit.
-* **Existing tests stay as written.** A syntax change the chore forces, or deleting a test of code the chore removes, is a question first; once agreed, it goes in its own commit naming each test, its file and that agreement.
+* **Existing tests stay as written.** A syntax change the chore forces is an unlock by the `tdd` skill, its evidence the release note. Deleting a test of code the chore removes is a question first; once agreed, it goes in its own commit naming each test, its file and that agreement.
 * **Small steps,** the check after each:
   * **A dependency or runtime:** read the release notes for every version crossed; cross at most one major version.
   * **CI, build or config:** use a parallel run where the system allows.

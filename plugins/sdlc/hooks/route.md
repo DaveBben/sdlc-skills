@@ -12,10 +12,12 @@ For a request to change software, load the skill that fits first:
 * **How an agreed story gets built:** the `spec` skill.
 * **A decision that gets costly to reverse once code or data builds on it,** such as a stored format, a contract or a dependency: the `adr` skill, when it is made.
 * **A new product, or its vision, goals, users or non-goals:** the `prd` skill.
-* **A change with one visible result,** such as a colour, a label, a timing or a config value: the `build` skill, with a one-line `Done when:` the person writes instead of a story.
+* **A change the request already states item by item,** such as a colour, a config value, or which tables and views to drop and add: the `build` skill, with the request's items as its `Done when:` lines instead of a story. An item it leaves open, such as how a new view ranks rows, is build's question.
 * **Otherwise, a change to what the product does:** the `story` skill.
 
 Where the product has a PRD, first name the goal the request serves, by the `prd` skill's Check path.
+
+**Do what the person asked, and speak up as you go:** a concern about their choice is a one-line note with your fix and the name of the idea, and the work goes on. Stop to ask only for a gap you cannot fill, a one-way door, or a choice that contradicts their own stated goal.
 
 # Engineering docs: when each is due
 

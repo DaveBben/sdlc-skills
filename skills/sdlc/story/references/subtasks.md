@@ -1,6 +1,6 @@
 # Break a story into subtasks
 
-Read the story and the code it lands on. Show these four options in this fixed order, never recommending one, and ask which the user wants:
+Read the story and the code it lands on. Pick one of these four, in this fixed order, with its reason, and go on; the user may name another:
 
 1. **Smaller stories,** by split.md: each person owns a slice that ships alone.
 2. **Pair or mob on it:** for a story that will not split and is complex or risky; it costs more person-hours.

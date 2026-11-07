@@ -5,7 +5,7 @@ Agent skills that built on Extreme Programming (XP): stories, test-first, pairin
 ## What you get
 
 - You write 3 to 5 acceptance criteria before any code is written. The agent first tells you how the existing code and decisions affect the change, then critiques what you wrote.
-- A small change with one visible result, such as a colour, skips the story: you write one `Done when:` line.
+- A change your request already spells out item by item, such as a colour or the tables to drop, skips the story: its items become the `Done when:` lines.
 - Tests come first, from your examples, and the agent can't change them to make its code pass.
 - Two ways to work: pair programming, where you steer each turn and the agent coaches, or autopilot, where the agent builds a story alone.
 - A fresh review of every change, each finding proved by a verifier before you see it.

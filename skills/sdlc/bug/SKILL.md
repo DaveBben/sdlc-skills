@@ -7,10 +7,10 @@ metadata:
 ---
 # Bug
 
-A bug is shipped behaviour that contradicts what the code was built to do, such as a criterion, a documented contract, a crash or lost data. A defect on an unmerged branch is unfinished work there; behaviour nobody built is a story. A bug is reproduced, filed and decided, never left open "for later".
+A bug is shipped behaviour that contradicts what the code was built to do, such as a criterion, a documented contract, a crash or lost data. A defect on an unmerged branch is unfinished work there; behaviour nobody built is a story: say so in one line, naming it a feature request rather than a bug. A bug is reproduced, filed and decided, never left open "for later".
 
-* **Contain first** when it loses or exposes data, or blocks a path for every user in production: tell the user at once, and ask, as equals, which step stops the harm: revert, turn off its flag or roll back.
-* **The reporter's guess:** when a person reports it here, ask once, as optional, for their guess at the cause, and start reproducing meanwhile.
+* **Contain first** when it loses or exposes data, or blocks a path for every user in production: tell the user at once with the step you'd take to stop the harm (revert, turn off its flag or roll back), and take it on their yes.
+* **The reporter's guess:** when a person reports it here, unless the report already gives a guess, ask once, as optional, for their guess at the cause, and start reproducing meanwhile.
 
 ## Report a bug
 
@@ -39,7 +39,7 @@ Escape: <by references/escape.md>
 
 ## Triage a backlog
 
-Read the open bugs by the user's label or query, else `bug`; past 10, map them by the `tracker` skill for title, reproduction, severity, the reporter's guess and the last comment. Ask one question per bug, with `duplicate of #N` and `cannot reproduce: ask for <fact>` beside the three decisions as equals, reproducing only where the answer turns on it. Find the escape once per group in one file or of one kind. Apply each answer, then show `| Issue | Decision | Escape |`.
+Read the open bugs by the user's label or query, else `bug`; past 10, map them by the `tracker` skill for title, reproduction, severity, the reporter's guess and the last comment. Pick a decision for each bug, from the three plus `duplicate of #N` and `cannot reproduce: ask for <fact>`, reproducing only where the decision turns on it, and show them all in one `| Issue | Decision | Why |` table; the person changes any row. Ask only about a `won't fix` or a `story` that needs a product decision. Find the escape once per group in one file or of one kind. Apply the decisions, then show `| Issue | Decision | Escape |`.
 
 ## Report
 

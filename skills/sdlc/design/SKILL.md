@@ -9,7 +9,7 @@ metadata:
 
 A design doc says how a project, or a change spanning several stories, will be built and why, while changing it is still cheap. One story's design is a spec, by the `spec` skill; one decision costly to reverse is an ADR, by the `adr` skill.
 
-* **None** unless a decision costly to reverse binds more than one story. Otherwise say so: one story's design goes to the `spec` skill, a change with no trade-off to `story` or `build`.
+* **None** unless a decision costly to reverse binds more than one story. Otherwise say so in one line: one story's design goes to the `spec` skill, a change with no trade-off to `story` or `build`. If they asked for one, write it.
 * **Size:** under 100 lines, with what and why in its first 3. Past that, move per-story detail to specs.
 * **Who writes what:** you fill in the template's headings and the repository's facts, each with its `file:line`. The goals, non-goals, design and each decision are the person's; you critique them. Mark each decision `Decided:`, `Assumed:` or `Open:`.
 * **Status:** `Draft` until its first story is written, then `Agreed`. Edit it while any of its stories is unbuilt; afterwards change only links. A changed costly decision gets a new ADR.

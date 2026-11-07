@@ -2,13 +2,14 @@
 
 The user writes the story; you show them what affects it and critique what they write. Draft a criterion only when they ask, and mark it as yours.
 
-1. **Find the need:** five whys, until the goal names no solution. Offer a cheaper way to it as an option. Where the product has a PRD, check the request against it by the `prd` skill's Check path.
+1. **Find the need:** the goal from the request's words; ask why once only when it names a solution and no goal. A cheaper way to it is a one-line note naming it.
 2. **Show what affects it:** read the code the need touches, its tests, each ADR in force and `AGENTS.md`. Tell the user in plain sentences how what is already built or decided shapes this story, each with its `file:line`, such as "An ADR chose Haiku for cost and a test locks it, so Sonnet reverses that decision." Effects only, never a criterion or an approach.
 3. **The user writes the criteria:** 3 to 5, each one rule with an examples table in values from the project's real data. More than 5 is a story to split by [split.md](split.md). A question they will research goes under `Open questions`.
-4. **Critique them** against INVEST, in one list of `AC<n>: <problem> — <fix>` for the user to rewrite, until none remain. Also flag:
+4. **Critique them** against INVEST, in one list of `AC<n>: <problem> (<INVEST letter or idea>) — <fix>`. The user revises or keeps each; a kept one goes on the story as theirs, with its risk named. Also flag:
    * an example missing, not in real values, or whose result follows today's code instead of the user's rule;
    * a criterion the facts from step 2 contradict;
    * an action that saves data or calls another system with no failure row: what the person sees and what is saved;
+   * an abuse case, or a person not allowed to act, with no row;
    * an invariant, such as `a card is never charged twice`, not stated as its own criterion;
    * a sentence over 25 words, a term neither in `Terms` nor the glossary, or prose describing output a sample could show.
 5. **Write it** in this form, leaving out empty sections:
@@ -55,6 +56,5 @@ Measure: <the number that shows the `so that`>, read in <where>, now <value>, ta
 * **Output:** a criterion about what the person sees shows one sample of it, such as a row of the list.
 * **Context:** what the reader needs to judge the story, never how it was found, and a link to the design doc it comes from.
 
-6. **Ask what was missed,** and critique each one they add like step 4.
-7. **Review it blind:** a fresh subagent, given only the story, the titles of stories already filed, and the Review path with this file and split.md, reviews it and changes nothing. Check each quote before giving its finding to the user to fix.
-8. **Agree it:** show its `Decided:` lines, and ask each part no answer settled, such as `so that` or `Measure:`. File it by SKILL.md.
+6. **Review it blind:** a fresh subagent, given only the story, the titles of stories already filed, and the Review path with this file and split.md, reviews it and changes nothing. Check each quote, then give its findings as one list in step 4's form.
+7. **Agree it:** list its `Decided:` lines, ask a `Measure:` still open once with your pick, and file it by SKILL.md.

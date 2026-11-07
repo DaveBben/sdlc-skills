@@ -2,7 +2,7 @@
 
 Write the body for a person who saw none of the build: nothing outside the repository and the pull request, and no term this plugin coins, such as red commit, marker or holdout.
 
-* **Under 40 lines outside `<details>`:** when it cannot fit, ask the person whether to split the change.
+* **Under 40 lines outside `<details>`:** when it cannot fit, split the change by criterion, as a `Decided:` line.
 * **Rewrite, never append:** at every push, rewrite the body against the final diff. A person's answer replaces the line it reverses.
 * **Each shortcoming ends one of three ways:** fixed, filed by the `bug` skill with its issue number, or asked under `Needs you`.
 * **Decided by people:** only choices that change the ticket, a locked test, or something costly to reverse. The agent's `Decided:` lines go in `<details>`.
@@ -17,7 +17,7 @@ Built: <paired with a person | by the agent alone>
 <or "None">
 
 ## Needs you
-- [ ] Decide: <question>. <options, one line>
+- [ ] Decide: <question>. <your pick, because <reason>; else <options>; a one-way door's options as equals, your pick last>
 - [ ] Before deploy: <step>
 - [ ] After deploy: <check, with its pass bar>
 

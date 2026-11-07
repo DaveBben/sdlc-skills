@@ -11,4 +11,4 @@ For a request too big for one reviewable pull request, or a PRD with several out
    * **A non-functional requirement, enabler or hardening** is a criterion on the story that needs it.
 4. **Keep them independent:** block a story only by its feature's first story and what it truly waits on, with the reason, never for order alone. A rule two stories share goes to one.
 5. **Check coverage:** map each requirement to a story, a criterion, an `Out of scope` line or an open question, and show the leftovers.
-6. **Agree it:** show the map, then ask the first story and each dependency with its reason, one question each, before filing. The first story gets its criteria now by create.md; each later one by refine.md when it starts.
+6. **File it:** show the map, with the first story and each dependency and its reason as `Decided:` lines, then file. The first story gets its criteria now by create.md; each later one by refine.md when it starts.

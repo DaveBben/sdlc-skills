@@ -7,19 +7,20 @@ metadata:
 ---
 # Refactoring
 
-Refactor code you are about to change, code you struggled to understand, and hotspots. Leave the rest alone.
+Unasked, refactor only code you are about to change, code you struggled to understand, and hotspots.
 
 ## Where to look
 
 When the user asks where to clean up, rank hotspots (Tornhill): change count and churn per line over the last year, code files only, then each top file's change coupling. Coupled files with no import or call between them share a hidden concept: give it one owner. Read for smells only inside the top files, judged by whether a reader can predict what the code does, never by a single score.
 
-Leave code alone when no change touches it, it is due for deletion, its duplication is coincidental, or length is the only complaint.
+Unasked, leave code alone when no change touches it, it is due for deletion, its duplication is coincidental, or length is the only complaint; asked, do it and note in one line why it may not pay, such as the wrong abstraction.
 
 ## Refactor safely
 
 * **Green first:** run the tests. Code with no test gets characterization tests first, committed alone; kill one hand-made mutant to prove each can fail.
 * **One named refactoring per step,** by TCR. After each step, re-read for the smell it targeted; still there means the wrong refactoring: revert it.
-* **Two hats:** a bug found mid-refactoring is reported by the `bug` skill, not fixed in it.
+* **Behaviour change:** a step, asked or not, that changes what a test or caller observes is not a refactoring: name the behaviour it changes.
+* **Two hats:** a bug found mid-refactoring is a one-line note now and filed by the `bug` skill after, not fixed in it.
 * **Keep** public names and signatures (migrate them by parallel change), error handling, assertions, logging and comments that explain why. Read each commit's diff for deleted lines.
 * **Commits:** each refactoring alone, `refactor: <refactoring> (<smell>)`.
 * **Large:** a change that cannot be one pull request: [references/large.md](references/large.md).

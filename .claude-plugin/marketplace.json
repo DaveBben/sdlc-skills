@@ -10,7 +10,7 @@
       "name": "sdlc",
       "source": "./plugins/sdlc",
       "description": "Extreme Programming with an agent: you decide what gets built, as a PRD that holds the north star, user stories with acceptance criteria you agree, spikes, bug tickets, chores, design docs, specs and decision records, then pair-program it with you steering, or build it on autopilot with failing tests first and a blind test challenger, through one fresh review to a pull request you merge, and keep a short AGENTS.md. At session start, a hook prints a routing list and when each engineering doc is due.",
-      "version": "1.8.0",
+      "version": "1.9.0",
       "license": "MIT",
       "skills": [
         "./skills/prd",
@@ -36,7 +36,7 @@
       "name": "working-agreement",
       "source": "./plugins/working-agreement",
       "description": "Optional house rules for how the agent works with you: keep it simple, look facts up instead of asking, one decision per question that yes accepts, and explanations that lead with what a thing means for you and a concrete case before the mechanism and its name. One hook adds them at session start.",
-      "version": "1.2.0",
+      "version": "1.4.0",
       "license": "MIT",
       "author": {
         "name": "DaveBben"

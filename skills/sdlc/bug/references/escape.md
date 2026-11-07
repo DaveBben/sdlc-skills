@@ -9,6 +9,6 @@ Name each kind that holds from the reproduction and the git history:
 * **Systemic:** a program could detect this kind of fault. Propose the check.
 * **Accepted risk:** the hazard was known and taken. Propose recording it by the `adr` skill when no ADR holds it.
 
-Write the kinds and what shows each on the ticket's `Escape:` line. Propose only; build none without the user's yes to it.
+Write the kinds and what shows each on the ticket's `Escape:` line. Give each proposal as a one-line note in the report; build one only when the person asks for it.
 
 For "why do we keep getting these bugs": read every `bug` issue, past 10 mapped by the `tracker` skill for `Escape:`, `Entered:` and the faulty file; group by escape kind, by file, and for review escapes by build mode; propose one change for the largest group.
