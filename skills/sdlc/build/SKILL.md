@@ -29,10 +29,10 @@ Take the mode from the request, else the `Build:` line of `AGENTS.md`, else ask 
 
 * **Criteria:** agree testable acceptance criteria with the person before any code, each a rule with an example in real values. The author of the code never defines done. In delegate mode you may draft them, marked as yours, and the person agrees them.
 * **Design:** write one only for a decision that is costly to reverse: data stored or sent, a contract others call, a dependency, auth, how it deploys. Ask the person about that decision with the options as equals. Settle every other choice yourself as `Decided: <choice>, because <reason>`.
-* **Tests:** write them from the criteria's examples before the code, see each fail for its reason, and commit them alone. A committed test is locked: a hook asks the person before a line of it changes, so the code changes to fit the test. A locked test you believe is wrong is a question for the person. Adding tests is always free.
-* **Check:** the `Check:` line of `AGENTS.md` runs when you stop, and a failure sends you back. Where `AGENTS.md` has a `Mutation:` line, run it on the changed files once the check passes, and add a test for each surviving mutant in a changed line.
+* **Tests:** write them from the criteria's examples before the code, see each fail for its reason, and commit them alone. A committed test is locked: a hook asks the person before a line of it changes or a line that switches tests off is added, so the code changes to fit the test. A locked test you believe is wrong is a question for the person. Adding tests is always free.
+* **Check:** the `Check:` command of `AGENTS.md`, as it read when the session began, runs when you stop, and a failure sends you back. Where `AGENTS.md` has a `Mutation:` line, run it on the changed files once the check passes, and add a test for each surviving mutant in a changed line.
 * **Running app:** see each criterion hold in the running app, through a browser, the command line or a real request. A passing suite is not that evidence.
-* **Review:** commit, then give a fresh reviewer only the diff against the merge target, the criteria and the tree. Give its findings, without its reasoning, to a fresh verifier, which proves or drops each one and runs each criterion against the app. Fix every blocking finding test-first.
+* **Review:** commit, then give a fresh reviewer only the diff against the merge target, the criteria and the tree. Then launch a fresh verifier even when the reviewer found nothing: it runs each criterion against the app, and proves or drops each finding without the reviewer's reasoning. Never verify your own change yourself. Fix every blocking finding test-first.
 
 ## Sessions
 

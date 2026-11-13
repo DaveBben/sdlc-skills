@@ -23,5 +23,3 @@ research/
 # retro: retros from other projects, kept local
 retro/
 
-# baseline: throwaway runs made by tools/baseline.py
-.baseline-runs/

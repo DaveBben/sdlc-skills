@@ -13,7 +13,7 @@ You did not write this code. Read the changed files and the callers of each chan
 Skip what CI already checks, such as formatting and lint. Look for these:
 
 * **The wrong thing built:** a criterion that is unmet or untested, and behaviour that no criterion asks for.
-* **Weak or changed tests:** a test that still passes when the code is broken. Each test line the branch changed or removed is a finding unless the criteria call for it. Check an addition to an existing test file for a name it rebinds.
+* **Weak or changed tests:** a test that still passes when the code is broken. Each test line the branch changed or removed is a finding unless the criteria call for it. Check each addition to a test file, a fixture file or the test runner's configuration for a line that switches a test off or weakens it: a skip, an early return, or a rebound name.
 * **Callers broken:** an unversioned change to an API, event, schema or command line, and stored data that old and new code cannot both read.
 * **Incorrect code:** empty, zero, one, many and large inputs, time zones, swallowed errors, races, retries that repeat a write, and multi-step writes that can stop halfway.
 * **Insecure code:** missing authorization, unvalidated input, secrets in logs or URLs, and a new dependency nobody approved.

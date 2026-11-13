@@ -13,7 +13,7 @@ Set up the machine checks that an instruction cannot guarantee, and keep `AGENTS
 
 The person writes it. You supply facts from the repository with their `file:line`, and critique what they write. Never generate it whole. Keep a line only when deleting it would cause a mistake that nothing else in the repository prevents. A hook caps the file at 100 lines and 8 KB.
 
-* **`Check:`** the command that decides when work is done: fast, deterministic, and non-zero on failure. Usually the type checker, the linter and the tests the change touches. A hook runs it whenever the agent stops with changed files, and asks the person before the line changes. Run it once before recording it.
+* **`Check:`** the command that decides when work is done, in backticks: fast, deterministic, and non-zero on failure. Usually the type checker, the linter and the tests the change touches. A hook runs it whenever the agent stops with changed files. A session runs only the command it started with, so a changed line takes effect in the next session. Run it once before recording it.
 * **`Full check:`** the slow suite that runs before a pull request.
 * **`Mutation:`** the mutation-testing command for a set of changed files.
 * **`Build:`** the person's standing choice of who authors, such as `Build: learn for src/billing, otherwise delegate`. Only the person writes it.
