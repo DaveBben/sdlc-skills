@@ -1,32 +1,44 @@
 # sdlc
 
-Extreme Programming with an agent. You decide what gets built and write the intent; the tests carry the rest. `sdlc` turns a request into user stories with acceptance criteria you agree, files spikes, bugs, chores, design docs, specs and decision records, and builds each to a pull request you merge, by pair programming or on autopilot.
-
-* **Pair programming, for code you want to understand or learn from:** you steer each turn. Explore the code, propose a design, have the agent write part and leave part for you, or write signatures for it to critique and fill in. The agent answers as a senior engineer: it names the technique behind its feedback and disagrees when your idea is worse. When you want the change shipped, it hands the branch to `build`'s review and pull request.
-* **Autopilot, for code you just want built:** failing tests come first, from your examples, then a fresh agent that never reads the function bodies adds tests for wrong implementations, with its second-value and property tests held out of the builder's sight until the code passes, then the code with refactoring inside the loop, 1 fresh review, and a pull request that records the agent designed it. A script refuses any change to a locked test outside the commits allowed for it.
-
-Say "let's pair on X" or "just build X", or write a `Build:` line in `AGENTS.md`, such as `Build: pair for src/billing; otherwise autopilot`. With none of these, or a ticket comment naming the mode, the agent asks, with no pick.
+Whoever made the change, someone else attacks it, and a machine decides when it's done.
 
 ## What runs in a session
 
-* **One hook.** At session start, [`hooks/route.md`](hooks/route.md) prints the routing list and when each engineering doc is due, 458 words, which sends each change request to `prd`, `bug`, `refactor`, `chore`, `spike`, `pair-programming`, `build`, `design`, `spec`, `adr` or `story`.
-* **Descriptions:** 14 skills and 4 agents, 6,946 characters, about 1,736 tokens at 4 characters a token. A skill's body loads only when a request matches it.
-* **Rules read:** a pair-programming session reads 474 words of skill text in 16 lines. Autopilot's reads 1,899 words, or 2,307 when a choice costly to reverse also loads the `adr` skill.
-* **Subagents:** at review, 1 reviewer (Opus) and a verifier (Opus) that keeps only the findings it can prove. On autopilot, the test challenger (Sonnet) runs before the code, and an implementer (Sonnet) makes the failing tests pass, one launch at a time, and never sees the held-out tests. When a locked test calls an interface that turns out different, the session checks the implementer's unlock request, allows it in a commit of its own and re-locks the test, without asking you. Past 10 issues or ADRs, read-only subagents read them in parallel and return one sourced row each.
-* **With no person in the session,** such as a scheduled job, autopilot alone runs. Questions go to the story's contacts on its issue.
+One script, [`hooks/guard.py`](hooks/guard.py), handles 4 hooks. `python3 hooks/guard.py --self-test` runs its tests.
 
-## One session, traced in pair programming
+* **Test lock:** a test file is locked once it is committed. An edit that changes or removes one of its lines asks you first, and in a session with no person it is refused. Added lines pass. A shell command that changes a locked test is reported to the agent right after it runs, with the command that restores the file.
+* **Done check:** when the agent stops and the tree differs from the session's start or the last pass, the hook runs the `Check:` line of the root `AGENTS.md`. A failure sends the agent back with the last 40 lines of output. The agent may stop anyway by stopping again with no file changed, for a question, and then you see a message that the check still fails. It also asks you before an edit changes the `Check:` line.
+* **Dependency gate:** `pip install`, `uv add`, `npm install`, `pnpm add`, `yarn add`, `bun add`, `cargo add`, `go get`, `gem install`, `bundle add`, and edits to a manifest ask you when they name a package that no manifest or lockfile in the repository holds.
+* **Size cap:** an edit that leaves `AGENTS.md` or `CLAUDE.md` over 100 lines or 8 KB is refused.
 
-"Show me every call to the billing service."
+Three agents run only when the `build` skill calls for them.
 
-| Turn | Who | What happens |
+* **critic** (Opus) attacks a design, criteria or tests the session wrote. For tests, it names wrong implementations that pass them, without reading the code under test.
+* **reviewer** (Opus) reads the diff, the criteria and the tree, and reports candidate bugs.
+* **verifier** (Sonnet) proves or drops each finding without the reviewer's reasoning, and runs each criterion against the running app.
+
+Two skills load when a request matches.
+
+* **build** (about 850 words) covers who authors and who attacks, plus the branch and pull request conventions.
+* **onboard** (about 530 words) sets up `AGENTS.md`, the `Check:` line, mutation testing, property-based tests and a sandbox.
+
+## Known limits
+
+* **Test files are found by path,** such as `tests/`, `test_*.py` and `*.test.ts`. A test file named another way is not locked.
+* **An added line can still weaken a test,** such as a second function with the same name. The reviewer checks for that.
+* **The dependency gate checks the repository, not the registry.** You confirm that a first-seen name is real.
+* **A shell command that includes a git command that moves history,** such as `git checkout` or `git pull`, is not checked for test changes.
+
+## One change, traced
+
+"Build PAY-12: orders over 10 units get 10% off."
+
+| Step | Who | What happens |
 |---|---|---|
-| Explore | agent | Lists the 7 calls with `file:line`, grouped by what varies: 3 retry, 4 do not |
-| Idea | you | "I'm thinking one class for these calls" |
-| Critique | agent | Agrees: **Extract Class** ends the **Shotgun Surgery** of 7 copies. Warns that 2 callers need the raw response, so the class must expose it |
-| Split | you | "Write it, explain each function, leave one for me" |
-| Write | agent | Writes the class with a line on why each function exists, and leaves `retry_policy` as a stub with its contract and a failing test, because it holds the most judgement |
-| You write | you | You fill in `retry_policy`. The agent reads your diff and points out it retries a POST that is not idempotent |
-| Ship | agent | Asks for a `Done when:` line, then `build` reviews the branch and opens the pull request, `Built: paired with a person` |
-
-`refactor`, `adr` and `onboard` also work installed alone. `build` needs the 4 agents installed as subagents: the skills name none, so the harness picks each by its description.
+| Criteria | you | Agree 3 criteria, each with an example |
+| Tests | agent | Writes failing tests from the examples and commits them |
+| Attack | critic | Finds that a constant return passes 2 of them, and the agent adds tests |
+| Code | agent | Tries to edit a committed assertion, and the hook asks you |
+| Stop | hook | Runs `Check:`, which fails on rounding, and sends the agent back |
+| Review | reviewer, verifier | 4 candidates, 1 proved, and each criterion run from the command line |
+| Pull request | agent | 180 lines, with the evidence in the body |

@@ -1,7 +1,7 @@
 {
   "name": "sdlc",
-  "version": "1.9.0",
-  "description": "Extreme Programming with an agent: you decide what gets built, as a PRD that holds the north star, user stories with acceptance criteria you agree, spikes, bug tickets, chores, design docs, specs and decision records, then pair-program it with you steering, or build it on autopilot with failing tests first and a blind test challenger, through one fresh review to a pull request you merge, and keep a short AGENTS.md. At session start, a hook prints a routing list and when each engineering doc is due.",
+  "version": "2.0.0",
+  "description": "Whoever made the change, someone else attacks it, and a machine decides when it is done. Four hooks lock committed tests, run your check before the agent can stop, cap AGENTS.md and gate first-seen dependencies. Three fresh agents attack designs and tests, review the diff and verify it against the running app. Two short skills: build, where you author to learn or the agent authors to delegate, and onboard, which sets up the check, mutation testing, property-based tests and a sandbox.",
   "license": "MIT",
   "author": {
     "name": "DaveBben"

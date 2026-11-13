@@ -1,43 +1,42 @@
 ---
 name: onboard
-description: "Use when a repository's AGENTS.md or CLAUDE.md must be written, trimmed or reviewed, or an agent must orient itself, such as 'write AGENTS.md', 'my CLAUDE.md is too long' or 'orient yourself': keeps only what an agent cannot learn from the repository."
+description: "Use when a repository is set up for work with an agent, or its AGENTS.md or CLAUDE.md is written, trimmed or reviewed, such as 'set this repo up', 'write AGENTS.md', 'my CLAUDE.md is too long' or 'add a check command': the person writes a short AGENTS.md, and the agent sets up the check that decides done, mutation testing, property-based tests and a sandbox."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "2.0.0"
 ---
 # Onboard
 
-`AGENTS.md` at the repository root loads into every session. Keep a line only when deleting it would cause a mistake nothing else in the repository prevents.
+Set up the machine checks that an instruction cannot guarantee, and keep `AGENTS.md` to what no check can hold. Prefer a hook, script, linter, type checker or CI job to a written rule. When the agent fails at something, add a check that catches it and leave the instructions alone.
 
-## What goes in
+## AGENTS.md
 
-* **Boundaries:** a `Boundaries:` line: each system, store and repository the product reads, writes or runs inside, in data-flow order, who owns each step and who writes each store it reads. Draft the systems and stores from the code, giving the user each one's `file:line`; the user names each owner. Edit it when a system, store or owner is added, removed or changes. Past 5 lines, or about 10,000 lines of code, move it to a one-page `docs/ARCHITECTURE.md`, a codemap, its invariants and at most one diagram, leave a Pointer, and note the move.
-* **Project tracker:** the issue tracker's URL, when the team uses one.
-* **Commands** the repository does not make obvious, exact and copy-pasteable:
-  * `Check:` runs at turn end, `Full check:` before a pull request, `Setup:` the install step a fresh checkout needs, and `Scheduled check:` the slow check a scheduled job runs.
-  * How to run one test, and tool choices the agent would get wrong.
-* **Lines only a person writes:** `Build:`, the standing choice of pairing or autopilot for the paths it names, such as `Build: pair for src/billing; otherwise autopilot`; and `Sensitive:`, the paths a person reads in every review, such as `Sensitive: src/billing/, migrations/`. Never draft or propose either. When `Sensitive:` is missing, ask once which paths, with no suggestions.
-* **Constraints no program checks,** each as its mechanism and what breaks: "the pool has 5 workers and a full pool returns 502 to every user", not "keep the pool safe".
-* **Traps,** one line each.
-* **Pointers:** a document the agent would not find, and when to read it, such as `Cross-repository ADRs:` or `docs/glossary.md`, read before naming code or tests.
+The person writes it. You supply facts from the repository with their `file:line`, and critique what they write. Never generate it whole. Keep a line only when deleting it would cause a mistake that nothing else in the repository prevents. A hook caps the file at 100 lines and 8 KB.
 
-Keep the `Check:`, `Full check:`, `Setup:`, `Scheduled check:`, `Build:`, `Sensitive:` and `Cross-repository ADRs:` lines as found, even where the README repeats one.
+* **`Check:`** the command that decides when work is done: fast, deterministic, and non-zero on failure. Usually the type checker, the linter and the tests the change touches. A hook runs it whenever the agent stops with changed files, and asks the person before the line changes. Run it once before recording it.
+* **`Full check:`** the slow suite that runs before a pull request.
+* **`Mutation:`** the mutation-testing command for a set of changed files.
+* **`Build:`** the person's standing choice of who authors, such as `Build: learn for src/billing, otherwise delegate`. Only the person writes it.
+* **Constraints that no program checks:** each as its mechanism and what breaks, such as "the pool has 5 workers, and a full pool returns 502 to every user".
+* **Traps and pointers:** one line each.
 
-## What stays out
+Leave out what a check enforces, what the repository already shows, and session state such as plans and status. Link `CLAUDE.md` to `AGENTS.md`.
 
-* **What a check enforces,** such as formatter, lint and type rules. A rule a program could check but none does: propose the check, and keep the line until one holds it.
-* **What the repository already says,** such as its stack and directory map.
-* **Session state:** plans, handoff notes, status and superseded designs. Delete any found and note it; on a review, list it as a finding.
+## Harder-to-game checks
 
-Order the file `Boundaries:`, the tracker, then only the headings with content: Commands, Constraints, Traps, Pointers. A module's conventions go in a nested `AGENTS.md`. Link `CLAUDE.md`, and any other instructions-file name the repository uses, to `AGENTS.md`.
+Agents write tests that pass without proving much. Offer each of these once, and install it only on the person's yes, because each adds a development dependency.
 
-## Write or trim it
+* **Mutation testing:** install the tool the language has, such as mutmut for Python, Stryker for JavaScript and TypeScript, cargo-mutants for Rust or PIT for Java. Scope the run to changed files so it finishes in minutes, and record the command as the `Mutation:` line.
+* **Property-based tests:** where the code has parsers, serializers, money arithmetic or any rule over a range of inputs, install the library the language has, such as Hypothesis, fast-check or proptest, and write one property as the example to copy.
 
-1. **Read** the existing `AGENTS.md` and any real `CLAUDE.md` whole, and run each command once. Report a failing `Check:` or `Full check:` as a trap and tell the user it fails; drop any other command that fails.
-2. **Note** in one message each line you move to a check or drop, with its reason, and each dropped command with its error, and go on; ask in that message only what the repository cannot answer, such as owners or `Sensitive:`.
-3. **Rewrite** the whole file, never append, and replace a real `CLAUDE.md` with the symlink.
-4. **Size cap,** only on the user's yes, where the agent runs Claude Code hooks: copy [scripts/size_guard.py](scripts/size_guard.py) to `.claude/hooks/` and merge [scripts/size-guard-settings.json](scripts/size-guard-settings.json) into `.claude/settings.json`. It holds every `AGENTS.md` and `CLAUDE.md` to 100 lines and 8 KB.
+## Sandbox
 
-## Orient or review
+Offer to run the agent in a sandbox that limits network egress and approves commands inside it automatically, in place of permission prompts. In Claude Code that is this block in `.claude/settings.json`, with the domains the build needs:
 
-Report the commands, constraints and traps in one message. On a review, also list each finding, quoting its line: a line that belongs out, a command that does not run, or a constraint with no mechanism. Rewrite nothing unless the user accepts a finding. With no `AGENTS.md`, offer to write one. With no check command, ask once, giving the command you would run from the build files, and record the answer as a `Check:` line.
+```json
+{"sandbox": {"enabled": true, "autoAllowBashIfSandboxed": true, "network": {"allowedDomains": ["github.com"]}}}
+```
+
+## Review an existing file
+
+Report each line that belongs out, each command that fails when run, and each constraint with no mechanism, quoting the line. Change nothing until the person accepts a finding.

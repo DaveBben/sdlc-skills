@@ -1,18 +1,19 @@
 # sdlc-skills
 
-Agent skills that built on Extreme Programming (XP): stories, test-first, pairing and small releases.
+A plugin for coding agents built on one rule: whoever made the change, someone else attacks it, and a machine decides when it's done.
+
+A plain prompt can't guarantee that. The agent that wrote the code also judges it, and it can edit a failing test until it passes. This plugin enforces the rule with hooks and fresh agents, and keeps its two skills to about 1,400 words.
 
 ## What you get
 
-- You write 3 to 5 acceptance criteria before any code is written. The agent first tells you how the existing code and decisions affect the change, then critiques what you wrote.
-- A change your request already spells out item by item, such as a colour or the tables to drop, skips the story: its items become the `Done when:` lines.
-- Tests come first, from your examples, and the agent can't change them to make its code pass.
-- Two ways to work: pair programming, where you steer each turn and the agent coaches, or autopilot, where the agent builds a story alone.
-- A fresh review of every change, each finding proved by a verifier before you see it.
+- **Test lock:** a hook asks you before the agent changes or removes a line of a committed test. Adding tests is free.
+- **Done check:** a hook runs the `Check:` command from your `AGENTS.md` whenever the agent stops with changed files, and sends it back to work on a failure.
+- **Dependency gate:** a hook asks you before the agent installs a package that no manifest or lockfile in the repository names.
+- **Size cap:** a hook holds `AGENTS.md` and `CLAUDE.md` to 100 lines and 8 KB.
+- **Three fresh agents:** a critic attacks designs and tests, a reviewer reads the diff, and a verifier proves each finding and checks each acceptance criterion against the running app.
+- **Two modes:** you write the code to learn and the agent attacks it, or the agent writes it and the three agents attack it.
 
 ## Install
-
-From your shell:
 
 ```bash
 claude plugin marketplace add DaveBben/sdlc-skills
@@ -20,21 +21,23 @@ claude plugin install sdlc@sdlc-skills
 claude plugin install working-agreement@sdlc-skills   # optional
 ```
 
-Then start a new session, or run `/reload-plugins` in one that's open. Inside a session you can also run `/plugin marketplace add DaveBben/sdlc-skills`, then `/plugin install sdlc@sdlc-skills`.
+Then start a new session. The hooks need `python3` and `git`.
 
-Other agents: run `npx skills add DaveBben/sdlc-skills --all`, register `skills/sdlc/agents/` as subagents if your agent supports them, and paste `plugins/sdlc/hooks/route.md` into your `AGENTS.md`.
+Other agents: run `npx skills add DaveBben/sdlc-skills --all` and register `skills/sdlc/agents/` as subagents. The hooks are Claude Code hooks, and `plugins/sdlc/hooks/guard.py` reads the same events from any agent that sends them.
 
 ## How to use it
 
-Just ask for what you want. A routing hook at session start picks the skill.
+1. Say "set this repo up". The `onboard` skill records your `Check:` line and offers mutation testing, property-based tests and a sandbox.
+2. Ask for the change. "Build PAY-12" has the agent write it. "Let's pair on the billing calls" or "I'll write it, you review" has you write it.
 
-- "Write a PRD for an order-tracking app" agrees the north star every story is checked against.
-- "Add a CSV export to the orders page" starts a story.
-- "Let's pair on the billing calls" starts pair programming; "just build PAY-12" builds it on autopilot.
-- "The export times out past 10k orders" reproduces and fixes a bug.
+A small change with one obvious result skips the skills. The hooks still run.
 
-Skills: prd, story, design, spec, spike, bug, chore, tracker, adr, build, pair-programming, tdd, refactor and onboard. More detail in [plugins/sdlc](plugins/sdlc/README.md).
+## Does it beat a plain prompt
 
-working-agreement is optional. It adds house rules for how the agent works with you, like one question at a time and plain explanations. See [plugins/working-agreement](plugins/working-agreement/README.md).
+`python3 tools/baseline.py` runs each task in `tools/tasks/` twice, once with a plain prompt and once with the plugin, and scores defects against held-out tests, refused tool calls, minutes and dollars. Add your own tasks there, and rerun it whenever a new model ships. A part that doesn't beat the plain prompt gets cut.
+
+More detail in [plugins/sdlc](plugins/sdlc/README.md). The principles behind the design are in [docs/principles.md](docs/principles.md).
+
+working-agreement is optional. It adds house rules for how the agent works with you. See [plugins/working-agreement](plugins/working-agreement/README.md).
 
 MIT license.
