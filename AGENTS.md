@@ -17,7 +17,7 @@ When an agent using the plugin fails, add a check that catches the failure. Do n
 ## Key files
 
 - `plugins/sdlc/hooks/guard.py` is the 4 hooks in one script: test lock, done check, size cap and dependency gate. `hooks.json` beside it registers the events.
-- `skills/sdlc/build/SKILL.md` and `skills/sdlc/onboard/SKILL.md` are the only skills. Edit a skill only there.
+- `skills/sdlc/build/SKILL.md`, `skills/sdlc/onboard/SKILL.md` and `skills/sdlc/principles/SKILL.md` are the only skills. Edit a skill only there.
 - `skills/sdlc/agents/` holds the 3 subagent prompts: `critic`, `reviewer` and `verifier`. Skills describe each delegated step and never name an agent, because the harness picks the agent by its `description`.
 - `plugins/<plugin>/` is a thin Claude Code wrapper: a `.claude-plugin/plugin.json`, a README, and for `sdlc` the symlinks `skills` and `agents` into `skills/sdlc`. Do not replace the symlinks with real files.
 - `plugins/working-agreement/hooks/working-agreement.md` is opt-in, so no other plugin may depend on it or repeat it.

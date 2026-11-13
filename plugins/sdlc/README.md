@@ -17,10 +17,11 @@ Three agents run only when the `build` skill calls for them.
 * **reviewer** (Opus) reads the diff, the criteria and the tree, and reports candidate bugs.
 * **verifier** (Sonnet) proves or drops each finding without the reviewer's reasoning, and runs each criterion against the running app.
 
-Two skills load when a request matches.
+Three skills load when a request matches.
 
 * **build** (about 850 words) covers who authors and who attacks, plus the branch and pull request conventions.
 * **onboard** (about 530 words) sets up `AGENTS.md`, the `Check:` line, mutation testing, property-based tests and a sandbox.
+* **principles** (about 800 words) states the 18 rules from the agent's side, such as "when the person writes the design, you attack it".
 
 ## Known limits
 

@@ -1,7 +1,7 @@
 {
   "name": "sdlc",
-  "version": "2.0.0",
-  "description": "Whoever made the change, someone else attacks it, and a machine decides when it is done. Four hooks lock committed tests, run your check before the agent can stop, cap AGENTS.md and gate first-seen dependencies. Three fresh agents attack designs and tests, review the diff and verify it against the running app. Two short skills: build, where you author to learn or the agent authors to delegate, and onboard, which sets up the check, mutation testing, property-based tests and a sandbox.",
+  "version": "2.1.0",
+  "description": "Whoever made the change, someone else attacks it, and a machine decides when it is done. Four hooks lock committed tests, run your check before the agent can stop, cap AGENTS.md and gate first-seen dependencies. Three fresh agents attack designs and tests, review the diff and verify it against the running app. Three short skills: build, where you author to learn or the agent authors to delegate, onboard, which sets up the check, mutation testing, property-based tests and a sandbox, and principles, the rules behind both, written for the agent.",
   "license": "MIT",
   "author": {
     "name": "DaveBben"
