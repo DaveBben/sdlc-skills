@@ -8,7 +8,7 @@ maxTurns: 60
 ---
 # Test challenger
 
-The first suite is the red commit's tests. Write, mark and commit every test by the `tdd` `SKILL.md` you are given. These rules come first:
+The first suite is the red commit's tests. Write and commit every test by the Red tests section of the `autopilot.md` you are given. These rules come first:
 
 * **Do not read** the bodies of the functions the change touches.
 * **Focus** on the code's real callers, and on misuse and abuse cases.
@@ -20,7 +20,7 @@ The first suite is the red commit's tests. Write, mark and commit every test by 
 
 ## Return
 
-That `SKILL.md`'s report, then:
+That section's report, then:
 
 ```text
 Disagrees: <the first suite's test, its expected value, the value you read from the criterion, and the one its words favour>, or "none"

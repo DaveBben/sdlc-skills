@@ -1,35 +1,40 @@
 ---
 name: build
-description: "Use when agreed work such as a story file, a ticket or a triaged bug must be built, or a pair-programming branch shipped, such as 'implement story PAY-12' or 'just build X': asks whether to pair or run autopilot unless told, then builds it test-first through one fresh review to a pull request."
+description: "Use when code is to be built and shipped from agreed work or a plain request, such as a story, a ticket, a bug fix, a chore or a refactoring, like 'implement story PAY-12', 'fix this bug' or 'just build X': the person's acceptance criteria decide done, failing tests come first and are challenged blind, fresh agents implement and review, and a small pull request goes to the person."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "3.0.0"
 ---
 # Build
 
-Build one ticket to a pull request a person merges. A bug follows [references/bug.md](references/bug.md), a chore or refactoring [references/chore.md](references/chore.md), over any step below.
+Build one change to a pull request a person merges. Whoever made a thing, someone else attacks it, and a check decides when it is done. A bug follows [references/bug.md](references/bug.md), a chore or refactoring [references/chore.md](references/chore.md), over any step below.
 
-1. **Criteria:** the ticket's; for a request that states the change in full, its items as `Done when:` lines. Otherwise load the `story` skill now, and the person writes them by it.
-2. **Mode:** from the request, else the ticket's comments, else `AGENTS.md`'s `Build:` line, else ask whether to pair or run autopilot, your pick first. To pair, run the `pair-programming` skill on the ticket. A branch it hands back goes straight to step 5.
-3. **Branch:** a worktree from main, `<story|bug|chore|refactor>/<key>-<title-words>`. Move its issue through In progress, In review and Testing.
-4. **Build** by [references/autopilot.md](references/autopilot.md).
-5. **Check:** run `AGENTS.md`'s `Full check:` or `Check:` line, else what CI runs. Except on a branch from pairing, run `python3 ../tdd/scripts/locked_tests.py <merge target> <each red commit>`; each `refused` line is a stop. Where the change reads real data or calls a real service, run it once on the newest real input, writing nothing live, against each criterion's bar.
-6. **Review:** commit, then make a review directory, `<temp>/review-<timestamp>/`, holding `diff.patch` (`git diff --no-color <merge target>...HEAD`), `story.md` (the ticket and its criteria) and, except from pairing, `locked.txt` (step 5's locked-tests lines). Have one fresh subagent review it, given only the review directory, the worktree, the merge target and the red commits. Then have another verify its findings, given only its `findings.md`, the worktree, `diff.patch`, `story.md` and the check command. Tell the person each kept finding in one line, naming the idea, then fix it test-first; redo step 5 on the final diff, and remove the review directory.
-7. **Pull request** into main, titled `[<key>] <what it does, imperative>`, body by [references/pull-request.md](references/pull-request.md). Fix CI failures the same way.
-8. **After merge:** remove the worktree and branch. Once in production, observe each criterion, read-only; close the ticket, its spec first by the `spec` skill, and the design doc it links by the `design` skill's Built rule when it was the last story left, or hand a failure to the `bug` skill.
-9. **Retro** (After Action Review), each answer citing its evidence: what you assumed wrongly, what the person had to correct or supply, what cost the most time and which check would have caught it, and which question a `Decided:` line or a note would have served.
+A change with one obvious result and no trade-off, such as a colour, a config value or a rename, needs none of this: make it and let the check run.
+
+1. **Criteria:** the ticket's; for a request that states the change in full, its items as `Done when:` lines. Otherwise the person writes them, each a rule with an examples table in real values that a test or the running app can show. Critique what they write in one-line notes, each with your fix; never write a criterion for them. The agent that builds never defines done.
+2. **Branch:** a worktree from main, `<story|bug|chore|refactor>/<key>-<title-words>`.
+3. **Build** by [references/autopilot.md](references/autopilot.md).
+4. **Check:** run `AGENTS.md`'s `Full check:` or `Check:` line, else what CI runs. Where `AGENTS.md` has a `Mutation:` line, run it on the changed files and add a test for each surviving mutant in a changed line. Then see each criterion hold in the running app, through a browser, the command line or a real request, writing nothing live; a passing suite is not that evidence.
+5. **Review:** commit, then make a review directory, `<temp>/review-<timestamp>/`, holding `diff.patch` (`git diff --no-color <merge target>...HEAD`) and `story.md` (the ticket, its criteria and each locked-test change the person said yes to). Have one fresh subagent review it, given only the review directory, the worktree, the merge target and the red commits. Then have another verify its findings, given only its `findings.md`, the worktree, `diff.patch`, `story.md` and the check command. Never verify your own change yourself. Tell the person each kept finding in one line, naming the idea, then fix it test-first; redo step 4 on the final diff, and remove the review directory.
+6. **Pull request** into main, titled `[<key>] <what it does, imperative>`, body by [references/pull-request.md](references/pull-request.md). Past about 400 changed lines, split it by criterion. Fix CI failures the same way.
+7. **After merge:** remove the worktree, the branch and its holdout directory. Once in production, observe each criterion, read-only; a failure is a new bug.
+8. **Retro** (After Action Review), each answer citing its evidence: what you assumed wrongly, what the person had to correct or supply, what cost the most time, and which check would have caught it.
+
+## Locked tests
+
+Each committed test is locked: the code changes to fit it. Change a line of one, or add a line that switches tests off, only with the person's yes; in Claude Code a hook asks them. Adding tests is always free. A locked test you think is wrong is a question, never a workaround.
 
 ## Questions
 
 * **Decide** what a later edit undoes for free: `Decided: <choice>, because <reason>`.
 * **Before you ask, strike every option that:**
   1. fails a criterion's example, or
-  2. exists only for something the story's `Out of scope` lists, or for a future change no story asks for.
+  2. exists only for something the ticket's `Out of scope` lists, or for a future change no ticket asks for.
 
-  One left: take it as a `Decided:` line naming what would reopen it. Several left: take the one that is no one-way door (data stored or sent, a contract others call, a dependency, auth, how it deploys, how the parts are split) and matches how the repository already does it. Ask only when every option left is a one-way door, offering them as equals, or when the ticket leaves open a result the person will see, such as how a list is ranked, with your pick first. Build nothing the answer could change until it comes, and record a one-way-door answer by the `adr` skill, any other on the story.
+  One left: take it as a `Decided:` line naming what would reopen it. Several left: take the one that is no one-way door (data stored or sent, a contract others call, a dependency, auth, how it deploys, how the parts are split) and matches how the repository already does it. Ask only when every option left is a one-way door, offering them as equals, or when the ticket leaves open a result the person will see, such as how a list is ranked, with your pick first. Build nothing the answer could change until it comes. Record a one-way-door answer where the repository keeps decision records, else under the pull request's `Decided by people`.
 * **Ask before changing** anything a person agreed, however cheap: `<name>: <A> → <B>, because <reason>`.
-* **Stuck:** a test you cannot pass, or a locked test you think is wrong, is a question, never a workaround.
-* **No person** in the session: read [references/unattended.md](references/unattended.md) first.
+* **Stuck:** a test you cannot pass is a question, never a workaround.
+* **No person** in the session: ask on the ticket's issue or the pull request, say what waits on the answer, and stop.
 
 ## Resume
 

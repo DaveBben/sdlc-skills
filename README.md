@@ -1,14 +1,15 @@
 # sdlc-skills
 
-Agent skills that built on Extreme Programming (XP): stories, test-first, pairing and small releases.
+One plugin for coding agents, built on one rule: whoever made a change, someone else attacks it, and a machine decides when it is done.
 
 ## What you get
 
-- You write 3 to 5 acceptance criteria before any code is written. The agent first tells you how the existing code and decisions affect the change, then critiques what you wrote.
-- A change your request already spells out item by item, such as a colour or the tables to drop, skips the story: its items become the `Done when:` lines.
-- Tests come first, from your examples, and the agent can't change them to make its code pass.
-- Two ways to work: pair programming, where you steer each turn and the agent coaches, or autopilot, where the agent builds a story alone.
-- A fresh review of every change, each finding proved by a verifier before you see it.
+- **Your criteria decide done:** you write the acceptance criteria, and the agent critiques them. The agent that builds never defines done.
+- **Tests come first:** failing tests from your examples, then a blind challenger adds tests for wrong implementations and holds some back until the code passes.
+- **Fresh agents attack the work:** one implements, one reviews the diff, and one proves or drops each finding before you see it.
+- **Hooks enforce the rest:** a committed test can't change without your yes, the `Check:` command must pass before the agent stops, first-seen packages ask you, `AGENTS.md` stays under 100 lines, the implementer can't read the held-back tests, and a pull request over 400 changed lines asks you.
+
+The 18 principles behind it are in [docs/principles.md](docs/principles.md). Most are habits for you, so the plugin holds only what a skill, an agent or a hook can enforce.
 
 ## Install
 
@@ -20,20 +21,13 @@ claude plugin install sdlc@sdlc-skills
 claude plugin install working-agreement@sdlc-skills   # optional
 ```
 
-Then start a new session, or run `/reload-plugins` in one that's open. Inside a session you can also run `/plugin marketplace add DaveBben/sdlc-skills`, then `/plugin install sdlc@sdlc-skills`.
+Then start a new session, or run `/reload-plugins` in one that's open.
 
-Other agents: run `npx skills add DaveBben/sdlc-skills --all`, register `skills/sdlc/agents/` as subagents if your agent supports them, and paste `plugins/sdlc/hooks/route.md` into your `AGENTS.md`.
+Other agents: run `npx skills add DaveBben/sdlc-skills --all` and register `skills/sdlc/agents/` as subagents if your agent supports them. The hooks are Claude Code's.
 
 ## How to use it
 
-Just ask for what you want. A routing hook at session start picks the skill.
-
-- "Write a PRD for an order-tracking app" agrees the north star every story is checked against.
-- "Add a CSV export to the orders page" starts a story.
-- "Let's pair on the billing calls" starts pair programming; "just build PAY-12" builds it on autopilot.
-- "The export times out past 10k orders" reproduces and fixes a bug.
-
-Skills: prd, story, design, spec, spike, bug, chore, tracker, adr, build, pair-programming, tdd, refactor and onboard. More detail in [plugins/sdlc](plugins/sdlc/README.md).
+Ask for the change, such as "build PAY-12" or "fix: the export times out past 10k orders". Add a `Check:` line to `AGENTS.md`, such as ``Check: `make test` ``, so the done check knows what to run. More detail is in [plugins/sdlc](plugins/sdlc/README.md).
 
 working-agreement is optional. It adds house rules for how the agent works with you, like one question at a time and plain explanations. See [plugins/working-agreement](plugins/working-agreement/README.md).
 
