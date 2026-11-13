@@ -2,7 +2,7 @@
 
 The user writes the story; you show them what affects it and critique what they write. Draft a criterion only when they ask, and mark it as yours.
 
-1. **Find the need:** the goal from the request's words; ask why once only when it names a solution and no goal. A cheaper way to it is a one-line note naming it.
+1. **Find the need:** the goal from the request's words. A request that names a solution and no goal, such as "email me when it's done", gets one question first: what they will do once it arrives. A cheaper way to the goal is a one-line note naming it.
 2. **Show what affects it:** read the code the need touches, its tests, each ADR in force and `AGENTS.md`. Tell the user in plain sentences how what is already built or decided shapes this story, each with its `file:line`, such as "An ADR chose Haiku for cost and a test locks it, so Sonnet reverses that decision." Effects only, never a criterion or an approach.
 3. **The user writes the criteria:** 3 to 5, each one rule with an examples table in values from the project's real data. More than 5 is a story to split by [split.md](split.md). A question they will research goes under `Open questions`.
 4. **Critique them** against INVEST, in one list of `AC<n>: <problem> (<INVEST letter or idea>) — <fix>`. The user revises or keeps each; a kept one goes on the story as theirs, with its risk named. Also flag:

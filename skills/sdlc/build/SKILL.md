@@ -9,7 +9,7 @@ metadata:
 
 Build one ticket to a pull request a person merges. A bug follows [references/bug.md](references/bug.md), a chore or refactoring [references/chore.md](references/chore.md), over any step below.
 
-1. **Criteria:** the ticket's, else the request's items as `Done when:` lines; with neither, the person writes them by the `story` skill.
+1. **Criteria:** the ticket's; for a request that states the change in full, its items as `Done when:` lines. Otherwise load the `story` skill now, and the person writes them by it.
 2. **Mode:** from the request, else the ticket's comments, else `AGENTS.md`'s `Build:` line, else ask whether to pair or run autopilot, your pick first. To pair, run the `pair-programming` skill on the ticket. A branch it hands back goes straight to step 5.
 3. **Branch:** a worktree from main, `<story|bug|chore|refactor>/<key>-<title-words>`. Move its issue through In progress, In review and Testing.
 4. **Build** by [references/autopilot.md](references/autopilot.md).
