@@ -14,6 +14,8 @@
                      directory, `~/.sdlc-holdout/`, outside every repository.
   * Pull request cap: opening a pull request or pushing a branch whose diff from the default branch
                      changes more than 400 lines asks the person.
+  * Leftovers gate:  a commit that adds a debugger call, a TODO or commented-out code asks the person.
+  * Silencer gate:   a commit that adds a line switching a type checker or linter off asks the person.
 """
 import difflib, hashlib, json, os, re, shlex, subprocess, sys
 
@@ -52,6 +54,15 @@ INSTALL = re.compile(PREFIX + r"(?:(?:python[\d.]*\s+-m\s+|uv\s+)?pip[\d.]*\s+in
 # A runner fetches and executes its first argument at once.
 RUNNER = re.compile(PREFIX + r"(?:npx|uvx|bunx|pipx\s+run|pnpm\s+dlx|npm\s+exec|uv\s+tool\s+run)\s+(.*)$")
 PR = re.compile(PREFIX + r"(?:gh\s+pr\s+create|glab\s+mr\s+create|git\s+push)\b")
+COMMIT = re.compile(PREFIX + r"git\s+(?:-\S+\s+\S+\s+)*commit\b")
+# shortcut: matched by pattern per added line; a print() left in, an unused import or a shim passes and rests on the reviewer.
+LEFTOVER = re.compile(r"\bconsole\.(?:log|debug)\(|^\s*debugger;?\s*$|\bbreakpoint\(\)|\bi?pdb\.set_trace\(|binding\.pry|\bdbg!\("
+                      r"|\b(?:TODO|FIXME|XXX)\b"
+                      r"|^\s*(?:#|//)\s*(?:import\s|from\s+\S+\s+import\s|def\s|class\s|return\b|(?:const|let|var)\s"
+                      r"|[\w.]+\s*=\s*[^=\s]|[\w.]+\(.*\)\s*;?\s*$)")
+SILENCER = re.compile(r"#\s*type:\s*ignore|#\s*noqa|#\s*pyright:\s*ignore|#\s*pylint:\s*disable|eslint-disable"
+                      r"|@ts-(?:ignore|nocheck|expect-error)|\bas\s+any\b|:\s*any\b|//\s*nolint|#\[allow\(|@SuppressWarnings")
+PROSE = (".md", ".txt", ".rst")
 INSTALLERS = {"pip", "setuptools", "wheel"}
 VALUE_FLAGS = {"-r", "-c", "-e", "-i", "-f", "-t", "-p", "--requirement", "--constraint", "--editable", "--index-url",
                "--extra-index-url", "--find-links", "--target", "--prefix", "--python", "--group", "--registry",
@@ -258,6 +269,35 @@ def holdout(inp):
     return None
 
 
+def added_lines(root):
+    """(path, line number, text) for each line the tree adds since HEAD, untracked files included, prose and lockfiles left out."""
+    out, path, n = [], None, 0
+    for l in (git(root, "diff", "HEAD", "-U0", "--no-color", "--no-ext-diff") or "").splitlines():
+        if l.startswith("+++ "):
+            path = l[6:] if l.startswith("+++ b/") else None
+        elif l.startswith("@@"):
+            n = int(re.search(r"\+(\d+)", l).group(1))
+        elif l.startswith("+") and path:
+            out.append((path, n, l[1:])); n += 1
+    for f in (git(root, "ls-files", "-o", "--exclude-standard") or "").splitlines():
+        out += [(f, i, t) for i, t in enumerate(read(os.path.join(root, f)).splitlines(), 1)]
+    return [r for r in out if not r[0].endswith(PROSE) and os.path.basename(r[0]) not in LOCKFILES]
+
+
+def commit_gates(root):
+    rows = added_lines(root)
+    show = lambda hits: "; ".join(f"{p}:{n} `{t.strip()[:60]}`" for p, n, t in hits[:5])
+    left, quiet = [r for r in rows if LEFTOVER.search(r[2])], [r for r in rows if SILENCER.search(r[2])]
+    reasons = []
+    if left:
+        reasons.append(f"Leftovers in this commit: {show(left)}. Remove each debugger call, TODO and commented-out line; "
+                       "approve only when one is meant to stay.")
+    if quiet:
+        reasons.append(f"This commit switches a checker off: {show(quiet)}. Fix the type or lint finding instead; "
+                       "approve only when it cannot be fixed.")
+    return reasons
+
+
 def pre_bash(command, root):
     state = load(root)
     state["head"] = (git(root, "rev-parse", "HEAD") or "").strip()
@@ -269,7 +309,10 @@ def pre_bash(command, root):
     if names:
         reasons.append(f"First-seen dependency: {', '.join(names)} is in no manifest or lockfile of this repository. "
                        "Confirm each name exists on its registry and is the package you mean.")
-    if any(PR.match(part.strip()) for part in re.split(r"&&|\|\||[;|\n]", command)):
+    parts = [part.strip() for part in re.split(r"&&|\|\||[;|\n]", command)]
+    if any(COMMIT.match(part) for part in parts):
+        reasons += commit_gates(root)
+    if any(PR.match(part) for part in parts):
         n = changed_lines(root)
         if n > DIFF_CAP:
             reasons.append(f"This branch changes {n} lines, over the {DIFF_CAP}-line cap for one pull request. "
@@ -467,6 +510,19 @@ def self_test():
     assert not pre_bash("git status", t), "other commands pass"
     run("git", "checkout", "-q", "-"); run("git", "branch", "-qD", "big")
     assert not pre_bash("git push", t), "a small diff passes"
+
+    # Leftovers and silencer gates
+    put("src/app.py", "def f(x):\n    breakpoint()\n    # return x + 1\n    return x  # TODO: real rule\n")
+    r = pre_bash("git add -A && git commit -qm f", t)["hookSpecificOutput"]["permissionDecisionReason"]
+    assert "src/app.py:2" in r and "src/app.py:3" in r and "src/app.py:4" in r and "switches" not in r
+    put("src/app.py", "def f(x):  # type: ignore\n    return x\n")
+    assert "switches a checker off" in pre_bash("git commit -qam f", t)["hookSpecificOutput"]["permissionDecisionReason"]
+    put("src/app.py", "def f(x):\n    # The tax office rounds half down, so round() is wrong here.\n    return x\n")
+    put("NOTES.md", "TODO: later\n")
+    assert not pre_bash("git commit -qam f", t), "a why comment and prose pass"
+    assert not pre_bash("git status", t), "only a commit is checked"
+    assert added_lines(t) and all(not p.endswith(".md") for p, _, _ in added_lines(t))
+    os.remove(os.path.join(t, "src/app.py")); os.remove(os.path.join(t, "NOTES.md"))
 
     # Done check
     save(t, {"baseline": fingerprint(t), "check": check_command(t)})

@@ -1,5 +1,5 @@
 {
-  "description": "Test lock, done check, AGENTS.md size cap, dependency gate, holdout guard and pull request size cap.",
+  "description": "Test lock, done check, AGENTS.md size cap, dependency gate, holdout guard, pull request size cap, leftovers gate and silencer gate, plus the working agreement printed at session start.",
   "hooks": {
     "SessionStart": [
       {
@@ -7,6 +7,10 @@
           {
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}\"/hooks/guard.py"
+          },
+          {
+            "type": "command",
+            "command": "cat \"${CLAUDE_PLUGIN_ROOT}/hooks/working-agreement.md\""
           }
         ]
       }

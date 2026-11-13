@@ -4,27 +4,21 @@
   "owner": {
     "name": "DaveBben"
   },
-  "description": "One plugin for coding agents: sdlc builds a change from criteria you write to a reviewed pull request, with hooks that decide when it is done. An optional second, working-agreement, sets how the agent works with you.",
+  "description": "One plugin for coding agents: sdlc builds a change from criteria you write to a reviewed pull request, with hooks that decide when it is done and house rules for how the agent works with you.",
   "plugins": [
     {
       "name": "sdlc",
       "source": "./plugins/sdlc",
-      "description": "Whoever made a change, someone else attacks it, and a machine decides when it is done: a build skill where your acceptance criteria decide done, failing tests come first and a blind challenger holds some back, and fresh agents implement, review and verify; plus hooks for a test lock, a done check, an AGENTS.md size cap, a dependency gate, a holdout guard and a pull request size cap.",
-      "version": "3.0.0",
+      "description": "Whoever made a change, someone else attacks it, and a machine decides when it is done: a story skill for the acceptance criteria you write, a spike skill for throwaway experiments, a bug skill that reproduces a fault and finds why it escaped, a refactor skill that keeps every test passing unchanged, a build skill where your acceptance criteria decide done, failing tests come first and a blind challenger holds some back, and fresh agents implement, review and verify; plus hooks for a test lock, a done check, an AGENTS.md size cap, a dependency gate, a holdout guard, a pull request size cap, and gates on commits that leave in debugging leftovers or switch a checker off. At session start, a hook adds house rules for how the agent works with you, and a delegator agent runs non-coding tasks in parallel.",
+      "version": "3.1.0",
       "license": "MIT",
       "skills": [
+        "./skills/story",
+        "./skills/spike",
+        "./skills/bug",
+        "./skills/refactor",
         "./skills/build"
       ],
-      "author": {
-        "name": "DaveBben"
-      }
-    },
-    {
-      "name": "working-agreement",
-      "source": "./plugins/working-agreement",
-      "description": "Optional house rules for how the agent works with you: keep it simple, look facts up instead of asking, one decision per question that yes accepts, and explanations that lead with what a thing means for you and a concrete case before the mechanism and its name. One hook adds them at session start.",
-      "version": "1.4.0",
-      "license": "MIT",
       "author": {
         "name": "DaveBben"
       }

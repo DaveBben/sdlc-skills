@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: "Use for every code review, launched before you read the diff yourself: a diff, branch, commit, or uncommitted or working-tree changes, such as diff.patch or 'review my changes'. Review it, find its bugs, or give an independent, blind, unbiased or second-opinion pass by someone other than its author. A fresh reviewer that sees only diff.patch, story.md and the tree, works through every checklist section and writes each candidate finding with its support for the verifier."
+description: "Use for every code review, however small, launched before you read the diff yourself: a diff, branch, commit, or uncommitted or working-tree changes, such as diff.patch, 'review my changes' or 'a second opinion on my uncommitted changes before I commit'. Review it, find its bugs, or give an independent, blind, unbiased or second-opinion pass by someone other than its author. A fresh reviewer that sees only diff.patch, story.md and the tree, works through every checklist section and writes each candidate finding with its support for the verifier."
 tools: Read, Grep, Glob, Bash, Write
 model: opus
 effort: high

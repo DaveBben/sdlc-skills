@@ -26,7 +26,6 @@ Write the body for a person who saw none of the build: nothing outside the repos
 ## Tests
 <n> added in <n> files. `<check command>` passes (<n> tests, <n>% coverage). Mutation: <n> of <n> killed, or not set up.
 Running app: <criterion>: <what was run> -> <what it showed>
-Real check: `<command>` on <input>: <result> against <bar>, or none, <reason>.
 Tests from before the branch or written before the code, changed with a person's agreement: <hash> <file>: <why>, or none.
 
 <details><summary>Agent decisions, test names, results of the check on changed tests</summary>

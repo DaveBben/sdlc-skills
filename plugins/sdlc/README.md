@@ -1,18 +1,25 @@
 # sdlc
 
-One skill, 4 agents and 6 hooks. Whoever made a change, someone else attacks it, and a machine decides when it is done.
+5 skills, 6 agents, 8 hooks and the house rules. Whoever made a change, someone else attacks it, and a machine decides when it is done.
 
 ## What runs in a session
 
+- **The `story` skill:** you write acceptance criteria, each with a Given/When/Then example in real values, and agree the done check; the agent shows what in the code affects them and critiques them against the failure modes of bad stories.
+- **The `spike` skill:** "do a spike on X" frames a question that can fail, builds throwaway code in a scratch directory, records the findings and deletes the code.
+- **The `bug` skill:** reproduces a fault before any fix, writes it as Given/When/Then, names why it escaped and the check that would have caught it, then decides fix now, story or won't fix.
+- **The `refactor` skill:** keeps every existing test passing unchanged, adds characterization tests where none cover the code, makes one named refactoring per commit, then ships it through `build`'s review.
 - **The `build` skill:** loads when you ask for a change to be built or fixed. You write the acceptance criteria, it writes failing tests from your examples and commits them, then delegates the rest.
-- **4 agents:** a test challenger adds tests for wrong implementations without reading the code and holds some back, an implementer makes the tests pass without seeing the held-back ones, a reviewer reads the diff, and a verifier proves or drops each finding.
-- **6 hooks,** all in [`hooks/guard.py`](hooks/guard.py):
+- **6 agents:** a plan reviewer attacks a spec, design or plan before any code, a test challenger adds tests for wrong implementations without reading the code and holds some back, an implementer makes the tests pass without seeing the held-back ones, a reviewer reads the diff, a verifier proves or drops each finding, and a delegator (Sonnet) runs a non-coding task in parallel and returns only its status, result, and what it created or deleted.
+- **House rules:** at session start, and again after `/clear` or a compaction, a hook prints [`hooks/working-agreement.md`](hooks/working-agreement.md): how the agent works with you, asks you questions and explains things.
+- **8 hooks,** all in [`hooks/guard.py`](hooks/guard.py):
   - **Test lock:** an edit that changes or removes a line of a committed test asks you.
   - **Done check:** when the agent stops, the `Check:` command of `AGENTS.md` runs, and a failure sends it back.
   - **Size cap:** `AGENTS.md` and `CLAUDE.md` stay under 100 lines and 8 KB.
   - **Dependency gate:** a package that no manifest or lockfile holds asks you.
   - **Holdout guard:** the implementer can't read the held-back tests.
   - **Pull request cap:** opening or pushing a branch past 400 changed lines asks you.
+  - **Leftovers gate:** a commit that adds a debugger call, a TODO or commented-out code asks you.
+  - **Silencer gate:** a commit that adds `# type: ignore`, `eslint-disable`, `as any` or the like asks you.
 
 A change with no trade-off, such as a colour or a config value, skips the skill: the agent makes it and the done check runs.
 
