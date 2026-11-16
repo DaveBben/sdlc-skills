@@ -7,7 +7,7 @@ One plugin for coding agents, built on one rule: whoever made a change, someone 
 - **You decide done:** before any work, the agent agrees with you in chat what you want, why, and the happy and failure paths. The agent that builds never defines done.
 - **Tests come first:** failing tests from your examples, committed before any code; mutation testing finds the weak ones.
 - **Fresh agents attack the work:** one implements, one reviews the diff, and one proves or drops each finding before you see it.
-- **Hooks enforce the rest:** your tests must pass before the agent stops, first-seen packages ask you, `AGENTS.md` stays under 100 lines, a pull request over 400 changed lines asks you, and so does a commit that leaves in a debugger call or TODO or switches a checker off.
+- **Hooks enforce the rest:** your tests must pass before the agent stops, first-seen packages ask you, `AGENTS.md` stays under 100 lines, a push or pull request is refused until every agreed `Done when:` command passes and each criterion has a test, a pull request over 400 changed lines asks you, and so does a commit that leaves in a debugger call or TODO or switches a checker off.
 
 The 18 principles behind it are in [docs/principles.md](docs/principles.md). Most are habits for you, so the plugin holds only what a skill, an agent or a hook can enforce.
 

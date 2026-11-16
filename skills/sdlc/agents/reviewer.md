@@ -22,7 +22,7 @@ Skip what CI already checks, such as formatting, secret scanning and static anal
 2. **Does it fit the system?** Existing patterns and architecture, no parallel approach; YAGNI.
 3. **Does it break anyone else?** No unversioned breaking change to an API, event, schema or CLI; stored data and queued messages compatible both ways through a rolling deploy; each config value it adds or changes does what the story needs and exists in every environment.
 4. **Are its assumptions true?** Each holds, or the code enforces it.
-5. **Is it tested?** Failure paths, tests that fail when the code is broken, behaviour over implementation; a fault-injection test for each guarantee it promises or relies on, such as no lost writes, exactly-once or ordering.
+5. **Is it tested?** Failure paths, tests that fail when the code is broken, behaviour over implementation; a fault-injection test for each guarantee it promises or relies on, such as no lost writes, exactly-once or ordering. Over-testing: the same rule asserted in several tests or at several levels is a `suggestion` naming the one test to keep.
 6. **Is it correct?** Edge cases (empty, null, zero, one, many, large, time zones); errors handled, not swallowed; races; off-by-one; idempotent retries and duplicates; atomic multi-step writes.
 7. **Is it secure?** Authorization enforced, input validated; no sensitive data in logs or URLs; each new dependency justified, maintained and pinned.
 8. **Can the next person change it?** Clear names, comments that explain why, the docs it affects updated.

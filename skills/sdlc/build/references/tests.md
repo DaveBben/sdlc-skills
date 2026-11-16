@@ -2,7 +2,7 @@
 
 When the change adds a signature, first commit it as a stub whose body only raises, so each test runs through the real interface.
 
-1. **Name** the tests in `docs/glossary.md`'s terms where it exists.
+1. **Name** each test after its criterion, such as `test_ac3_young_video_counts_from_zero`, in `docs/glossary.md`'s terms where it exists.
 2. **List** one test per example, per row of an example's table or per `Done when:` line, plus one each side of each boundary a criterion's rule states, and a property test for a rule over a range or an invariant where the repository has a property-testing library, and no other: `<n>. <criterion> — <test name> — <fixture values> — rejects: <a plausible wrong implementation this fixture fails>`.
 3. **Write** each through the interface, at the lowest level that shows its result. Never invent a public name.
    * **Expected values** come from the criterion's words, never from what the code does now. An example that contradicts its criterion's rule goes on `Questions:`, quoting both.

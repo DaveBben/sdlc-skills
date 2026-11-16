@@ -9,14 +9,20 @@
                      lockfile in the repository holds asks the person (slopsquatting).
   * Pull request cap: opening a pull request or pushing a branch whose diff from the default branch
                      changes more than 400 lines asks the person.
+  * Acceptance gate: pushing or opening a pull request from a branch that adds or changes a file under
+                     docs/acceptance/ runs each backticked `Done when:` command in it and the test command,
+                     checks that a test changed on the branch names each `AC<n>` criterion, and refuses on
+                     any failure. A story/ or bug/ branch with no such file asks the person. An edit that
+                     changes a committed criterion or `Done when:` command asks the person.
   * Leftovers gate:  a commit that adds a debugger call, a TODO or commented-out code asks the person.
   * Silencer gate:   a commit that adds a line switching a type checker or linter off asks the person.
 """
-import hashlib, json, os, re, shlex, subprocess, sys
+import hashlib, json, os, re, shlex, subprocess, sys, time
 
 MAX_LINES, MAX_BYTES = 100, 8 * 1024  # this plugin's choice, sized for a root file of commands, constraints and traps
 MAX_BLOCKS = 5  # this plugin's choice: failed checks in a row before the agent may stop anyway
 CHECK_SECONDS = 300
+GATE_SECONDS = 600  # the whole acceptance gate; hooks.json gives PreToolUse a little more
 DIFF_CAP = 400  # this plugin's choice: past about 400 changed lines a reviewer reads less of each line
 INSTRUCTIONS = {"AGENTS.md", "CLAUDE.md"}
 CHECK = re.compile(r"^\s*(?:[-*]\s+)?(?:\*\*)?Check:(?:\*\*)?\s*`([^`\n]+)`", re.M)
@@ -37,7 +43,12 @@ INSTALL = re.compile(PREFIX + r"(?:(?:python[\d.]*\s+-m\s+|uv\s+)?pip[\d.]*\s+in
                      r"|(?:npm|pnpm|bun)\s+(?:install|i|add)|go\s+get|gem\s+install|uv\s+tool\s+install|pipx\s+install)\s+(.*)$")
 # A runner fetches and executes its first argument at once.
 RUNNER = re.compile(PREFIX + r"(?:npx|uvx|bunx|pipx\s+run|pnpm\s+dlx|npm\s+exec|uv\s+tool\s+run)\s+(.*)$")
-PR = re.compile(PREFIX + r"(?:gh\s+pr\s+create|glab\s+mr\s+create|git\s+push)\b")
+PR = re.compile(PREFIX + r"(?:gh\s+pr\s+create|glab\s+mr\s+create|tea\s+(?:pr|pulls?)\s+create|git\s+push)\b")
+# The acceptance file: criteria as `AC<n>:` lines, each `Done when:` a command that exits 0 only when its result holds.
+ACCEPTANCE = re.compile(r"(?:^|/)docs/acceptance/[^/]+\.md$")
+AC = re.compile(r"^[^\w\n]*(?:\d+\.\s+)?(?:\*\*)?AC(\d+)\b.*$", re.M)
+DONE_WHEN = re.compile(r"^\s*(?:[-*]\s+)?(?:\*\*)?Done when:(?:\*\*)?\s*`([^`\n]+)`", re.M)
+TEST_FILE = re.compile(r"(?:^|/)(?:tests?|__tests__|spec)/|(?:^|/)test_[^/]*$|[._-](?:test|spec)\.[^/.]+$")
 COMMIT = re.compile(PREFIX + r"git\s+(?:-\S+\s+\S+\s+)*commit\b")
 # shortcut: matched by pattern per added line; a print() left in, an unused import or a shim passes and rests on the reviewer.
 LEFTOVER = re.compile(r"\bconsole\.(?:log|debug)\(|^\s*debugger;?\s*$|\bbreakpoint\(\)|\bi?pdb\.set_trace\(|binding\.pry|\bdbg!\("
@@ -164,6 +175,12 @@ def pre_edit(tool, inp, cwd):
     root = (git(os.path.dirname(path) or cwd, "rev-parse", "--show-toplevel") or "").strip()
     if not root:
         return None
+    if ACCEPTANCE.search(path) and (git(root, "ls-files", "--", path) or "").strip():
+        agreed = lambda text: {m.group(0).strip() for m in AC.finditer(text)} | set(DONE_WHEN.findall(text))
+        gone = sorted(agreed(old) - agreed(new))
+        if gone:
+            return ask("This edit changes agreed criteria or `Done when:` commands that are already committed: "
+                       + "; ".join(gone)[:600] + ". They are the person's to change.")
     kind = manifest_kind(path)
     if kind:
         names = unknown(new_packages(kind, old, new), known_text(root))
@@ -203,13 +220,19 @@ def fingerprint(root):
     return h.hexdigest()
 
 
-def changed_lines(root):
-    """Lines added plus removed in the tree since the branch left the default branch, lockfiles left out."""
+def merge_base(root):
+    """The commit where the branch left the default branch, or None."""
     for ref in ("origin/HEAD", "origin/main", "origin/master", "main", "master"):
         base = (git(root, "merge-base", ref, "HEAD") or "").strip()
         if base:
-            break
-    else:
+            return base
+    return None
+
+
+def changed_lines(root):
+    """Lines added plus removed in the tree since the branch left the default branch, lockfiles left out."""
+    base = merge_base(root)
+    if not base:
         return 0
     rows = (l.split("\t") for l in (git(root, "diff", "--numstat", base, "--") or "").splitlines())
     new = [f for f in (git(root, "ls-files", "-o", "--exclude-standard") or "").splitlines() if os.path.basename(f) not in LOCKFILES]
@@ -246,6 +269,47 @@ def commit_gates(root):
     return reasons
 
 
+def run(cmd, cwd, seconds):
+    try:
+        r = subprocess.run(cmd, shell=True, cwd=cwd, capture_output=True, text=True, errors="replace", timeout=max(1, seconds))
+        return r.returncode == 0, "\n".join((r.stdout + r.stderr).splitlines()[-20:])
+    except subprocess.TimeoutExpired:
+        return False, f"timed out after {max(1, seconds):.0f} s"
+
+
+def acceptance_gate(root):
+    """(refusals, questions) for a push or pull request, from the acceptance files the branch adds or changes."""
+    base = merge_base(root)
+    files = ((git(root, "diff", "--name-only", base, "--") or "").splitlines() if base else []) + \
+        (git(root, "ls-files", "-o", "--exclude-standard") or "").splitlines()
+    files = [f for f in dict.fromkeys(files) if os.path.isfile(os.path.join(root, f))]
+    docs = [f for f in files if ACCEPTANCE.search(f)]
+    branch = (git(root, "branch", "--show-current") or "").strip()
+    if not docs:
+        return [], ([f"Branch {branch} has no docs/acceptance/<key>.md holding its `AC<n>:` criteria and `Done when:` "
+                     "commands, so nothing shows it is done. Approve only when this branch needs none."]
+                    if re.match(r"(?:story|bug)/", branch) else [])
+    tests = "\n".join(f + "\n" + read(os.path.join(root, f)) for f in files if TEST_FILE.search(f))
+    refusals, end = [], time.time() + GATE_SECONDS
+    for d in docs:
+        text = read(os.path.join(root, d))
+        missing = [n for n in dict.fromkeys(AC.findall(text))
+                   if not re.search(rf"(?<![A-Za-z0-9])ac_?{n}(?![0-9])", tests, re.I)]
+        if missing:
+            refusals.append(f"{d}: no test changed on this branch names {', '.join('AC' + n for n in missing)}. "
+                            "Put `ac<n>` in the name of each criterion's tests, such as `test_ac3_<what>`.")
+        for cmd in DONE_WHEN.findall(text):
+            ok, out = run(cmd, root, end - time.time())
+            if not ok:
+                refusals.append(f"{d}: `Done when: {cmd}` fails:\n{out}")
+    cmd = check_command(root)
+    if cmd and not refusals:
+        ok, out = run(cmd, root, end - time.time())
+        if not ok:
+            refusals.append(f"The tests fail: `{cmd}`:\n{out}")
+    return refusals, []
+
+
 def pre_bash(command, root):
     reasons = []
     names = unknown(installs(command), known_text(root))
@@ -255,11 +319,17 @@ def pre_bash(command, root):
     parts = [part.strip() for part in re.split(r"&&|\|\||[;|\n]", command)]
     if any(COMMIT.match(part) for part in parts):
         reasons += commit_gates(root)
+    refusals = []
     if any(PR.match(part) for part in parts):
         n = changed_lines(root)
         if n > DIFF_CAP:
             reasons.append(f"This branch changes {n} lines, over the {DIFF_CAP}-line cap for one pull request. "
                            "Approve only when it cannot be split by criterion.")
+        refusals, questions = acceptance_gate(root)
+        reasons += questions
+    if refusals:
+        return deny("Not done:\n" + "\n".join(refusals) + "\nFix the code, test-first. A criterion or `Done when:` "
+                    "command that is itself wrong goes to the person.")
     return ask(" ".join(reasons)) if reasons else None
 
 
@@ -463,6 +533,31 @@ def self_test():
     assert not pre_bash("git status", t), "only a commit is checked"
     assert added_lines(t) and all(not p.endswith(".md") for p, _, _ in added_lines(t))
     os.remove(os.path.join(t, "src/app.py")); os.remove(os.path.join(t, "NOTES.md"))
+
+    # Acceptance gate
+    run("git", "checkout", "-qb", "story/x-export")
+    put("docs/acceptance/x.md", "# X: export\n\nAC1: A rule.\n  Given a\n  When b\n  Then c\n\n**AC2:** Another.\n\n"
+        "Done when: `test -f ready`\nDone when (checked by you): the page looks right\n")
+    put("tests/test_x.py", "def test_ac1_rule():\n    pass\n")
+    r = pre_bash("git push -u origin story/x-export", t)
+    assert decision(r) == "deny", "a failing Done when refuses the push"
+    reason = r["hookSpecificOutput"]["permissionDecisionReason"]
+    assert "AC2" in reason and "AC1" not in reason and "test -f ready" in reason, reason
+    put("tests/test_x.py", "def test_ac1_rule():\n    pass\n\ndef test_ac2_other():\n    pass\n"); put("ready", "")
+    assert decision(pre_bash("gh pr create --fill", t)) != "deny", "met criteria and a passing test command pass"
+    put("flag", "no")
+    assert "The tests fail" in pre_bash("tea pr create", t)["hookSpecificOutput"]["permissionDecisionReason"]
+    put("flag", "ok")
+    assert decision(pre_bash("git status", t)) is None, "only a push or pull request runs the gate"
+    run("git", "add", "-A"); run("git", "commit", "-qm", "test(red): x")
+    e = lambda a, b: pre_edit("Edit", {"file_path": os.path.join(t, "docs/acceptance/x.md"), "old_string": a, "new_string": b}, t)
+    assert decision(e("`test -f ready`", "`true`")) == "ask", "weakening a committed Done when asks"
+    assert decision(e("AC1: A rule.", "AC1: A looser rule.")) == "ask", "changing a committed criterion asks"
+    assert not e("  Given a", "  Given a, b"), "an example's wording passes"
+    run("git", "checkout", "-q", "-"); run("git", "checkout", "-qb", "bug/y")
+    assert decision(pre_bash("git push", t)) == "ask", "a story or bug branch with no acceptance file asks"
+    run("git", "checkout", "-q", "-")
+    run("git", "branch", "-qD", "story/x-export", "bug/y")
 
     # Done check
     start(t)

@@ -9,7 +9,7 @@
     {
       "name": "sdlc",
       "source": "./plugins/sdlc",
-      "description": "Whoever made a change, someone else attacks it, and a machine decides when it is done: a build skill that agrees with you what to build and why as testable Given/When/Then criteria, for a feature, a bug or a refactor, plans it and has the plan reviewed, writes failing tests first, and has fresh agents implement, review and verify, a story skill that holds the user story template, and a spike skill for throwaway experiments; plus hooks for a done check, an AGENTS.md size cap, a dependency gate, a pull request size cap, and gates on commits that leave in debugging leftovers or switch a checker off. At session start, a hook adds house rules for how the agent works with you, and a delegator agent runs non-coding tasks in parallel.",
+      "description": "Whoever made a change, someone else attacks it, and a machine decides when it is done: a build skill that agrees with you what to build and why as testable Given/When/Then criteria, for a feature, a bug or a refactor, plans it and has the plan reviewed, writes failing tests first, and has fresh agents implement, review and verify, a story skill that holds the user story template, and a spike skill for throwaway experiments; plus hooks for a done check, an AGENTS.md size cap, a dependency gate, a pull request size cap, an acceptance gate that refuses a push until each agreed `Done when:` command passes and each criterion has a test, and gates on commits that leave in debugging leftovers or switch a checker off. At session start, a hook adds house rules for how the agent works with you, and a delegator agent runs non-coding tasks in parallel.",
       "version": "3.2.0",
       "license": "MIT",
       "skills": [

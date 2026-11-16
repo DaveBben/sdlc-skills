@@ -46,10 +46,10 @@ Whoever made it, someone else attacks it, and a machine decides when it's done. 
 | Principle | Enforced by |
 |---|---|
 | 1, 2 | The `plan-reviewer` agent, and `build`'s design spec step |
-| 5 | `build`'s align and criteria review steps |
+| 5 | `build`'s align and criteria review steps, and the acceptance gate hook: each `AC<n>` needs a test |
 | 3 | The `build` skill and its agents |
-| 6 | Done-check hook, on the `Check:` line |
-| 7 | `build`'s check step |
+| 6 | Done-check hook, on the test command, and the acceptance gate hook, on each `Done when:` command |
+| 7 | `Done when:` commands on real data or the running app, run by the acceptance gate |
 | 8 | The reviewer, on each test changed after the red commit |
 | 9 | A `Mutation:` line in `AGENTS.md`, and property tests in `build` |
 | 10 | Leftovers and silencer gate hooks |

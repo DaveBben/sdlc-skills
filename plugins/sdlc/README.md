@@ -1,6 +1,6 @@
 # sdlc
 
-3 skills, 5 agents, 6 hooks and the house rules. Whoever made a change, someone else attacks it, and a machine decides when it is done.
+3 skills, 5 agents, 7 hooks and the house rules. Whoever made a change, someone else attacks it, and a machine decides when it is done.
 
 ## What runs in a session
 
@@ -9,11 +9,12 @@
 - **The `spike` skill:** "do a spike on X" frames a question that can fail, builds throwaway code in a scratch directory, records the findings and deletes the code.
 - **5 agents:** a plan reviewer attacks a spec, design or plan before any code, an implementer makes the tests pass, a reviewer reads the diff, a verifier proves or drops each finding, and a delegator (Sonnet) runs a non-coding task in parallel and returns only its status, result, and what it created or deleted.
 - **House rules:** at session start, and again after `/clear` or a compaction, a hook prints [`hooks/working-agreement.md`](hooks/working-agreement.md): how the agent works with you, asks you questions and explains things.
-- **6 hooks,** all in [`hooks/guard.py`](hooks/guard.py):
+- **7 hooks,** all in [`hooks/guard.py`](hooks/guard.py):
   - **Done check:** when the agent stops, the repository's test command runs in each worktree that changed, or the `Check:` command of `AGENTS.md` if it has one, and a failure sends it back.
   - **Size cap:** `AGENTS.md` and `CLAUDE.md` stay under 100 lines and 8 KB.
   - **Dependency gate:** a package that no manifest or lockfile holds asks you.
   - **Pull request cap:** opening or pushing a branch past 400 changed lines asks you.
+  - **Acceptance gate:** pushing or opening a pull request runs each `Done when:` command in the branch's `docs/acceptance/<key>.md` and the test command, and checks that each `AC<n>` criterion has a test named for it. Any failure refuses it. Changing a committed criterion or `Done when:` asks you.
   - **Leftovers gate:** a commit that adds a debugger call, a TODO or commented-out code asks you.
   - **Silencer gate:** a commit that adds `# type: ignore`, `eslint-disable`, `as any` or the like asks you.
 

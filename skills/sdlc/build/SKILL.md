@@ -19,9 +19,10 @@ The test command is the `Check:` line in `AGENTS.md`, else the repository's own,
    * Ask in chat, a few questions at a time, scaled to the change. A ticket that already answers them is the answer.
    * You are aligned when you agree on two things:
      * **Acceptance criteria** a test can decide. Each is a rule with a Given/When/Then example in real values. Include the failure paths.
-     * **`Done when:` lines** you will check before the pull request. Each is a command or action and the exact result it must show, on real data or the running app where it can. They write nothing live.
+     * **`Done when:` lines** checked before the pull request. Each is a command that exits 0 only when its result holds, on real data or the running app where it can. It writes nothing live. A result only an eye can judge is written `Done when (checked by you):`.
    * Every number or rule in them is the person's.
    * A request that already names the result and every value needs no examples. Its `Done when:` lines are enough.
+   * Write them to `docs/acceptance/<key>.md`, as [references/criteria.md](references/criteria.md) shows.
 2. **Review the criteria** for the failure modes in [references/criteria.md](references/criteria.md).
    * If you drafted any of them, a fresh subagent reviews them, given the criteria, the worktree and that file.
    * Fix wording slips yourself. Show the person the rest.
@@ -31,7 +32,8 @@ The test command is the `Check:` line in `AGENTS.md`, else the repository's own,
 5. **Review the plan** by a fresh subagent, given the plan, the criteria and the worktree. Fix what blocks.
 6. **Write the failing tests first,** from the acceptance criteria, by [references/tests.md](references/tests.md). One test per example.
    * See each one fail for the right reason.
-   * Commit them alone, the message starting `test(red):`.
+   * Name each test after its criterion, such as `test_ac3_<what>`.
+   * Commit them alone with the acceptance file, the message starting `test(red):`.
    * If a criterion changes later, review it again (step 2) and commit its new failing tests before any code.
 7. **Implement** by a fresh subagent, given the worktree, the red commit, the criteria, the test command, and the paths of the tests and refactor references.
    * Trust `git log` and the test command's output over what it reports.
@@ -42,7 +44,7 @@ The test command is the `Check:` line in `AGENTS.md`, else the repository's own,
    * One subagent reviews it. Another verifies the findings.
    * Tell the person each kept finding in one line. Fix each blocking one test-first.
 9. **Pull request** into main, titled `[<key>] <what it does>`, body by [references/pull-request.md](references/pull-request.md).
-   * First run each `Done when:` check and tell the person what it showed. Fix one that fails, test-first, before opening it.
+   * First run each `Done when:` command and the test command; all must pass. Fix what fails, test-first, never the criterion or the command. List the `Done when (checked by you):` lines in the pull request.
    * Watch CI and review comments until it merges. Fix what fails, reply to each comment.
    * After merge, remove the worktree and the branch.
 

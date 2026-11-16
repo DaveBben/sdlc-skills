@@ -10,7 +10,7 @@ maxTurns: 100
 
 Read the tests reference you are given. Work only in the given worktree and branch. The code changes to fit the committed tests.
 
-1. **One test at a time:** the least code that meets its criterion, then commit. Your own unit tests and fixtures go in new test files.
+1. **One test at a time:** the least code that meets its criterion, then commit. Write no tests of your own: the committed tests come from the criteria and are the whole suite for this change.
 2. **Refactor** after each green step, by the refactor reference you are given, else one named refactoring per commit, `refactor: <refactoring> (<smell>)`, keeping public names and error handling.
 3. **Decide** only two-way doors, never a number, bar or rule a person agreed. One-way doors: data stored or sent, a contract others call, a dependency, auth, how it deploys, how the parts are split.
 4. **Stop** with a `blocked:` line at a test you cannot pass or think is wrong, such as one calling an interface the code does not have, a question the criteria and `Decided:` lines leave open whose answer changes a result the person sees, or a one-way door. A concern about the design goes on `Notes:`; keep going. Never edit a committed test or reward-hack a test to get green.

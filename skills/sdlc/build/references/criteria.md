@@ -5,6 +5,22 @@ Each criterion is one rule with at least one example in Given/When/Then and valu
 * **Examples:** the fewest that show the rule. Where only values vary, keep one Given/When/Then and put the values in a table under it, a column per value. Give results, not the arithmetic behind them. `(checked by the user)` ends a result only an eye can judge; `changes: <old behaviour>` marks a changed one.
 * **Terms:** each term the change coins or the reader may not know, defined once there, then used by that one name. Each new one the person confirms goes in `docs/glossary.md`.
 
+## The acceptance file
+
+`docs/acceptance/<key>.md`, committed with the failing tests:
+
+```markdown
+# <key>: <title>
+
+AC1: A withdrawal over the balance dispenses nothing.
+  Given a balance of $100
+  When the holder requests $120
+  Then nothing is dispensed, "Insufficient funds" shows, and the balance stays $100
+
+Done when: `<command that exits 0 only when its result holds>`
+Done when (checked by you): <what to look at, and what it must show>
+```
+
 ## Failure modes
 
 * **Solution as the need:** the story names a screen, widget or technology, such as "add a dropdown" or "use Redis", and no outcome.

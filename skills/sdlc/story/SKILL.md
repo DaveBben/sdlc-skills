@@ -24,13 +24,13 @@ As a <role>, I want <action> so that <outcome>.
 
 ## Acceptance criteria
 
-1. A withdrawal up to the balance is paid out from the balance.
+AC1: A withdrawal up to the balance is paid out from the balance.
 
    Given a balance of $100\
    When the holder requests $20\
    Then $20 is dispensed and the balance is $80
 
-2. A withdrawal over the balance dispenses nothing.
+AC2: A withdrawal over the balance dispenses nothing.
 
    Given a balance of $100\
    When the holder requests $120\
@@ -38,7 +38,8 @@ As a <role>, I want <action> so that <outcome>.
 
 ## Done when
 
-- `<command>`, or <what to do>: <the exact result it shows, on which data or app>
+Done when: `<command that exits 0 only when its result holds>`
+Done when (checked by you): <what to look at, and what it must show>
 
 ## Out of scope
 
