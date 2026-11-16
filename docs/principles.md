@@ -46,14 +46,14 @@ Whoever made it, someone else attacks it, and a machine decides when it's done. 
 | Principle | Enforced by |
 |---|---|
 | 1, 2 | The `plan-reviewer` agent, and `build`'s design spec step |
-| 5 | The `story` skill, and `build`'s criteria step |
-| 3, 9 | The `build` skill and its agents |
+| 5 | `build`'s align and criteria review steps |
+| 3 | The `build` skill and its agents |
 | 6 | Done-check hook, on the `Check:` line |
 | 7 | `build`'s check step |
-| 8 | Test-lock hook |
-| 9 | Holdout guard hook, and a `Mutation:` line in `AGENTS.md` |
+| 8 | The reviewer, on each test changed after the red commit |
+| 9 | A `Mutation:` line in `AGENTS.md`, and property tests in `build` |
 | 10 | Leftovers and silencer gate hooks |
-| 11 | The `bug` skill's escape check, then you |
+| 11 | You |
 | 12 | Dependency-gate hook |
 | 13 | Size-cap hook, 100 lines or 8 KB |
 | 16 | Pull request cap hook, 400 changed lines |

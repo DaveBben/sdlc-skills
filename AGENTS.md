@@ -16,10 +16,10 @@ When an agent using the plugin fails, add a check that catches the failure. Do n
 
 ## Key files
 
-- `plugins/sdlc/hooks/guard.py` is the 8 hooks in one script: test lock, done check, size cap, dependency gate, holdout guard, pull request cap, leftovers gate and silencer gate. `hooks.json` beside it registers the events.
-- `skills/sdlc/` holds the 5 skills: `story` writes and critiques acceptance criteria, `spike` runs a throwaway experiment, `bug` reproduces a fault and finds why it escaped, `refactor` changes structure with every test unchanged, and `build` takes criteria to a pull request. `build/references/tests.md` holds how to write the failing tests. Edit a skill only there.
+- `plugins/sdlc/hooks/guard.py` is the 6 hooks in one script: done check, size cap, dependency gate, pull request cap, leftovers gate and silencer gate. `hooks.json` beside it registers the events.
+- `skills/sdlc/` holds the 2 skills: `build`, which takes a feature, bug or refactor from agreed criteria to a merged pull request, and `spike`, which runs a throwaway experiment. `build/references/` holds the conventions each step loads: criteria and their failure modes, the plan, the failing tests, refactoring and the pull request body. Edit a skill only there.
 - **A skill as a stored prompt:** a skill also earns its place when it holds the owner's own conventions, which a capable model would follow but the owner would otherwise retype each time. Keep such a skill to those conventions.
-- `skills/sdlc/agents/` holds the 6 subagent prompts: `plan-reviewer`, `test-challenger`, `implementer`, `reviewer`, `verifier` and `delegator`, which runs non-coding tasks in parallel. The skill describes each delegated step and never names an agent, because the harness picks the agent by its `description`. The holdout guard finds the implementer by its agent type, `sdlc:implementer`.
+- `skills/sdlc/agents/` holds the 5 subagent prompts: `plan-reviewer`, `implementer`, `reviewer`, `verifier` and `delegator`, which runs non-coding tasks in parallel. The skill describes each delegated step and never names an agent, because the harness picks the agent by its `description`.
 - `plugins/<plugin>/` is a thin Claude Code wrapper: a `.claude-plugin/plugin.json`, a README, and for `sdlc` the symlinks `skills` and `agents` into `skills/sdlc`. Do not replace the symlinks with real files.
 - `plugins/sdlc/hooks/working-agreement.md` is the house rules, printed at session start. A skill's own rules win where they differ, so no skill repeats them.
 - `tools/baseline.py` compares the plugin against a plain prompt on the tasks in `tools/tasks/`.

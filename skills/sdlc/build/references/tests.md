@@ -3,7 +3,7 @@
 When the change adds a signature, first commit it as a stub whose body only raises, so each test runs through the real interface.
 
 1. **Name** the tests in `docs/glossary.md`'s terms where it exists.
-2. **List** one test per example, or per row of an example's table, plus one each side of each boundary a criterion's rule states, and no other: `<n>. <criterion> — <test name> — <fixture values> — rejects: <a plausible wrong implementation this fixture fails>`.
+2. **List** one test per example, per row of an example's table or per `Done when:` line, plus one each side of each boundary a criterion's rule states, and a property test for a rule over a range or an invariant where the repository has a property-testing library, and no other: `<n>. <criterion> — <test name> — <fixture values> — rejects: <a plausible wrong implementation this fixture fails>`.
 3. **Write** each through the interface, at the lowest level that shows its result. Never invent a public name.
    * **Expected values** come from the criterion's words, never from what the code does now. An example that contradicts its criterion's rule goes on `Questions:`, quoting both.
    * **Sociable tests** on production's database engine: double only an outside service, the clock and randomness, preferring the repository's own fake.
@@ -12,7 +12,7 @@ When the change adds a signature, first commit it as a stub whose body only rais
    * **No test** for an example marked `(checked by the user)`. A criterion with no observable result goes on `Questions:`.
 4. **Existing tests:** change one only where a criterion states the new behaviour, and list it on `Changes existing:`.
 5. **Red:** run them; each fails for the right reason. One already passing is listed `already passing`, or goes.
-6. **Commit** them alone on the branch, never main, the message starting `test(red):` and holding the criteria, the test list and `Changes existing:`: the red commit. A commit hook a red test fails is skipped alone, by its id.
+6. **Commit** them alone on the branch, never main, the message starting `test(red):` and holding the criteria, the test list and `Changes existing:`: the red commit. A commit hook a red test fails is skipped alone, by its id, never by marking the tests expected to fail.
 
 ```text
 Red: <hash>; tests: <paths>; <n> failing, <n> already passing

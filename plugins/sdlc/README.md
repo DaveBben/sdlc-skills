@@ -1,22 +1,17 @@
 # sdlc
 
-5 skills, 6 agents, 8 hooks and the house rules. Whoever made a change, someone else attacks it, and a machine decides when it is done.
+2 skills, 5 agents, 6 hooks and the house rules. Whoever made a change, someone else attacks it, and a machine decides when it is done.
 
 ## What runs in a session
 
-- **The `story` skill:** you write acceptance criteria, each with a Given/When/Then example in real values, and agree the done check; the agent shows what in the code affects them and critiques them against the failure modes of bad stories.
+- **The `build` skill:** loads for any change: a feature, a bug or a refactor. It first agrees with you in chat what you want, why, and the happy and failure paths, as Given/When/Then criteria in real values, and reviews them against the failure modes of bad criteria. A bug is reproduced first; a refactor keeps every test unchanged. It plans the change and has the plan reviewed, asks you each hard-to-reverse decision, writes failing tests from your examples and commits them, then delegates the rest. Ask for a story and it writes the criteria up as one, such as for a ticket at work.
 - **The `spike` skill:** "do a spike on X" frames a question that can fail, builds throwaway code in a scratch directory, records the findings and deletes the code.
-- **The `bug` skill:** reproduces a fault before any fix, writes it as Given/When/Then, names why it escaped and the check that would have caught it, then decides fix now, story or won't fix.
-- **The `refactor` skill:** keeps every existing test passing unchanged, adds characterization tests where none cover the code, makes one named refactoring per commit, then ships it through `build`'s review.
-- **The `build` skill:** loads when you ask for a change to be built or fixed. You write the acceptance criteria, it writes failing tests from your examples and commits them, then delegates the rest.
-- **6 agents:** a plan reviewer attacks a spec, design or plan before any code, a test challenger adds tests for wrong implementations without reading the code and holds some back, an implementer makes the tests pass without seeing the held-back ones, a reviewer reads the diff, a verifier proves or drops each finding, and a delegator (Sonnet) runs a non-coding task in parallel and returns only its status, result, and what it created or deleted.
+- **5 agents:** a plan reviewer attacks a spec, design or plan before any code, an implementer makes the tests pass, a reviewer reads the diff, a verifier proves or drops each finding, and a delegator (Sonnet) runs a non-coding task in parallel and returns only its status, result, and what it created or deleted.
 - **House rules:** at session start, and again after `/clear` or a compaction, a hook prints [`hooks/working-agreement.md`](hooks/working-agreement.md): how the agent works with you, asks you questions and explains things.
-- **8 hooks,** all in [`hooks/guard.py`](hooks/guard.py):
-  - **Test lock:** an edit that changes or removes a line of a committed test asks you.
-  - **Done check:** when the agent stops, the `Check:` command of `AGENTS.md` runs, and a failure sends it back.
+- **6 hooks,** all in [`hooks/guard.py`](hooks/guard.py):
+  - **Done check:** when the agent stops, the `Check:` command of `AGENTS.md` runs in each worktree that changed, and a failure sends it back.
   - **Size cap:** `AGENTS.md` and `CLAUDE.md` stay under 100 lines and 8 KB.
   - **Dependency gate:** a package that no manifest or lockfile holds asks you.
-  - **Holdout guard:** the implementer can't read the held-back tests.
   - **Pull request cap:** opening or pushing a branch past 400 changed lines asks you.
   - **Leftovers gate:** a commit that adds a debugger call, a TODO or commented-out code asks you.
   - **Silencer gate:** a commit that adds `# type: ignore`, `eslint-disable`, `as any` or the like asks you.
@@ -31,10 +26,8 @@ Finish branches started under sdlc 1.x before upgrading. Their red tests carry e
 
 | Step | Who | What happens |
 |---|---|---|
-| Criteria | you | Write the rule with an examples table: 9 items full price, 10 items 5% off |
+| Align | you, agent | You give the rule and why; the agent asks for the boundary and you give an examples table: 9 items full price, 10 items 5% off |
 | Red tests | agent | Writes a test per row and each side of the boundary, sees each fail, and commits them |
-| Challenge | test challenger | Adds a test with 11 unsorted items and holds back a property test |
-| Implement | implementer | Makes the tests pass. The hook asks you if it tries to edit a committed test |
-| Holdout | agent | Copies the held-back test in. It passes |
+| Implement | implementer | Makes the tests pass. A mutation run finds one weak test, and the agent adds a test that kills it |
 | Review | reviewer, verifier | 3 candidates found, 1 proved: a discount applied twice on retry |
 | Pull request | agent | Fixes it test-first, and opens a pull request under 400 lines |

@@ -3,7 +3,7 @@ name: spike
 description: "Use first, before answering, when the person asks whether something would work, how hard or how much work it would be, or what adopting a library or platform would do to the codebase, or wants to try an approach and see if it works, a prototype or a quick experiment, such as 'do a spike on X', 'how hard would it be to make the export async', 'would Postgres full-text search be fast enough' or 'try the decimal module and see if it fixes the rounding': frames a question that can fail, builds throwaway code in a scratch directory, records what it found and deletes the code."
 license: MIT
 metadata:
-  version: "3.1.0"
+  version: "3.2.0"
 ---
 # Spike
 

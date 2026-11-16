@@ -21,8 +21,8 @@ import argparse, concurrent.futures as cf, json, os, shutil, subprocess, sys, ti
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLUGIN, RUNS = os.path.join(REPO, "plugins", "sdlc"), os.path.expanduser("~/.sdlc-trigger-runs")
-SKILLS = {"story", "spike", "bug", "refactor", "build"}
-AGENTS = {"plan-reviewer", "test-challenger", "implementer", "reviewer", "verifier", "delegator"}
+SKILLS = {"spike", "build"}
+AGENTS = {"plan-reviewer", "implementer", "reviewer", "verifier", "delegator"}
 
 FIXTURE = {
     "AGENTS.md": "Check: `python3 -m unittest discover -q -s tests -t .`\n",
@@ -50,23 +50,22 @@ DIRTY = {"pricing.py": FIXTURE["pricing.py"].replace("    return", "    if not l
 
 # (prompt, expected): a skill name, "agent:<name>", or None.
 CASES = [
-    ("Write a story for letting customers download their order history.", "story"),
-    ("Critique my acceptance criteria in docs/stories/export.md.", "story"),
-    ("Do a story for gift cards at checkout.", "story"),
-    ("Review this story before we build it: docs/stories/export.md", "story"),
+    ("Write a story for letting customers download their order history.", "build"),
+    ("Critique my acceptance criteria in docs/stories/export.md.", "build"),
+    ("Do a story for gift cards at checkout.", "build"),
+    ("Review this story before we build it: docs/stories/export.md", "build"),
     ("Add a CSV export to the orders page.", "build"),
     ("Implement the story in docs/stories/export.md.", "build"),
     ("Just build a bulk discount: orders of 10 or more items get 5% off.", "build"),
     ("Bump the requests dependency to the latest version.", "build"),
     ("Add a --dry-run flag to the export.", "build"),
-    ("total() returns a negative number when a quantity is negative. It should reject it.", "bug"),
-    ("File a bug: the export crashes on an empty order list.", "bug"),
-    ("Exports over 10k orders time out in production.", "bug"),
-    ("Why does total give 9.999999 instead of 10 for some carts?", "bug"),
-    ("Clean up export.py, it's hard to follow.", "refactor"),
-    ("Rename total to order_total everywhere.", "refactor"),
-    ("Extract the line-total calculation in pricing.py into its own function.", "refactor"),
-    ("Where should I clean up in this repo?", "refactor"),
+    ("total() returns a negative number when a quantity is negative. It should reject it.", "build"),
+    ("File a bug: the export crashes on an empty order list.", "build"),
+    ("Exports over 10k orders time out in production.", "build"),
+    ("Why does total give 9.999999 instead of 10 for some carts?", "build"),
+    ("Clean up export.py, it's hard to follow.", "build"),
+    ("Rename total to order_total everywhere.", "build"),
+    ("Extract the line-total calculation in pricing.py into its own function.", "build"),
     ("Would SQLite full-text search be fast enough for a million orders?", "spike"),
     ("Do a spike on using Polars for the export.", "spike"),
     ("How hard would it be to make the export async?", "spike"),
@@ -79,19 +78,17 @@ CASES = [
     ("Review my design in SPEC.md.", "agent:plan-reviewer"),
     ("Poke holes in this plan: SPEC.md", "agent:plan-reviewer"),
     ("Is the architecture in docs/design.md sound?", "agent:plan-reviewer"),
-    ("Challenge the failing tests in tests/test_bulk.py blind before any code is written.", "agent:test-challenger"),
-    ("I wrote failing tests in tests/test_bulk.py but no code yet. Are they strong enough to catch a wrong implementation?", "agent:test-challenger"),
     ("Make the failing tests in tests/test_bulk.py pass.", "agent:implementer"),
     ("Go green on the red commit.", "agent:implementer"),
     ("While we keep working, run the test suite in the background and tell me only whether it passed.", "agent:delegator"),
     ("In the background, summarize worker.log and logs-a.log in one line each.", "agent:delegator"),
     ("In parallel, move every .log file in this repo into a logs/ folder and tell me what moved.", "agent:delegator"),
     # Held out: phrased unlike any description, to catch wording tuned to the cases above.
-    ("Customers keep asking for a way to save their carts for later. Can we spec that out properly first?", "story"),
+    ("Customers keep asking for a way to save their carts for later. Can we spec that out properly first?", "build"),
     ("Can you wire up a new endpoint that returns order totals as JSON?", "build"),
     ("Upgrade us to Python 3.13.", "build"),
-    ("Something is off: the second export of the day always has duplicate rows.", "bug"),
-    ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "refactor"),
+    ("Something is off: the second export of the day always has duplicate rows.", "build"),
+    ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "build"),
     ("Is it realistic to move the export to a background worker? I want to know before we commit to it.", "spike"),
     ("Look over what I just changed and tell me what's broken.", "agent:reviewer"),
     ("Here is my plan for the discount feature in SPEC.md. What am I missing?", "agent:plan-reviewer"),
@@ -189,7 +186,7 @@ def self_test():
     assert fires(ev(skill("sdlc:build"), parent="x")) == [], "a subagent's own calls are not counted"
     assert passed(["skill:build", "agent:implementer"], "agent:implementer") and not passed(["agent:Explore"], "agent:delegator")
     assert passed(["agent:Explore"], None) and not passed(["agent:delegator"], None)
-    assert passed(["skill:story"], "story") and not passed(["skill:build", "skill:story"], "story")
+    assert passed(["skill:spike"], "spike") and not passed(["skill:build", "skill:spike"], "spike")
     assert done(["skill:build"], "build") and not done(["skill:build"], "agent:implementer") and done(["agent:Explore"], "agent:x")
     print("self-test passed")
 

@@ -1,11 +1,11 @@
 # Pull request body
 
-Write the body for a person who saw none of the build: nothing outside the repository and the pull request, and no term this plugin coins, such as red commit or holdout.
+Write the body for a person who saw none of the build: nothing outside the repository and the pull request, and no term this plugin coins, such as red commit.
 
 * **Under 40 lines outside `<details>`:** when it cannot fit, split the change by criterion, as a `Decided:` line.
 * **Rewrite, never append:** at every push, rewrite the body against the final diff. A person's answer replaces the line it reverses.
 * **Each shortcoming ends one of three ways:** fixed, filed as an issue with its number, or asked under `Needs you`.
-* **Decided by people:** only choices that change the ticket, a locked test, or something costly to reverse. The agent's `Decided:` lines go in `<details>`.
+* **Decided by people:** only choices that change the ticket or something costly to reverse. The agent's `Decided:` lines go in `<details>`.
 
 ```markdown
 ## Why
@@ -26,7 +26,7 @@ Write the body for a person who saw none of the build: nothing outside the repos
 ## Tests
 <n> added in <n> files. `<check command>` passes (<n> tests, <n>% coverage). Mutation: <n> of <n> killed, or not set up.
 Running app: <criterion>: <what was run> -> <what it showed>
-Tests from before the branch or written before the code, changed with a person's agreement: <hash> <file>: <why>, or none.
+Tests from before the branch or written before the code, changed since: <hash> <file>: <why>, or none.
 
 <details><summary>Agent decisions, test names, results of the check on changed tests</summary>
 

@@ -1,40 +1,24 @@
 #!/usr/bin/env python3
 """The sdlc plugin's hooks. Reads one hook event as JSON on stdin; `--self-test` runs its tests.
 
-  * Test lock:       an edit that changes or removes a line of a committed test file asks the
-                     person; adding tests passes. A shell command that does the same is reported
-                     back to the agent as soon as it has run.
   * Done check:      at Stop, runs the backticked `Check:` command of the root AGENTS.md, as it read
-                     when the session began, when the tree changed during the turn, and blocks the
-                     stop on failure.
+                     when the session began, in the session's tree and in each other worktree of the
+                     repository that changed during the turn, and blocks the stop on failure.
   * Size cap:        refuses an edit that leaves AGENTS.md or CLAUDE.md over 100 lines or 8 KB.
   * Dependency gate: an install command or manifest edit naming a package that no manifest or
                      lockfile in the repository holds asks the person (slopsquatting).
-  * Holdout guard:   refuses the implementer subagent any tool call that names the held-out tests'
-                     directory, `~/.sdlc-holdout/`, outside every repository.
   * Pull request cap: opening a pull request or pushing a branch whose diff from the default branch
                      changes more than 400 lines asks the person.
   * Leftovers gate:  a commit that adds a debugger call, a TODO or commented-out code asks the person.
   * Silencer gate:   a commit that adds a line switching a type checker or linter off asks the person.
 """
-import difflib, hashlib, json, os, re, shlex, subprocess, sys
+import hashlib, json, os, re, shlex, subprocess, sys
 
 MAX_LINES, MAX_BYTES = 100, 8 * 1024  # this plugin's choice, sized for a root file of commands, constraints and traps
 MAX_BLOCKS = 5  # this plugin's choice: failed checks in a row before the agent may stop anyway
 CHECK_SECONDS = 300
 DIFF_CAP = 400  # this plugin's choice: past about 400 changed lines a reviewer reads less of each line
-HOLDOUT = os.path.realpath(os.path.expanduser("~/.sdlc-holdout"))
-IMPLEMENTER = re.compile(r"(?:[\w.-]+:)?implementer")  # a plugin agent's type is "<plugin>:<name>"
 INSTRUCTIONS = {"AGENTS.md", "CLAUDE.md"}
-# shortcut: test files are found by path; a test file named otherwise is not locked.
-TEST = re.compile(r"(^|/)(tests?|spec|specs|__tests__)/|(^|/)test_[^/]+\.py$|_test\.[^/]+$"
-                  r"|(^|/)tests\.py$|\.(test|spec)\.[^/]+$|Tests?\.(java|kt|swift|cs)$|_spec\.rb$"
-                  r"|(^|/)(conftest\.py|pytest\.ini|(jest|vitest|playwright)\.config\.[^/]+)$")
-# shortcut: an added line that switches a test off by a known marker; an early return or a rebound
-# name passes here and rests on the reviewer.
-SKIPS = re.compile(r"@pytest\.mark\.(skip|xfail)|pytest\.skip\(|unittest\.skip|\b(it|test|describe)\.(skip|only|todo|fails|failing)\b"
-                   r"|\bx(it|describe|test)\(|@Disabled\b|@Ignore\b|deselect|collect_ignore|pytestmark|\bt\.Skip\(|#\[ignore\]"
-                   r"|modifyitems")
 CHECK = re.compile(r"^\s*(?:[-*]\s+)?(?:\*\*)?Check:(?:\*\*)?\s*`([^`\n]+)`", re.M)
 # Each manifest's pattern captures a dependency's name from one added line.
 MANIFESTS = {
@@ -99,13 +83,6 @@ def after(tool, inp, old):
             return None
         text = text.replace(a, b) if e.get("replace_all") else text.replace(a, b, 1)
     return text
-
-
-def removed(old, new):
-    """Lines of old that new changes or drops."""
-    a, b = old.splitlines(), new.splitlines()
-    return [l for tag, i, j, _, _ in difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes()
-            if tag in ("delete", "replace") for l in a[i:j]]
 
 
 def known_text(root):
@@ -187,20 +164,6 @@ def pre_edit(tool, inp, cwd):
     root = (git(os.path.dirname(path) or cwd, "rev-parse", "--show-toplevel") or "").strip()
     if not root:
         return None
-    rel = os.path.relpath(os.path.realpath(path), os.path.realpath(root))
-    if TEST.search(rel):
-        head = git(root, "show", f"HEAD:{rel}")
-        gone = removed(head, new) if head is not None else []
-        gone = [l for l in gone if l.strip()]
-        was = set((head or "").splitlines())
-        off = [l for l in new.splitlines() if l not in was and SKIPS.search(l)]
-        if off and not gone:
-            return ask(f"This edit adds a line to {rel} that can switch tests off: `{off[0].strip()[:80]}`. "
-                       "Approve only when those tests should not run.")
-        if gone:
-            return ask(f"Locked test: {rel} is committed and this edit changes or removes {len(gone)} of its lines, "
-                       f"first `{gone[0].strip()[:80]}`. Code changes to fit a committed test. Approve only when the "
-                       "test itself is wrong.")
     kind = manifest_kind(path)
     if kind:
         names = unknown(new_packages(kind, old, new), known_text(root))
@@ -208,12 +171,6 @@ def pre_edit(tool, inp, cwd):
             return ask(f"First-seen dependency: {', '.join(names)} is in no manifest or lockfile of this repository. "
                        "Confirm each name exists on its registry and is the package you mean.")
     return None
-
-
-def test_removals(root, rev):
-    out = git(root, "diff", "-w", "--numstat", "--no-renames", rev, "--") or ""  # -w: a formatter's rewrap is no change
-    rows = (l.split("\t") for l in out.splitlines())
-    return {r[2]: int(r[1]) for r in rows if len(r) == 3 and r[1].isdigit() and int(r[1]) and TEST.search(r[2])}
 
 
 def state_path(root):
@@ -260,15 +217,6 @@ def changed_lines(root):
                and os.path.basename(r[2]) not in LOCKFILES) + sum(read(os.path.join(root, f)).count("\n") for f in new)
 
 
-def holdout(inp):
-    path = os.path.realpath(os.path.expanduser(inp.get("path") or inp.get("file_path") or "/"))
-    # shortcut: matched by name in the call; a search from a parent of ~, such as `find / -name 'test_*'`, passes.
-    if "sdlc-holdout" in json.dumps(inp) or path == HOLDOUT or path.startswith(HOLDOUT + os.sep) or path == os.path.dirname(HOLDOUT):
-        return deny("The held-out tests are hidden from the implementer until the whole suite passes. "
-                    "Make the given tests pass from the criteria instead.")
-    return None
-
-
 def added_lines(root):
     """(path, line number, text) for each line the tree adds since HEAD, untracked files included, prose and lockfiles left out."""
     out, path, n = [], None, 0
@@ -299,11 +247,6 @@ def commit_gates(root):
 
 
 def pre_bash(command, root):
-    state = load(root)
-    state["head"] = (git(root, "rev-parse", "HEAD") or "").strip()
-    state["branch"] = (git(root, "symbolic-ref", "-q", "HEAD") or "").strip()
-    state["tests"] = test_removals(root, state["head"]) if state["head"] else {}
-    save(root, state)
     reasons = []
     names = unknown(installs(command), known_text(root))
     if names:
@@ -321,24 +264,10 @@ def pre_bash(command, root):
 
 
 def post_bash(command, root):
-    state = load(root)
     big = [n for n in INSTRUCTIONS if n in command and too_big(read(os.path.join(root, n)).encode())]
     if big:
         return {"decision": "block", "reason": f"{', '.join(big)} is now over {MAX_LINES} lines or {MAX_BYTES // 1024} KB. "
                 "Rewrite it shorter: delete lines a check enforces or the repository already shows."}
-    if not state.get("head"):
-        return None
-    now = (git(root, "rev-parse", "HEAD") or "").strip()
-    moved = (git(root, "symbolic-ref", "-q", "HEAD") or "").strip() != state.get("branch", "")
-    if moved and now != state["head"] and git(root, "merge-base", "--is-ancestor", state["head"], now) is None:
-        return None  # the command switched branch, so the files changed from git's own record; an amend still counts
-    before = state.get("tests", {})
-    hit = sorted(f for f, n in test_removals(root, state["head"]).items() if n > before.get(f, 0))
-    if hit:
-        return {"decision": "block", "reason":
-                f"That command changed or removed lines of committed tests, which are locked: {', '.join(hit)}. "
-                f"Restore each with `git checkout {state['head'][:10]} -- <file>` and change the code to fit the test. "
-                "When the test itself is wrong, ask the person."}
     return None
 
 
@@ -347,39 +276,67 @@ def check_command(root):
     return m.group(1).strip() if m else None
 
 
+def trees(root):
+    """The session's tree, then each other worktree of its repository, such as one a build works in."""
+    paths = [os.path.realpath(root)]
+    for block in (git(root, "worktree", "list", "--porcelain") or "").split("\n\n"):
+        lines = block.splitlines()
+        if lines and lines[0].startswith("worktree ") and not {"bare", "prunable"} & {l.split()[0] for l in lines[1:]}:
+            p = os.path.realpath(lines[0][len("worktree "):])
+            if p not in paths and os.path.isdir(p):
+                paths.append(p)
+    return paths
+
+
+def start(root):
+    save(root, {"check": check_command(root), "trees": {p: {"baseline": fingerprint(p)} for p in trees(root)}})
+
+
+def new_turn(root):  # a tree only the person changed this turn runs no check
+    state = load(root)
+    for p in trees(root):
+        state.setdefault("trees", {}).setdefault(p, {})["turn"] = fingerprint(p)
+    save(root, state)
+
+
 def stop(root):
-    state, fp = load(root), fingerprint(root)
-    if fp in (state.get("baseline"), state.get("passed"), state.get("turn")):
+    state = load(root)
+    outs = [o for p in trees(root) for o in [stop_tree(p, state, state.setdefault("trees", {}).setdefault(p, {}))] if o]
+    save(root, state)
+    blocks = [o for o in outs if "decision" in o]
+    return blocks[0] if blocks else outs and {"systemMessage": " ".join(o["systemMessage"] for o in outs)} or None
+
+
+def stop_tree(path, state, t):
+    fp = fingerprint(path)
+    if fp in (t.get("baseline"), t.get("passed"), t.get("turn")):
         return None
-    cmd = check_command(root)
+    cmd, where = check_command(path), f" in {path}"
     if "check" in state and cmd != state["check"]:
         # The session cannot choose its own check: only the command from the session's start runs.
-        if fp == state.get("failed"):
+        if fp == t.get("failed"):
             return None
-        state["failed"] = fp
-        save(root, state)
-        return {"systemMessage": f"sdlc: the `Check:` line changed during this session, from `{state['check']}` to "
-                f"`{cmd}`, so the done check did not run. A new session uses the new line."}
+        t["failed"] = fp
+        return {"systemMessage": f"sdlc: the `Check:` line{where} is `{cmd}`, not `{state['check']}` as when the "
+                "session began, so the done check did not run there. A new session uses the new line."}
     if not cmd:
         return None
-    if fp == state.get("failed"):
-        return {"systemMessage": f"sdlc: `{cmd}` still fails, and nothing changed since it last ran."}
+    if fp == t.get("failed"):
+        return {"systemMessage": f"sdlc: `{cmd}` still fails{where}, and nothing changed since it last ran."}
     try:
-        r = subprocess.run(cmd, shell=True, cwd=root, capture_output=True, text=True, errors="replace", timeout=CHECK_SECONDS)
+        r = subprocess.run(cmd, shell=True, cwd=path, capture_output=True, text=True, errors="replace", timeout=CHECK_SECONDS)
         ok, out = r.returncode == 0, (r.stdout + r.stderr)
     except subprocess.TimeoutExpired:
         ok, out = False, f"timed out after {CHECK_SECONDS} s. Move slow checks to a `Full check:` line."
-    fp = fingerprint(root)  # the check may write files
+    fp = fingerprint(path)  # the check may write files
     if ok:
-        state.update(passed=fp, blocks=0)
-        save(root, state)
+        t.update(passed=fp, blocks=0)
         return None
-    state.update(failed=fp, blocks=state.get("blocks", 0) + 1)
-    save(root, state)
-    if state["blocks"] >= MAX_BLOCKS:
-        return {"systemMessage": f"sdlc: `{cmd}` failed {state['blocks']} times in a row. The work is not done."}
+    t.update(failed=fp, blocks=t.get("blocks", 0) + 1)
+    if t["blocks"] >= MAX_BLOCKS:
+        return {"systemMessage": f"sdlc: `{cmd}` failed {t['blocks']} times in a row{where}. The work is not done."}
     return {"decision": "block", "reason":
-            f"The work is not done: `{cmd}` fails.\n" + "\n".join(out.splitlines()[-40:]) +
+            f"The work is not done: `{cmd}` fails{where}.\n" + "\n".join(out.splitlines()[-40:]) +
             "\nFix the cause in the code. To stop instead, for a question or because the failure is in the person's "
             "own unfinished work, stop again without changing a file and say what fails."}
 
@@ -393,9 +350,7 @@ def main():
     cwd = inp.get("cwd") or os.getcwd()
     root = (git(cwd, "rev-parse", "--show-toplevel") or "").strip()
     out = None
-    if event == "PreToolUse" and IMPLEMENTER.fullmatch(inp.get("agent_type") or "") and holdout(ti):
-        out = holdout(ti)
-    elif event == "PreToolUse" and tool in ("Edit", "Write", "MultiEdit"):
+    if event == "PreToolUse" and tool in ("Edit", "Write", "MultiEdit"):
         out = pre_edit(tool, ti, cwd)
     elif not root:
         return
@@ -405,11 +360,9 @@ def main():
         out = post_bash(ti.get("command", ""), root)
     elif event == "SessionStart":
         if inp.get("source") in (None, "startup", "clear"):
-            save(root, {"baseline": fingerprint(root), "check": check_command(root)})
-    elif event == "UserPromptSubmit":  # a tree only the person changed this turn runs no check
-        state = load(root)
-        state["turn"] = fingerprint(root)
-        save(root, state)
+            start(root)
+    elif event == "UserPromptSubmit":
+        new_turn(root)
     elif event == "Stop":
         out = stop(root)
     if out:
@@ -431,25 +384,6 @@ def self_test():
     put("flag", "ok")
     run("git", "add", "-A"); run("git", "commit", "-qm", "base")
     decision = lambda o: o and o["hookSpecificOutput"]["permissionDecision"]
-
-    # Test lock
-    e = lambda old, new, f="tests/test_a.py": pre_edit("Edit", {"file_path": f, "old_string": old, "new_string": new}, t)
-    assert decision(e("== 4", "== 5")) == "ask", "changing an assertion of a committed test asks"
-    assert not e("assert f(2) == 4\n", "assert f(2) == 4\n\ndef test_b():\n    assert f(3) == 9\n"), "adding a test passes"
-    assert decision(pre_edit("Write", {"file_path": "tests/test_a.py", "content": ""}, t)) == "ask", "emptying it asks"
-    assert not pre_edit("Write", {"file_path": "tests/test_new.py", "content": "x"}, t), "a new test file passes"
-    put("tests/test_new.py", "def test_n():\n    assert 1\n")
-    assert not e("assert 1", "assert 2", "tests/test_new.py"), "an uncommitted test is not locked"
-    assert removed("a\nb\n", "a\nx\nb\n") == [] and removed("a\nb\n", "a\n") == ["b"]
-    assert not pre_bash("sed -i '' s/4/5/ tests/test_a.py", t)
-    put("tests/test_a.py", "def test_a():\n    assert f(2) == 5\n")
-    assert "tests/test_a.py" in post_bash("sed -i '' s/4/5/ tests/test_a.py", t)["reason"], "a shell edit is reported"
-    assert not e("def test_a():", "@pytest.mark.skip\ndef test_a():") is None, "an added skip marker asks"
-    assert decision(pre_edit("Write", {"file_path": "conftest.py", "content": "collect_ignore = ['tests']\n"}, t)) == "ask"
-    assert not pre_edit("Write", {"file_path": "new/tests/test_x.py", "content": "x"}, t), "a new directory does not crash"
-    pre_bash("ls", t)
-    assert not post_bash("ls", t), "a change from before the command is not reported again"
-    run("git", "checkout", "--", "tests/test_a.py")
 
     # Size cap and the Check: line
     full = "line\n" * MAX_LINES
@@ -480,22 +414,7 @@ def self_test():
     assert decision(p('"react": "^19.0.0"', '"react": "^19.0.0",\n    "left-pad": "^1.3.0"', "package.json")) == "ask"
     assert not p('"test": "vitest"', '"test": "vitest", "lint": "eslint ."', "package.json"), "a script passes"
 
-    # Holdout guard and pull request cap
-    assert decision(holdout({"command": "cat ~/.sdlc-holdout/repo/b/tests/test_h.py"})) == "deny"
-    assert decision(holdout({"file_path": os.path.join(HOLDOUT, "repo/b/t.py")})) == "deny"
-    assert decision(holdout({"pattern": "test_", "path": "~"})) == "deny", "a search of the home directory is refused"
-    assert not holdout({"file_path": os.path.join(t, "tests/test_a.py")}), "other paths pass"
-    assert not holdout({"file_path": "src/model.py", "content": "holdout = 0.2  # https://x/y.git"}), "the word alone passes"
-    hook = lambda ev: subprocess.run([sys.executable, os.path.abspath(__file__)], input=json.dumps(ev), text=True,
-                                     capture_output=True).stdout
-    read_ev = lambda agent: {"hook_event_name": "PreToolUse", "tool_name": "Read", "agent_type": agent, "cwd": "/",
-                             "tool_input": {"file_path": os.path.join(HOLDOUT, "r/b/t.py")}}
-    assert '"deny"' in hook(read_ev("sdlc:implementer")), "the implementer is refused, from any directory"
-    assert not hook(read_ev("sdlc:test-challenger")) and not hook({**read_ev(None), "agent_type": None}), "others pass"
-    run("git", "checkout", "-qb", "amend"); pre_bash("true", t)
-    put("tests/test_a.py", "def test_a():\n    assert True\n"); run("git", "commit", "-qa", "--amend", "--no-edit")
-    assert "tests/test_a.py" in post_bash("x", t)["reason"], "an amend that changes a committed test is reported"
-    run("git", "checkout", "-qf", "-"); run("git", "branch", "-qD", "amend")
+    # Pull request cap
     run("git", "branch", "-q", "main") if not git(t, "rev-parse", "--verify", "-q", "main") else None
     n0 = changed_lines(t)  # untracked files from the tests above
     run("git", "checkout", "-qb", "big")
@@ -525,21 +444,29 @@ def self_test():
     os.remove(os.path.join(t, "src/app.py")); os.remove(os.path.join(t, "NOTES.md"))
 
     # Done check
-    save(t, {"baseline": fingerprint(t), "check": check_command(t)})
+    start(t)
     assert stop(t) is None, "an unchanged tree runs no check"
     put("flag", "no")
     assert stop(t)["decision"] == "block", "a failing check blocks the stop"
     assert "systemMessage" in stop(t), "stopping again with nothing changed is allowed, and the person is told"
     put("flag", "ok"); put("fix.py", "x = 1\n")
-    assert stop(t) is None and load(t)["blocks"] == 0, "a passing check lets it stop"
+    assert stop(t) is None and load(t)["trees"][t]["blocks"] == 0, "a passing check lets it stop"
     for i in range(MAX_BLOCKS):
         put("flag", "no" + str(i))
         last = stop(t)
     assert "systemMessage" in last, "at the 5th failure in a row it may stop, and the person is told"
-    state = load(t); state["turn"] = fingerprint(t); save(t, state)
+    new_turn(t)
     assert stop(t) is None, "a tree unchanged since the turn began runs no check"
+    wt = t + "-wt"
+    run("git", "worktree", "add", "-qb", "wt", wt)
+    assert stop(t) is None, "a worktree made during the session whose check passes lets it stop"
+    open(os.path.join(wt, "flag"), "w").write("no")
+    r = stop(t)
+    assert r["decision"] == "block" and wt in r["reason"], "a failing check in another worktree blocks the stop"
+    run("git", "worktree", "remove", "--force", wt)
+    assert stop(t) is None, "a removed worktree is not checked"
     put("AGENTS.md", "Check: `true`\n")
-    assert "changed during this session" in stop(t)["systemMessage"], "a check the session rewrote does not run"
+    assert "as when the session began" in stop(t)["systemMessage"], "a check the session rewrote does not run"
     print("self-test passed")
 
 
