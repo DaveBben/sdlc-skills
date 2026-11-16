@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """The sdlc plugin's hooks. Reads one hook event as JSON on stdin; `--self-test` runs its tests.
 
-  * Done check:      at Stop, runs the backticked `Check:` command of the root AGENTS.md, as it read
-                     when the session began, in the session's tree and in each other worktree of the
+  * Done check:      at Stop, runs the test command, as it was when the session began: the backticked
+                     `Check:` command of the root AGENTS.md, else the repository's own test command, in the session's tree and in each other worktree of the
                      repository that changed during the turn, and blocks the stop on failure.
   * Size cap:        refuses an edit that leaves AGENTS.md or CLAUDE.md over 100 lines or 8 KB.
   * Dependency gate: an install command or manifest edit naming a package that no manifest or
@@ -273,7 +273,28 @@ def post_bash(command, root):
 
 def check_command(root):
     m = CHECK.search(read(os.path.join(root, "AGENTS.md")) or read(os.path.join(root, "CLAUDE.md")))
-    return m.group(1).strip() if m else None
+    return m.group(1).strip() if m else test_command(root)
+
+
+def test_command(root):
+    """The repository's own test command, for a repository whose AGENTS.md names none."""
+    has = lambda f: os.path.exists(os.path.join(root, f))
+    try:
+        script = json.loads(read(os.path.join(root, "package.json")) or "{}").get("scripts", {}).get("test", "")
+    except (ValueError, AttributeError):
+        script = ""
+    if script and "no test specified" not in script:  # npm init's placeholder only fails
+        return next((f"{pm} test" for pm, lock in (("pnpm", "pnpm-lock.yaml"), ("yarn", "yarn.lock"), ("bun", "bun.lockb"))
+                     if has(lock)), "npm test")
+    if re.search(r"^test\s*:", read(os.path.join(root, "Makefile")), re.M):
+        return "make test"
+    if has("Cargo.toml"):
+        return "cargo test"
+    if has("go.mod"):
+        return "go test ./..."
+    if has("pytest.ini") or has("conftest.py") or "pytest" in read(os.path.join(root, "pyproject.toml")):
+        return "uv run pytest" if has("uv.lock") else ".venv/bin/python -m pytest" if has(".venv/bin/python") else "python3 -m pytest"
+    return None
 
 
 def trees(root):
@@ -327,7 +348,7 @@ def stop_tree(path, state, t):
         r = subprocess.run(cmd, shell=True, cwd=path, capture_output=True, text=True, errors="replace", timeout=CHECK_SECONDS)
         ok, out = r.returncode == 0, (r.stdout + r.stderr)
     except subprocess.TimeoutExpired:
-        ok, out = False, f"timed out after {CHECK_SECONDS} s. Move slow checks to a `Full check:` line."
+        ok, out = False, f"timed out after {CHECK_SECONDS} s. Name a faster command in a `Check:` line in AGENTS.md."
     fp = fingerprint(path)  # the check may write files
     if ok:
         t.update(passed=fp, blocks=0)
@@ -467,6 +488,16 @@ def self_test():
     assert stop(t) is None, "a removed worktree is not checked"
     put("AGENTS.md", "Check: `true`\n")
     assert "as when the session began" in stop(t)["systemMessage"], "a check the session rewrote does not run"
+    # The repository's own test command, when AGENTS.md names none
+    d = tempfile.mkdtemp()
+    tc = lambda **files: ([open(os.path.join(d, f), "w").write(x) for f, x in files.items()], test_command(d))[1]
+    assert tc() is None, "a repository with no test command runs nothing"
+    assert tc(**{"pyproject.toml": "[tool.pytest.ini_options]\n"}) == "python3 -m pytest"
+    assert tc(**{"uv.lock": ""}) == "uv run pytest"
+    assert tc(**{"go.mod": "module x\n"}) == "go test ./...", "go comes before pytest"
+    assert tc(**{"Makefile": "lint:\n\truff .\ntest: lint\n\tpytest\n"}) == "make test"
+    assert tc(**{"package.json": '{"scripts": {"test": "echo \\"Error: no test specified\\" && exit 1"}}'}) == "make test"
+    assert tc(**{"package.json": '{"scripts": {"test": "vitest"}}', "pnpm-lock.yaml": ""}) == "pnpm test"
     print("self-test passed")
 
 

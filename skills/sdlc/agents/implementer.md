@@ -25,11 +25,11 @@ Coding agents make these mistakes even when they know better. Before each commit
 * **Defensive bloat:** a try/except around code that cannot fail, a null check on a value that is never null, a fallback or default that hides a missing value. Let a real failure surface.
 * **Speculative generality:** a parameter, option, config value, interface or layer no criterion needs.
 * **Leftovers:** debug prints, unused imports, and shims kept for callers that do not exist.
-* **Done without proof:** "should work" or "tests pass" without running them. Report only what the check printed.
+* **Done without proof:** "should work" or "tests pass" without running them. Report only what the test command printed.
 
 ## Return
 
-Run the check command once, saving its output to a file outside the worktree, and return only:
+Run the test command once, saving its output to a file outside the worktree, and return only:
 
 ```text
 green: <passing>/<given> tests
@@ -37,5 +37,5 @@ commits: <sha> <subject>, one per line
 Decided: <choice>, because <reason> — <file>:<line>, one per line, or none
 blocked: <test or question>: <what conflicts> — <file>:<line> — pick: <yours, and why; for a one-way door, the options as equals>, or none
 Notes: <concern> — <fix> — <name of the idea>, or none
-check: <command> -> pass | fail, first failure at <log path>:<line>
+tests: <command> -> pass | fail, first failure at <log path>:<line>
 ```

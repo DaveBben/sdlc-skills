@@ -21,7 +21,7 @@ import argparse, concurrent.futures as cf, json, os, shutil, subprocess, sys, ti
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLUGIN, RUNS = os.path.join(REPO, "plugins", "sdlc"), os.path.expanduser("~/.sdlc-trigger-runs")
-SKILLS = {"spike", "build"}
+SKILLS = {"story", "spike", "build"}
 AGENTS = {"plan-reviewer", "implementer", "reviewer", "verifier", "delegator"}
 
 FIXTURE = {
@@ -50,9 +50,9 @@ DIRTY = {"pricing.py": FIXTURE["pricing.py"].replace("    return", "    if not l
 
 # (prompt, expected): a skill name, "agent:<name>", or None.
 CASES = [
-    ("Write a story for letting customers download their order history.", "build"),
+    ("Write a story for letting customers download their order history.", "story"),
     ("Critique my acceptance criteria in docs/stories/export.md.", "build"),
-    ("Do a story for gift cards at checkout.", "build"),
+    ("Do a story for gift cards at checkout.", "story"),
     ("Review this story before we build it: docs/stories/export.md", "build"),
     ("Add a CSV export to the orders page.", "build"),
     ("Implement the story in docs/stories/export.md.", "build"),
@@ -85,6 +85,7 @@ CASES = [
     ("In parallel, move every .log file in this repo into a logs/ folder and tell me what moved.", "agent:delegator"),
     # Held out: phrased unlike any description, to catch wording tuned to the cases above.
     ("Customers keep asking for a way to save their carts for later. Can we spec that out properly first?", "build"),
+    ("Here are my notes on saved carts. Make them into a proper user story.", "story"),
     ("Can you wire up a new endpoint that returns order totals as JSON?", "build"),
     ("Upgrade us to Python 3.13.", "build"),
     ("Something is off: the second export of the day always has duplicate rows.", "build"),

@@ -24,11 +24,11 @@ Write the body for a person who saw none of the build: nothing outside the repos
 - <person>: <decision>
 
 ## Tests
-<n> added in <n> files. `<check command>` passes (<n> tests, <n>% coverage). Mutation: <n> of <n> killed, or not set up.
+<n> added in <n> files. `<test command>` passes (<n> tests, <n>% coverage). Mutation: <n> of <n> killed, or not set up.
 Running app: <criterion>: <what was run> -> <what it showed>
 Tests from before the branch or written before the code, changed since: <hash> <file>: <why>, or none.
 
-<details><summary>Agent decisions, test names, results of the check on changed tests</summary>
+<details><summary>Agent decisions, test names, results of changed tests</summary>
 
 <each as given>
 </details>

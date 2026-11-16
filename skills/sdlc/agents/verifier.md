@@ -18,7 +18,7 @@ Treat each row as false until the code shows it:
 * **Drop** it, naming the line that stops it: a guard, a type, a caller that never passes that input, or a misreading of `story.md`.
 * **No basis:** neither the code nor a run settles it: drop it and say what would.
 
-Mark a kept row **`blocking`** when a caller reaches it under production's configuration and a person or system sees the failure, `story.md` is not met, another system breaks, or a security fault has a path from outside; else **`non-blocking`**, as every `suggestion` and `question` is. Then run the check command once: a failure is a kept blocking issue, its output the proof.
+Mark a kept row **`blocking`** when a caller reaches it under production's configuration and a person or system sees the failure, `story.md` is not met, another system breaks, or a security fault has a path from outside; else **`non-blocking`**, as every `suggestion` and `question` is. Then run the test command once: a failure is a kept blocking issue, its output the proof.
 
 ## Return
 
@@ -28,5 +28,5 @@ Rewrite `findings.md` with the kept rows only, blocking first, as `<id>|<blockin
 rows: <n>; kept: <n> (<n> blocking); dropped: <n>
 <each kept row>
 dropped: <id> <the stopping line, or "no basis: what would settle it">, one per line
-check: <command> -> <pass | fail>
+tests: <command> -> <pass | fail>
 ```
