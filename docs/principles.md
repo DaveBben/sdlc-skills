@@ -12,7 +12,7 @@ Whoever made it, someone else attacks it, and a machine decides when it's done. 
 ## Tests and done
 
 5. **Criteria first:** write testable acceptance criteria before the build. The building agent never defines done.
-6. **Deterministic check:** give the agent a `Check:` command that says when it's done.
+6. **Definition of done:** give the agent a `Definition of done:` command, every test and the linter, that says when any change is done.
 7. **Running app:** check the change in the browser, the command line or a real request, as well as the test suite.
 8. **Locked tests:** the agent can't change a test to make it pass.
 9. **Harder-to-game tests:** use a blind test challenger, mutation testing and property-based tests, because agents write weak tests.
@@ -45,13 +45,13 @@ Whoever made it, someone else attacks it, and a machine decides when it's done. 
 
 | Principle | Enforced by |
 |---|---|
-| 1, 2 | The `plan-reviewer` agent, and `build`'s design spec step |
-| 5 | `build`'s align and criteria review steps, and the acceptance gate hook: each `AC<n>` needs a test |
+| 1, 2 | `build`'s design step, which coaches you, and the `design-reviewer` agent |
+| 5 | `build`'s align and criteria steps, and the acceptance gate hook: each `AC<n>` in the red commit needs a test |
 | 3 | The `build` skill and its agents |
-| 6 | Done-check hook, on the test command, and the acceptance gate hook, on each `Done when:` command |
-| 7 | `Done when:` commands on real data or the running app, run by the acceptance gate |
-| 8 | The reviewer, on each test changed after the red commit |
-| 9 | A `Mutation:` line in `AGENTS.md`, and property tests in `build` |
+| 6 | Done-check hook at every stop, and the acceptance gate hook at push, pull request and merge |
+| 7 | `build`'s failing tests, each an acceptance test at the level where its result shows; not checked by a hook |
+| 8 | The `code-reviewer` agent, on each test changed after the red commit |
+| 9 | A `Mutation:` line in `AGENTS.md` |
 | 10 | Leftovers and silencer gate hooks |
 | 11 | You |
 | 12 | Dependency-gate hook |

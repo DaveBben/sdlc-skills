@@ -24,7 +24,7 @@ Write the body for a person who saw none of the build: nothing outside the repos
 - <person>: <decision>
 
 ## Tests
-<n> added in <n> files. `<test command>` passes (<n> tests, <n>% coverage). Mutation: <n> of <n> killed, or not set up.
+<n> added in <n> files. `<definition of done>` passes (<n> tests, <n>% coverage). Mutation: <n> of <n> killed, or not set up.
 Running app: <criterion>: <what was run> -> <what it showed>
 Tests from before the branch or written before the code, changed since: <hash> <file>: <why>, or none.
 

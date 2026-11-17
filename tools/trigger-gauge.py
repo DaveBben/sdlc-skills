@@ -21,8 +21,8 @@ import argparse, concurrent.futures as cf, json, os, shutil, subprocess, sys, ti
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLUGIN, RUNS = os.path.join(REPO, "plugins", "sdlc"), os.path.expanduser("~/.sdlc-trigger-runs")
-SKILLS = {"story", "spike", "build"}
-AGENTS = {"plan-reviewer", "implementer", "reviewer", "verifier", "delegator"}
+SKILLS = {"ticket", "spike", "build"}
+AGENTS = {"design-reviewer", "implementer", "code-reviewer", "verifier", "delegator"}
 
 FIXTURE = {
     "AGENTS.md": "Check: `python3 -m unittest discover -q -s tests -t .`\n",
@@ -50,9 +50,9 @@ DIRTY = {"pricing.py": FIXTURE["pricing.py"].replace("    return", "    if not l
 
 # (prompt, expected): a skill name, "agent:<name>", or None.
 CASES = [
-    ("Write a story for letting customers download their order history.", "story"),
-    ("Critique my acceptance criteria in docs/stories/export.md.", "build"),
-    ("Do a story for gift cards at checkout.", "story"),
+    ("Write a story for letting customers download their order history.", "ticket"),
+    ("Critique the story in docs/stories/export.md.", "ticket"),
+    ("Log a spike on Polars for the export, for later.", "ticket"),
     ("Review this story before we build it: docs/stories/export.md", "build"),
     ("Add a CSV export to the orders page.", "build"),
     ("Implement the story in docs/stories/export.md.", "build"),
@@ -60,7 +60,8 @@ CASES = [
     ("Bump the requests dependency to the latest version.", "build"),
     ("Add a --dry-run flag to the export.", "build"),
     ("total() returns a negative number when a quantity is negative. It should reject it.", "build"),
-    ("File a bug: the export crashes on an empty order list.", "build"),
+    ("File a bug: the export crashes on an empty order list.", "ticket"),
+    ("The export crashes on an empty order list. Fix it.", "build"),
     ("Exports over 10k orders time out in production.", "build"),
     ("Why does total give 9.999999 instead of 10 for some carts?", "build"),
     ("Clean up export.py, it's hard to follow.", "build"),
@@ -70,30 +71,14 @@ CASES = [
     ("Do a spike on using Polars for the export.", "spike"),
     ("How hard would it be to make the export async?", "spike"),
     ("Try the decimal module for money and see if it fixes the rounding.", "spike"),
-    ("Review my changes.", "agent:reviewer"),
-    ("Give me a second-opinion review of my uncommitted changes before I commit.", "agent:reviewer"),
-    ("Find the bugs in my working-tree diff.", "agent:reviewer"),
-    ("Verify the review findings in findings.md: which are real?", "agent:verifier"),
-    ("Fact-check these review comments in findings.md against the code.", "agent:verifier"),
-    ("Review my design in SPEC.md.", "agent:plan-reviewer"),
-    ("Poke holes in this plan: SPEC.md", "agent:plan-reviewer"),
-    ("Is the architecture in docs/design.md sound?", "agent:plan-reviewer"),
-    ("Make the failing tests in tests/test_bulk.py pass.", "agent:implementer"),
-    ("Go green on the red commit.", "agent:implementer"),
-    ("While we keep working, run the test suite in the background and tell me only whether it passed.", "agent:delegator"),
-    ("In the background, summarize worker.log and logs-a.log in one line each.", "agent:delegator"),
-    ("In parallel, move every .log file in this repo into a logs/ folder and tell me what moved.", "agent:delegator"),
     # Held out: phrased unlike any description, to catch wording tuned to the cases above.
     ("Customers keep asking for a way to save their carts for later. Can we spec that out properly first?", "build"),
-    ("Here are my notes on saved carts. Make them into a proper user story.", "story"),
+    ("Here are my notes on saved carts. Park them as a proper user story for next sprint.", "ticket"),
     ("Can you wire up a new endpoint that returns order totals as JSON?", "build"),
     ("Upgrade us to Python 3.13.", "build"),
     ("Something is off: the second export of the day always has duplicate rows.", "build"),
     ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "build"),
     ("Is it realistic to move the export to a background worker? I want to know before we commit to it.", "spike"),
-    ("Look over what I just changed and tell me what's broken.", "agent:reviewer"),
-    ("Here is my plan for the discount feature in SPEC.md. What am I missing?", "agent:plan-reviewer"),
-    ("Kick off a background job that deletes the .log files and let me know when it's done.", "agent:delegator"),
     ("What does pricing.py do?", None),
     ("Find every caller of total.", None),
     ("Explain what a property-based test is.", None),
@@ -101,6 +86,121 @@ CASES = [
     ("What's the time complexity of Python's sorted()?", None),
     ("Commit this.", None),
 ]
+
+# 20 per agent; the last 6 of each are held out, phrased unlike any description.
+AGENT_CASES = {
+    "code-reviewer": [
+        "Review my changes.",
+        "Give me a second-opinion review of my uncommitted changes before I commit.",
+        "Find the bugs in my working-tree diff.",
+        "Do a code review of my uncommitted change to pricing.py.",
+        "Review the diff against main.",
+        "Code review please: the change in pricing.py.",
+        "Check my diff for bugs before I push.",
+        "Give my working-tree changes an independent, blind review.",
+        "Review the uncommitted edits before I open a pull request.",
+        "Do an unbiased review of what's uncommitted.",
+        "Is my uncommitted change to total() correct? Review it.",
+        "Review the last commit and my uncommitted changes.",
+        "Have someone other than me review the change to pricing.py.",
+        "Review pricing.py's diff for edge cases I missed.",
+        "Look over what I just changed and tell me what's broken.",
+        "Before this goes in, can a fresh pair of eyes go through my edit to pricing.py?",
+        "Sanity-check the empty-cart handling I just added.",
+        "I'm about to commit. Anything wrong with my edit?",
+        "Tear apart my latest edit.",
+        "Would you approve this if it were a merge request?",
+    ],
+    "design-reviewer": [
+        "Review my design in SPEC.md.",
+        "Poke holes in this plan: SPEC.md",
+        "Is the architecture in docs/design.md sound?",
+        "Review the implementation plan in SPEC.md before we write code.",
+        "Critique the design doc docs/design.md.",
+        "Review this RFC: docs/design.md",
+        "Here is my plan for the discount feature in SPEC.md. What am I missing?",
+        "Is the proposed approach in SPEC.md sound?",
+        "Do a design review of SPEC.md.",
+        "Attack the spec in SPEC.md before any code is written.",
+        "Review the spec in SPEC.md.",
+        "Find the flaws in the architecture proposed in docs/design.md.",
+        "Give the plan in SPEC.md a second opinion before I start building.",
+        "Check SPEC.md's design for what will break in production.",
+        "We're thinking of putting Kafka between checkout and billing, see docs/design.md. Talk me out of it if it's a bad idea.",
+        "Before anyone writes a line, is a nightly cron recomputing every order total, as SPEC.md says, going to bite us?",
+        "Stress-test the thinking in docs/design.md.",
+        "Would you sign off on SPEC.md as written?",
+        "What are the risks in SPEC.md's approach?",
+        "I sketched how the discount should work in SPEC.md. Will it hold up?",
+    ],
+    "delegator": [
+        "While we keep working, run the test suite in the background and tell me only whether it passed.",
+        "In the background, summarize worker.log and logs-a.log in one line each.",
+        "In parallel, move every .log file in this repo into a logs/ folder and tell me what moved.",
+        "Run the tests in the background and report pass or fail.",
+        "In the background, delete the .log files and tell me what was removed.",
+        "While I keep going, check whether the tests pass.",
+        "Kick off the test suite in parallel and just report pass or fail.",
+        "Rename worker.log to worker-old.log in the background.",
+        "Summarize worker.log for me in the background.",
+        "In the background, count the commits on this branch and tell me the number.",
+        "In parallel, check which Python version is installed and report it.",
+        "Without blocking me, run the unit tests and tell me just the result.",
+        "In the background, list every file over 1 KB in this repo.",
+        "Run the test suite while we talk about the next feature, and tell me if it fails.",
+        "Kick off a background job that deletes the .log files and let me know when it's done.",
+        "Spin something off to tidy the log files into one folder; I don't need the details.",
+        "Have someone else run the tests; I only care whether they're green.",
+        "Can you fire off the tests on the side while we keep chatting?",
+        "Off to the side: what's in worker.log, in a sentence?",
+        "Get me the test results without cluttering our chat.",
+    ],
+    "verifier": [
+        "Verify the review findings in findings.md: which are real?",
+        "Fact-check these review comments in findings.md against the code.",
+        "Confirm each finding in findings.md.",
+        "Prove or drop each row in findings.md.",
+        "Reproduce the findings in findings.md.",
+        "Filter findings.md into real issues and false positives.",
+        "Are the code review findings in findings.md true?",
+        "Check findings.md: which findings are false positives?",
+        "Validate the review comments in findings.md.",
+        "Which findings in findings.md are blocking?",
+        "Verify findings.md against pricing.py and export.py.",
+        "Go through findings.md and confirm or reject each one.",
+        "Double-check the reviewer's findings in findings.md.",
+        "Triage findings.md: real or not?",
+        "A reviewer left these notes in findings.md. Are they right, or is the reviewer wrong?",
+        "I don't trust findings.md. Which of these would actually bite us?",
+        "Before I fix anything in findings.md, tell me which ones hold up.",
+        "Is the negative-quantity issue in findings.md real?",
+        "Someone claims csv is imported but unused, per findings.md. True?",
+        "Separate the signal from the noise in findings.md.",
+    ],
+    "implementer": [
+        "Make the failing tests in tests/test_bulk.py pass.",
+        "Go green on the red commit.",
+        "Implement against the committed tests.",
+        "Write the code for the red commit.",
+        "The bulk-discount test fails; make it pass.",
+        "Implement pricing.py so tests/test_bulk.py passes.",
+        "Get tests/test_bulk.py green.",
+        "There's a red commit on this branch; implement it.",
+        "Make test_ten_or_more_get_five_percent_off pass.",
+        "Make the red tests pass without touching the tests.",
+        "Implement the bulk discount the committed test describes.",
+        "Turn the red test green.",
+        "Write the minimum code to pass tests/test_bulk.py.",
+        "Implement against the test(red): bulk discount commit.",
+        "The tests are written; now write the code that satisfies them.",
+        "test_bulk is failing on purpose. Finish the job.",
+        "The spec is the test in tests/test_bulk.py. Build to it.",
+        "I committed a failing test for the 5% discount. Your turn.",
+        "Fill in the implementation the last commit is waiting for.",
+        "Get us from red to green.",
+    ],
+}
+CASES += [(p, "agent:" + a) for a, ps in AGENT_CASES.items() for p in ps]
 
 
 def git(work, *args):
@@ -194,7 +294,7 @@ def self_test():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", help="expected skill or agent name, such as build or reviewer; 'none' for negatives")
+    ap.add_argument("--only", help="expected skill or agent names, comma-separated, such as build,code-reviewer; 'none' for negatives")
     ap.add_argument("--runs", type=int, default=1)
     ap.add_argument("--model", default="sonnet")
     ap.add_argument("--jobs", type=int, default=6)
@@ -204,7 +304,7 @@ def main():
     if a.self_test:
         return self_test()
     label = lambda e: e.split(":")[-1] if e else "none"
-    cases = [(i, p, e) for i, (p, e) in enumerate(CASES) if not a.only or label(e) == a.only]
+    cases = [(i, p, e) for i, (p, e) in enumerate(CASES) if not a.only or label(e) in a.only.split(",")]
     with cf.ThreadPoolExecutor(a.jobs) as pool:
         rows = list(pool.map(lambda c: run_one(c[0], c[1], c[2][1], c[2][2], a.model, a.timeout),
                              [(i, n, c) for c in cases for n in range(1, a.runs + 1) for i in [c[0]]]))

@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
 """The sdlc plugin's hooks. Reads one hook event as JSON on stdin; `--self-test` runs its tests.
 
-  * Done check:      at Stop, runs the test command, as it was when the session began: the backticked
-                     `Check:` command of the root AGENTS.md, else the repository's own test command, in the session's tree and in each other worktree of the
-                     repository that changed during the turn, and blocks the stop on failure.
+  * Done check:      at Stop, runs the definition of done, as it was when the session began: the backticked
+                     `Definition of done:` (or `Check:`) command of the root AGENTS.md, else the repository's own
+                     test and lint commands, in the session's tree and in each other worktree of the repository
+                     that changed during the turn, and blocks the stop on failure.
   * Size cap:        refuses an edit that leaves AGENTS.md or CLAUDE.md over 100 lines or 8 KB.
   * Dependency gate: an install command or manifest edit naming a package that no manifest or
                      lockfile in the repository holds asks the person (slopsquatting).
   * Pull request cap: opening a pull request or pushing a branch whose diff from the default branch
                      changes more than 400 lines asks the person.
-  * Acceptance gate: pushing or opening a pull request from a branch that adds or changes a file under
-                     docs/acceptance/ runs each backticked `Done when:` command in it and the test command,
-                     checks that a test changed on the branch names each `AC<n>` criterion, and refuses on
-                     any failure. A story/ or bug/ branch with no such file asks the person. An edit that
-                     changes a committed criterion or `Done when:` command asks the person.
+  * Acceptance gate: pushing, opening a pull request from or merging a branch whose latest `test(red):`
+                     commit message holds `AC<n>` criteria checks that a test changed on the branch names each
+                     criterion, then runs the definition of done, and refuses on any failure. A story/ or bug/
+                     branch with no red commit asks the person.
   * Leftovers gate:  a commit that adds a debugger call, a TODO or commented-out code asks the person.
   * Silencer gate:   a commit that adds a line switching a type checker or linter off asks the person.
 """
-import hashlib, json, os, re, shlex, subprocess, sys, time
+import hashlib, json, os, re, shlex, subprocess, sys, tempfile, time
 
 MAX_LINES, MAX_BYTES = 100, 8 * 1024  # this plugin's choice, sized for a root file of commands, constraints and traps
 MAX_BLOCKS = 5  # this plugin's choice: failed checks in a row before the agent may stop anyway
@@ -25,7 +25,7 @@ CHECK_SECONDS = 300
 GATE_SECONDS = 600  # the whole acceptance gate; hooks.json gives PreToolUse a little more
 DIFF_CAP = 400  # this plugin's choice: past about 400 changed lines a reviewer reads less of each line
 INSTRUCTIONS = {"AGENTS.md", "CLAUDE.md"}
-CHECK = re.compile(r"^\s*(?:[-*]\s+)?(?:\*\*)?Check:(?:\*\*)?\s*`([^`\n]+)`", re.M)
+CHECK = re.compile(r"^\s*(?:[-*]\s+)?(?:\*\*)?(?:Definition of done|Check):(?:\*\*)?\s*`([^`\n]+)`", re.M | re.I)
 # Each manifest's pattern captures a dependency's name from one added line.
 MANIFESTS = {
     "package.json": r'^\s*"([^"]+)"\s*:\s*"(?:[\^~<>=*\d]|npm:|git|https?:|file:|workspace:|latest)',
@@ -44,10 +44,10 @@ INSTALL = re.compile(PREFIX + r"(?:(?:python[\d.]*\s+-m\s+|uv\s+)?pip[\d.]*\s+in
 # A runner fetches and executes its first argument at once.
 RUNNER = re.compile(PREFIX + r"(?:npx|uvx|bunx|pipx\s+run|pnpm\s+dlx|npm\s+exec|uv\s+tool\s+run)\s+(.*)$")
 PR = re.compile(PREFIX + r"(?:gh\s+pr\s+create|glab\s+mr\s+create|tea\s+(?:pr|pulls?)\s+create|git\s+push)\b")
-# The acceptance file: criteria as `AC<n>:` lines, each `Done when:` a command that exits 0 only when its result holds.
-ACCEPTANCE = re.compile(r"(?:^|/)docs/acceptance/[^/]+\.md$")
+MERGE = re.compile(PREFIX + r"git\s+(?:-C\s+\S+\s+)?merge\s+(.*)$")
+# The red commit: its message holds every current criterion as an `AC<n>:` line.
+RED = re.compile(r"^test\(red\):")
 AC = re.compile(r"^[^\w\n]*(?:\d+\.\s+)?(?:\*\*)?AC(\d+)\b.*$", re.M)
-DONE_WHEN = re.compile(r"^\s*(?:[-*]\s+)?(?:\*\*)?Done when:(?:\*\*)?\s*`([^`\n]+)`", re.M)
 TEST_FILE = re.compile(r"(?:^|/)(?:tests?|__tests__|spec)/|(?:^|/)test_[^/]*$|[._-](?:test|spec)\.[^/.]+$")
 COMMIT = re.compile(PREFIX + r"git\s+(?:-\S+\s+\S+\s+)*commit\b")
 # shortcut: matched by pattern per added line; a print() left in, an unused import or a shim passes and rests on the reviewer.
@@ -170,17 +170,11 @@ def pre_edit(tool, inp, cwd):
                         "of adding to it: delete lines a check enforces or the repository already shows.")
         was, now = CHECK.search(old), CHECK.search(new)
         if was and (not now or now.group(1) != was.group(1)):
-            return ask(f"This edit changes the `Check:` line that decides when work is done, from `{was.group(1)}` "
+            return ask(f"This edit changes the definition of done, the line that decides when work is done, from `{was.group(1)}` "
                        f"to `{now.group(1) if now else 'none'}`.")
     root = (git(os.path.dirname(path) or cwd, "rev-parse", "--show-toplevel") or "").strip()
     if not root:
         return None
-    if ACCEPTANCE.search(path) and (git(root, "ls-files", "--", path) or "").strip():
-        agreed = lambda text: {m.group(0).strip() for m in AC.finditer(text)} | set(DONE_WHEN.findall(text))
-        gone = sorted(agreed(old) - agreed(new))
-        if gone:
-            return ask("This edit changes agreed criteria or `Done when:` commands that are already committed: "
-                       + "; ".join(gone)[:600] + ". They are the person's to change.")
     kind = manifest_kind(path)
     if kind:
         names = unknown(new_packages(kind, old, new), known_text(root))
@@ -277,37 +271,56 @@ def run(cmd, cwd, seconds):
         return False, f"timed out after {max(1, seconds):.0f} s"
 
 
-def acceptance_gate(root):
-    """(refusals, questions) for a push or pull request, from the acceptance files the branch adds or changes."""
+def red_message(root, base):
+    """The newest `test(red):` commit message on the branch: it holds every current criterion."""
+    log = git(root, "log", "--format=%B%x00", f"{base}..HEAD") or ""
+    return next((m.strip() for m in log.split("\0") if RED.match(m.strip())), None)
+
+
+def acceptance_gate(root, branch=None):
+    """(refusals, questions) for a push, pull request or merge, from the branch's latest red commit."""
     base = merge_base(root)
-    files = ((git(root, "diff", "--name-only", base, "--") or "").splitlines() if base else []) + \
+    branch = branch or (git(root, "branch", "--show-current") or "").strip()
+    text = red_message(root, base) if base else None
+    if not text or not AC.search(text):
+        return [], ([f"Branch {branch} has no `test(red):` commit holding its `AC<n>:` criteria, "
+                     "so nothing shows it is done. Approve only when this branch needs none."]
+                    if re.match(r"(?:story|bug)/", branch) else [])
+    files = (git(root, "diff", "--name-only", base, "--") or "").splitlines() + \
         (git(root, "ls-files", "-o", "--exclude-standard") or "").splitlines()
     files = [f for f in dict.fromkeys(files) if os.path.isfile(os.path.join(root, f))]
-    docs = [f for f in files if ACCEPTANCE.search(f)]
-    branch = (git(root, "branch", "--show-current") or "").strip()
-    if not docs:
-        return [], ([f"Branch {branch} has no docs/acceptance/<key>.md holding its `AC<n>:` criteria and `Done when:` "
-                     "commands, so nothing shows it is done. Approve only when this branch needs none."]
-                    if re.match(r"(?:story|bug)/", branch) else [])
     tests = "\n".join(f + "\n" + read(os.path.join(root, f)) for f in files if TEST_FILE.search(f))
     refusals, end = [], time.time() + GATE_SECONDS
-    for d in docs:
-        text = read(os.path.join(root, d))
-        missing = [n for n in dict.fromkeys(AC.findall(text))
-                   if not re.search(rf"(?<![A-Za-z0-9])ac_?{n}(?![0-9])", tests, re.I)]
-        if missing:
-            refusals.append(f"{d}: no test changed on this branch names {', '.join('AC' + n for n in missing)}. "
-                            "Put `ac<n>` in the name of each criterion's tests, such as `test_ac3_<what>`.")
-        for cmd in DONE_WHEN.findall(text):
-            ok, out = run(cmd, root, end - time.time())
-            if not ok:
-                refusals.append(f"{d}: `Done when: {cmd}` fails:\n{out}")
+    missing = [n for n in dict.fromkeys(AC.findall(text))
+               if not re.search(rf"(?<![A-Za-z0-9])ac_?{n}(?![0-9])", tests, re.I)]
+    if missing:
+        refusals.append(f"No test changed on this branch names {', '.join('AC' + n for n in missing)} from the red commit. "
+                        "Put `ac<n>` in the name of each criterion's tests, such as `test_ac3_<what>`.")
     cmd = check_command(root)
     if cmd and not refusals:
         ok, out = run(cmd, root, end - time.time())
         if not ok:
-            refusals.append(f"The tests fail: `{cmd}`:\n{out}")
+            refusals.append(f"The definition of done fails: `{cmd}`:\n{out}")
     return refusals, []
+
+
+def merge_gate(root, args):
+    """The acceptance gate for `git merge <branch>`, run where that branch's committed state is checked out."""
+    ref = next((a for a in shlex.split(args, comments=True) if not a.startswith("-")), None) if args else None
+    if not ref or not git(root, "rev-parse", "--verify", "-q", ref + "^{commit}"):
+        return [], []
+    for block in (git(root, "worktree", "list", "--porcelain") or "").split("\n\n"):
+        lines = block.splitlines()
+        # A clean worktree of the branch keeps its installed dependencies; a dirty one would be judged on uncommitted work.
+        if f"branch refs/heads/{ref}" in lines and not git(lines[0][len("worktree "):], "status", "--porcelain"):
+            return acceptance_gate(lines[0][len("worktree "):], ref)
+    tmp = os.path.join(tempfile.mkdtemp(), "merge")
+    if git(root, "worktree", "add", "-q", "--detach", tmp, ref) is None:
+        return [], []
+    try:
+        return acceptance_gate(tmp, ref)
+    finally:
+        git(root, "worktree", "remove", "--force", tmp)
 
 
 def pre_bash(command, root):
@@ -327,9 +340,13 @@ def pre_bash(command, root):
                            "Approve only when it cannot be split by criterion.")
         refusals, questions = acceptance_gate(root)
         reasons += questions
+    merges = [m.group(1) for part in parts for m in [MERGE.match(part)] if m]
+    if merges and not refusals:
+        refusals, questions = merge_gate(root, merges[0])
+        reasons += questions
     if refusals:
-        return deny("Not done:\n" + "\n".join(refusals) + "\nFix the code, test-first. A criterion or `Done when:` "
-                    "command that is itself wrong goes to the person.")
+        return deny("Not done:\n" + "\n".join(refusals) + "\nFix the code, test-first. A criterion or a "
+                    "definition of done that is itself wrong goes to the person.")
     return ask(" ".join(reasons)) if reasons else None
 
 
@@ -342,8 +359,32 @@ def post_bash(command, root):
 
 
 def check_command(root):
+    """The definition of done: the AGENTS.md line, else the repository's own test and lint commands."""
     m = CHECK.search(read(os.path.join(root, "AGENTS.md")) or read(os.path.join(root, "CLAUDE.md")))
-    return m.group(1).strip() if m else test_command(root)
+    return m.group(1).strip() if m else " && ".join(c for c in (test_command(root), lint_command(root)) if c) or None
+
+
+def runner(root):
+    has = lambda f: os.path.exists(os.path.join(root, f))
+    return next((pm for pm, lock in (("pnpm", "pnpm-lock.yaml"), ("yarn", "yarn.lock"), ("bun", "bun.lockb")) if has(lock)), "npm")
+
+
+def lint_command(root):
+    """The repository's own lint command, for a repository whose AGENTS.md names no definition of done."""
+    has = lambda f: os.path.exists(os.path.join(root, f))
+    try:
+        script = json.loads(read(os.path.join(root, "package.json")) or "{}").get("scripts", {}).get("lint", "")
+    except (ValueError, AttributeError):
+        script = ""
+    if script:
+        return f"{runner(root)} run lint"
+    if re.search(r"^lint\s*:", read(os.path.join(root, "Makefile")), re.M):
+        return "make lint"
+    if has("go.mod"):
+        return "go vet ./..."
+    if has("ruff.toml") or has(".ruff.toml") or "[tool.ruff" in read(os.path.join(root, "pyproject.toml")):
+        return "uv run ruff check ." if has("uv.lock") else "ruff check ."
+    return None
 
 
 def test_command(root):
@@ -354,8 +395,7 @@ def test_command(root):
     except (ValueError, AttributeError):
         script = ""
     if script and "no test specified" not in script:  # npm init's placeholder only fails
-        return next((f"{pm} test" for pm, lock in (("pnpm", "pnpm-lock.yaml"), ("yarn", "yarn.lock"), ("bun", "bun.lockb"))
-                     if has(lock)), "npm test")
+        return f"{runner(root)} test"
     if re.search(r"^test\s*:", read(os.path.join(root, "Makefile")), re.M):
         return "make test"
     if has("Cargo.toml"):
@@ -408,7 +448,7 @@ def stop_tree(path, state, t):
         if fp == t.get("failed"):
             return None
         t["failed"] = fp
-        return {"systemMessage": f"sdlc: the `Check:` line{where} is `{cmd}`, not `{state['check']}` as when the "
+        return {"systemMessage": f"sdlc: the definition of done{where} is `{cmd}`, not `{state['check']}` as when the "
                 "session began, so the done check did not run there. A new session uses the new line."}
     if not cmd:
         return None
@@ -418,7 +458,7 @@ def stop_tree(path, state, t):
         r = subprocess.run(cmd, shell=True, cwd=path, capture_output=True, text=True, errors="replace", timeout=CHECK_SECONDS)
         ok, out = r.returncode == 0, (r.stdout + r.stderr)
     except subprocess.TimeoutExpired:
-        ok, out = False, f"timed out after {CHECK_SECONDS} s. Name a faster command in a `Check:` line in AGENTS.md."
+        ok, out = False, f"timed out after {CHECK_SECONDS} s. Name a faster one in a `Definition of done:` line in AGENTS.md."
     fp = fingerprint(path)  # the check may write files
     if ok:
         t.update(passed=fp, blocks=0)
@@ -461,7 +501,6 @@ def main():
 
 
 def self_test():
-    import tempfile
     t = os.path.realpath(tempfile.mkdtemp())
     run = lambda *a: subprocess.run(a, cwd=t, check=True, capture_output=True)
     put = lambda name, text: (os.makedirs(os.path.dirname(os.path.join(t, name)) or t, exist_ok=True),
@@ -535,27 +574,43 @@ def self_test():
     os.remove(os.path.join(t, "src/app.py")); os.remove(os.path.join(t, "NOTES.md"))
 
     # Acceptance gate
+    red = "test(red): export\n\nAC1: A rule.\n  Given a\n  When b\n  Then c\n\n**AC2:** Another.\n"
     run("git", "checkout", "-qb", "story/x-export")
-    put("docs/acceptance/x.md", "# X: export\n\nAC1: A rule.\n  Given a\n  When b\n  Then c\n\n**AC2:** Another.\n\n"
-        "Done when: `test -f ready`\nDone when (checked by you): the page looks right\n")
     put("tests/test_x.py", "def test_ac1_rule():\n    pass\n")
+    run("git", "add", "-A"); run("git", "commit", "-qm", red)
     r = pre_bash("git push -u origin story/x-export", t)
-    assert decision(r) == "deny", "a failing Done when refuses the push"
+    assert decision(r) == "deny", "a criterion with no test refuses the push"
     reason = r["hookSpecificOutput"]["permissionDecisionReason"]
-    assert "AC2" in reason and "AC1" not in reason and "test -f ready" in reason, reason
-    put("tests/test_x.py", "def test_ac1_rule():\n    pass\n\ndef test_ac2_other():\n    pass\n"); put("ready", "")
+    assert "AC2" in reason and "AC1" not in reason, reason
+    put("tests/test_x.py", "def test_ac1_rule():\n    pass\n\ndef test_ac2_other():\n    pass\n")
     assert decision(pre_bash("gh pr create --fill", t)) != "deny", "met criteria and a passing test command pass"
     put("flag", "no")
-    assert "The tests fail" in pre_bash("tea pr create", t)["hookSpecificOutput"]["permissionDecisionReason"]
+    assert "definition of done fails" in pre_bash("tea pr create", t)["hookSpecificOutput"]["permissionDecisionReason"]
     put("flag", "ok")
-    assert decision(pre_bash("git status", t)) is None, "only a push or pull request runs the gate"
-    run("git", "add", "-A"); run("git", "commit", "-qm", "test(red): x")
-    e = lambda a, b: pre_edit("Edit", {"file_path": os.path.join(t, "docs/acceptance/x.md"), "old_string": a, "new_string": b}, t)
-    assert decision(e("`test -f ready`", "`true`")) == "ask", "weakening a committed Done when asks"
-    assert decision(e("AC1: A rule.", "AC1: A looser rule.")) == "ask", "changing a committed criterion asks"
-    assert not e("  Given a", "  Given a, b"), "an example's wording passes"
-    run("git", "checkout", "-q", "-"); run("git", "checkout", "-qb", "bug/y")
-    assert decision(pre_bash("git push", t)) == "ask", "a story or bug branch with no acceptance file asks"
+    assert decision(pre_bash("git status", t)) is None, "only a push, pull request or merge runs the gate"
+    run("git", "add", "-A"); run("git", "commit", "-qm", "feat: export")
+    run("git", "commit", "-q", "--allow-empty", "-m", "test(red): export, looser\n\nAC1: A rule.\nAC3: New.\n")
+    assert "AC3" in pre_bash("git push", t)["hookSpecificOutput"]["permissionDecisionReason"], "the latest red commit rules"
+    run("git", "commit", "-q", "--allow-empty", "-m", "test(red): export, looser\n\nAC1: A rule.\n")
+    assert decision(pre_bash("git push", t)) != "deny", "the latest red commit holds the current criteria"
+    run("git", "checkout", "-q", "-")
+    assert decision(pre_bash("git merge --no-ff story/x-export", t)) != "deny", "a merge whose criteria hold passes"
+    run("git", "checkout", "-q", "story/x-export"); put(".gitignore", "deps\n"); put("AGENTS.md", "Definition of done: `test -f deps`\n")
+    run("git", "add", "-A"); run("git", "commit", "-qm", "chore: deps")
+    run("git", "checkout", "-q", "-")
+    r = pre_bash("git merge story/x-export", t)
+    assert decision(r) == "deny" and "test -f deps" in r["hookSpecificOutput"]["permissionDecisionReason"], \
+        "a merge is judged on the branch's committed state, in a temporary worktree"
+    assert len(trees(t)) == 1, "the temporary worktree is removed"
+    wt = t + "-merge"
+    run("git", "worktree", "add", "-q", wt, "story/x-export"); open(os.path.join(wt, "deps"), "w").write("")
+    assert decision(pre_bash("git merge story/x-export", t)) != "deny", "a clean worktree of the branch keeps its ignored files"
+    open(os.path.join(wt, "wip.py"), "w").write("")
+    assert decision(pre_bash("git merge story/x-export", t)) == "deny", "a dirty worktree is not trusted"
+    run("git", "worktree", "remove", "--force", wt)
+    assert decision(pre_bash("git merge --abort", t)) is None, "a merge with no branch runs no gate"
+    run("git", "checkout", "-qb", "bug/y")
+    assert decision(pre_bash("git push", t)) == "ask", "a story or bug branch with no red commit asks"
     run("git", "checkout", "-q", "-")
     run("git", "branch", "-qD", "story/x-export", "bug/y")
 
@@ -593,6 +648,11 @@ def self_test():
     assert tc(**{"Makefile": "lint:\n\truff .\ntest: lint\n\tpytest\n"}) == "make test"
     assert tc(**{"package.json": '{"scripts": {"test": "echo \\"Error: no test specified\\" && exit 1"}}'}) == "make test"
     assert tc(**{"package.json": '{"scripts": {"test": "vitest"}}', "pnpm-lock.yaml": ""}) == "pnpm test"
+    assert lint_command(d) == "make lint" and check_command(d) == "pnpm test && make lint", "done is tests and lint"
+    open(os.path.join(d, "package.json"), "w").write('{"scripts": {"test": "vitest", "lint": "eslint ."}}')
+    assert lint_command(d) == "pnpm run lint"
+    open(os.path.join(d, "AGENTS.md"), "w").write("- **Definition of done:** `make ci`\n")
+    assert check_command(d) == "make ci", "the AGENTS.md line wins"
     print("self-test passed")
 
 
