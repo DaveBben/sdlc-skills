@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Measure whether each sdlc skill and agent fires on the requests meant for it, and stays quiet otherwise.
+"""Measure whether each agentic-dev skill and agent fires on the requests meant for it, and stays quiet otherwise.
 
 Each case is a first message to a fresh `claude -p` session in a small fixture repository, with this working
-copy's plugin loaded and the user's own settings and plugins left out. The run stops at the first sdlc skill
+copy's plugin loaded and the user's own settings and plugins left out. The run stops at the first agentic-dev skill
 or agent it reaches, so no agent's work runs:
 
-  * a skill case passes when the first sdlc skill or agent is that skill;
+  * a skill case passes when the first agentic-dev skill or agent is that skill;
   * an agent case passes when the first agent launched is that agent, whatever skill loaded before it;
-  * a negative case passes when no sdlc skill or agent fires. Built-in agents such as Explore are allowed.
+  * a negative case passes when no agentic-dev skill or agent fires. Built-in agents such as Explore are allowed.
 
 Target: 9 hits in 10 per skill and agent. Runs go under ~/.sdlc-trigger-runs, outside this repository and
 outside the system temp directory, where skills do not load. Each run is a short headless session and costs
@@ -20,8 +20,8 @@ API money. Usage:
 import argparse, concurrent.futures as cf, json, os, shutil, subprocess, sys, time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PLUGIN, RUNS = os.path.join(REPO, "plugins", "sdlc"), os.path.expanduser("~/.sdlc-trigger-runs")
-SKILLS = {"bug", "build", "explain", "frame", "retro", "review", "spike", "story"}
+PLUGIN, RUNS = os.path.join(REPO, "plugins", "agentic-dev"), os.path.expanduser("~/.sdlc-trigger-runs")
+SKILLS = {"bug", "building", "explaining", "framing", "reflecting", "reviewing", "spike", "story"}
 AGENTS = set()  # the plugin ships no agents; reviewers are reference files its skills launch
 
 FIXTURE = {
@@ -50,67 +50,67 @@ DIRTY = {"pricing.py": FIXTURE["pricing.py"].replace("    return", "    if not l
 
 # (prompt, expected): a skill name, "agent:<name>", or None.
 CASES = [
-    ("Run a retro on the export change we just finished.", "retro"),
-    ("The bulk discount is merged. What could I do better next time when working with you?", "retro"),
-    ("Look back over the change we just made to pricing.py and tell me how to get better output from you.", "retro"),
-    ("We gave up on the async export. Review how we worked on it.", "retro"),
+    ("Run a retro on the export change we just finished.", "reflecting"),
+    ("The bulk discount is merged. What could I do better next time when working with you?", "reflecting"),
+    ("Look back over the change we just made to pricing.py and tell me how to get better output from you.", "reflecting"),
+    ("We gave up on the async export. Review how we worked on it.", "reflecting"),
     # Held out: phrased unlike any description, to catch wording tuned to the cases above.
-    ("That refactor of pricing.py is done. Any lessons for how I prompt you?", "retro"),
-    ("The new JSON endpoint shipped. Where did we lose time, and what should I do differently?", "retro"),
-    ("The empty-cart change to pricing.py is finished. Review it and fix what really matters before I open the pull request.", "review"),
-    ("Take my uncommitted change through review: verify what the reviewer finds and fix the blocking findings.", "review"),
-    ("Get my working-tree change reviewed and ready to merge.", "review"),
+    ("That refactor of pricing.py is done. Any lessons for how I prompt you?", "reflecting"),
+    ("The new JSON endpoint shipped. Where did we lose time, and what should I do differently?", "reflecting"),
+    ("The empty-cart change to pricing.py is finished. Review it and fix what really matters before I open the pull request.", "reviewing"),
+    ("Take my uncommitted change through review: verify what the reviewer finds and fix the blocking findings.", "reviewing"),
+    ("Get my working-tree change reviewed and ready to merge.", "reviewing"),
     # Held out.
-    ("I think the pricing edit is good to go. Have it checked properly and sort out anything serious first.", "review"),
+    ("I think the pricing edit is good to go. Have it checked properly and sort out anything serious first.", "reviewing"),
     # Talk about review, with no finished change to review, gets none.
-    ("What should a good code review checklist cover?", "explain"),  # a question about review, not a change to review
+    ("What should a good code review checklist cover?", "explaining"),  # a question about review, not a change to review
     ("Summarise what my uncommitted change does, for a pull request description.", None),
-    ("Bump the requests dependency to the latest version.", "frame"),
+    ("Bump the requests dependency to the latest version.", "framing"),
     # Held out.
-    ("Can you wire up a new endpoint that returns order totals as JSON?", "frame"),
-    ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "frame"),
-    ("Why does total give 9.999999 instead of 10 for some carts? I want to understand it before anything changes.", "explain"),
-    ("How does the export decide which columns to write?", "explain"),
+    ("Can you wire up a new endpoint that returns order totals as JSON?", "framing"),
+    ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "framing"),
+    ("Why does total give 9.999999 instead of 10 for some carts? I want to understand it before anything changes.", "explaining"),
+    ("How does the export decide which columns to write?", "explaining"),
     # Held out.
-    ("I don't get what a merge base is. Walk me through it.", "explain"),
+    ("I don't get what a merge base is. Walk me through it.", "explaining"),
     # A change about to start, or a trivial one, gets no retro.
-    ("Add a CSV export to the orders page.", "frame"),
-    ("The export crashes on an empty order list. Fix it.", "frame"),
-    ("Rename total to order_total everywhere.", "frame"),
+    ("Add a CSV export to the orders page.", "framing"),
+    ("The export crashes on an empty order list. Fix it.", "framing"),
+    ("Rename total to order_total everywhere.", "framing"),
     ("Write a story for letting customers download their order history.", "story"),
     ("Break the order-history PRD in docs/prd/history.md into stories.", "story"),
     ("Critique the story in docs/stories/export.md before the team picks it up.", "story"),
     # Held out.
     ("Order history is far too much for one go. Carve it into pieces that each ship on their own, for the backlog.", "story"),
     # Building a story, or a question about stories, is not the story skill's.
-    ("Implement the story in docs/stories/export.md.", "frame"),
+    ("Implement the story in docs/stories/export.md.", "framing"),
     ("Management wants a date: how many weeks will the remaining order-history stories take?", "story"),
-    ("What makes a good acceptance criterion?", "explain"),
+    ("What makes a good acceptance criterion?", "explaining"),
     ("Do a spike on using Polars for the export.", "spike"),
     ("How hard would it be to make the export async?", "spike"),
     ("Would streaming the export keep memory flat at a million orders? Try it and see.", "spike"),
     # Held out.
     ("Before we commit to sqlite, knock together something disposable to find out if it copes with our order volume.", "spike"),
     # The real change, or a question about spikes, is not the spike skill's.
-    ("Make the export async.", "frame"),
-    ("What is a spike, and when is one worth running?", "explain"),
+    ("Make the export async.", "framing"),
+    ("What is a spike, and when is one worth running?", "explaining"),
     ("File a bug: the export writes a blank file when there are no orders. Don't fix it yet.", "bug"),
     ("Customers say the export sometimes drops the last order. Reproduce it and write it up; no fix for now.", "bug"),
     ("Go through our open bug backlog and decide what to do with each one.", "bug"),
     # Held out.
     ("The empty-cart crash went live last week although CI was green and two people approved it. What let it through?", "bug"),
     # A fix, or a question about bug reports, is not the bug skill's; so is 'The export crashes ... Fix it.' above.
-    ("total returns 9.99 for a 10.00 cart. Find the cause and patch it.", "frame"),
-    ("What belongs in a good bug report?", "explain"),
+    ("total returns 9.99 for a 10.00 cart. Find the cause and patch it.", "framing"),
+    ("What belongs in a good bug report?", "explaining"),
     ("I just bumped the export timeout in AGENTS.md from 30 to 60 seconds. Done.", None),
-    ("What does pricing.py do?", "explain"),
+    ("What does pricing.py do?", "explaining"),
     ("Find every caller of total.", None),
-    ("Explain what a property-based test is.", "explain"),
+    ("Explain what a property-based test is.", "explaining"),
     ("How do I run the tests here?", None),
     ("Commit this.", None),
 ]
 
-# Requests to review a change, which the review skill takes; the last 6 are held out, phrased unlike any description.
+# Requests to review a change, which the reviewing skill takes; the last 6 are held out, phrased unlike any description.
 AGENT_CASES = {
     "code-reviewer": [
         "Review my changes.",
@@ -135,8 +135,8 @@ AGENT_CASES = {
         "Would you approve this if it were a merge request?",
     ],
 }
-# A request to review a change goes through the review skill, which launches the code-reviewer itself.
-CASES += [(p, "review" if a == "code-reviewer" else "agent:" + a) for a, ps in AGENT_CASES.items() for p in ps]
+# A request to review a change goes through the reviewing skill, which launches the code-reviewer itself.
+CASES += [(p, "reviewing" if a == "code-reviewer" else "agent:" + a) for a, ps in AGENT_CASES.items() for p in ps]
 
 
 def git(work, *args):
@@ -157,7 +157,7 @@ def setup(work):
 
 
 def fires(event):
-    """The sdlc skills and every agent one stream-json event launches from the main session, in order."""
+    """The agentic-dev skills and every agent one stream-json event launches from the main session, in order."""
     if event.get("type") != "assistant" or event.get("parent_tool_use_id"):
         return []
     out = []
@@ -219,13 +219,13 @@ def self_test():
     ev = lambda *blocks, parent=None: {"type": "assistant", "parent_tool_use_id": parent, "message": {"content": list(blocks)}}
     skill = lambda s: {"type": "tool_use", "name": "Skill", "input": {"skill": s}}
     agent = lambda a: {"type": "tool_use", "name": "Agent", "input": {"subagent_type": a}}
-    assert fires(ev(skill("sdlc:retro"), agent("sdlc:code-reviewer"))) == ["skill:retro", "agent:code-reviewer"]
-    assert fires(ev(skill("sdlc:retro"), parent="x")) == [], "a subagent's own calls are not counted"
-    assert passed(["skill:retro", "agent:code-reviewer"], "agent:code-reviewer") and not passed(["agent:Explore"], "agent:delegator")
+    assert fires(ev(skill("agentic-dev:reflecting"), agent("agentic-dev:code-reviewer"))) == ["skill:reflecting", "agent:code-reviewer"]
+    assert fires(ev(skill("agentic-dev:reflecting"), parent="x")) == [], "a subagent's own calls are not counted"
+    assert passed(["skill:reflecting", "agent:code-reviewer"], "agent:code-reviewer") and not passed(["agent:Explore"], "agent:delegator")
     assert passed(["agent:Explore"], None) and passed(["agent:general-purpose"], None), "a general subagent is not ours"
-    assert passed(["skill:retro"], "retro") and not passed(["skill:review", "skill:retro"], "retro")
-    assert not passed(["skill:retro"], None) and passed(["skill:other"], None), "only sdlc skills count"
-    assert done(["skill:retro"], "retro") and not done(["skill:retro"], "agent:code-reviewer") and done(["agent:Explore"], "agent:x")
+    assert passed(["skill:reflecting"], "reflecting") and not passed(["skill:reviewing", "skill:reflecting"], "reflecting")
+    assert not passed(["skill:reflecting"], None) and passed(["skill:other"], None), "only agentic-dev skills count"
+    assert done(["skill:reflecting"], "reflecting") and not done(["skill:reflecting"], "agent:code-reviewer") and done(["agent:Explore"], "agent:x")
     print("self-test passed")
 
 
@@ -236,12 +236,16 @@ def main():
     ap.add_argument("--model", default="sonnet")
     ap.add_argument("--jobs", type=int, default=6)
     ap.add_argument("--timeout", type=int, default=150, help="seconds per run")
+    ap.add_argument("--cases", default=os.path.join(REPO, "tools", "trigger-cases.json"),
+                    help="JSON list of {prompt, expected, source}; expected is a skill name or null. Falls back to CASES")
     ap.add_argument("--self-test", action="store_true")
     a = ap.parse_args()
     if a.self_test:
         return self_test()
     label = lambda e: e.split(":")[-1] if e else "none"
-    cases = [(i, p, e) for i, (p, e) in enumerate(CASES) if not a.only or label(e) in a.only.split(",")]
+    # A case that refers to an earlier conversation cannot pass as a first message, so it is listed but not run.
+    pool_ = [(c["prompt"], c["expected"]) for c in json.load(open(a.cases)) if not c.get("needs_context")] if os.path.exists(a.cases) else CASES
+    cases = [(i, p, e) for i, (p, e) in enumerate(pool_) if not a.only or label(e) in a.only.split(",")]
     with cf.ThreadPoolExecutor(a.jobs) as pool:
         rows = list(pool.map(lambda c: run_one(c[0], c[1], c[2][1], c[2][2], a.model, a.timeout),
                              [(i, n, c) for c in cases for n in range(1, a.runs + 1) for i in [c[0]]]))

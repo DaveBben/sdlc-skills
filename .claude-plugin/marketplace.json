@@ -4,20 +4,20 @@
   "owner": {
     "name": "DaveBben"
   },
-  "description": "One plugin for coding agents: sdlc keeps you on a loose loop from framing a change to a reviewed merge, with hooks that decide when it is done, house rules for how the agent works with you, and a retro after each non-trivial change.",
+  "description": "One plugin for coding agents: agentic-dev keeps you on a loose loop from framing a change to a reviewed merge, with hooks that decide when it is done, house rules for how the agent works with you, and a retro after each non-trivial change.",
   "plugins": [
     {
-      "name": "sdlc",
-      "source": "./plugins/sdlc",
-      "description": "You drive a loose loop, Frame, Explore, Plan, Build, Verify, Review, and a machine decides when it is done: a frame skill that, before any change to code, grills you when it is vague, looks where gaps hide and agrees the acceptance criteria, then hands to a build skill with the house rules for changing code (a pre-mortem on the design, the smallest complete change in its own worktree, done only when a check passed), an explain skill for teaching an idea so it sticks, a retro skill that, once a non-trivial change is finished, has a fresh agent read the session and tells you, with cases from it, what to do next time to get better output; a review skill that has a fresh agent review a finished change and a second prove or drop each finding, then fixes the blocking ones test-first within 3 rounds; story, bug and spike skills for work that is written down before it is built (a story as a short frame for one vertical slice, a bug report built on a reproduction that fails, a spike as a throwaway experiment that ends in a decision); plus hooks for a done check that runs every test and the linter, an AGENTS.md size cap, a dependency gate, a pull request size cap, gates on commits that leave in debugging leftovers, switch a checker off, or change, remove or skip a test the branch started with, and a reminder to run the retro once a branch with more than a few lines of code is merged or opened as a pull request.",
+      "name": "agentic-dev",
+      "source": "./plugins/agentic-dev",
+      "description": "You drive a loose loop, Frame, Explore, Plan, Build, Verify, Review, and a machine decides when it is done: a framing skill that, before any change to code, grills you when it is vague, looks where gaps hide and agrees the acceptance criteria, then hands to a building skill with the house rules for changing code (a pre-mortem on the design, the smallest complete change in its own worktree, done only when a check passed), a explaining skill for teaching an idea so it sticks, a reflecting skill that, once a non-trivial change is finished, has a fresh agent read the session and tells you, with cases from it, what to do next time to get better output; a reviewing skill that has a fresh agent review a finished change and a second prove or drop each finding, then fixes the blocking ones test-first within 3 rounds; story, bug and spike skills for work that is written down before it is built (a story as a short frame for one vertical slice, a bug report built on a reproduction that fails, a spike as a throwaway experiment that ends in a decision); plus hooks for a done check that runs every test and the linter, an AGENTS.md size cap, a dependency gate, a pull request size cap, gates on commits that leave in debugging leftovers, switch a checker off, or change, remove or skip a test the branch started with, and a reminder to run the retro once a branch with more than a few lines of code is merged or opened as a pull request.",
       "version": "5.0.0",
       "license": "MIT",
       "skills": [
-        "./skills/frame",
-        "./skills/build",
-        "./skills/explain",
-        "./skills/review",
-        "./skills/retro",
+        "./skills/framing",
+        "./skills/building",
+        "./skills/explaining",
+        "./skills/reviewing",
+        "./skills/reflecting",
         "./skills/story",
         "./skills/bug",
         "./skills/spike"
