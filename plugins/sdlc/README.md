@@ -1,6 +1,6 @@
 # sdlc
 
-4 skills, 4 agents, 8 hooks and the house rules. You drive a loose loop, Frame, Explore, Plan, Build, Verify, Review, and a machine decides when it is done.
+4 skills, 8 hooks and the house rules. You drive a loose loop, Frame, Explore, Plan, Build, Verify, Review, and a machine decides when it is done.
 
 ## What runs in a session
 
@@ -9,7 +9,6 @@
 - **The `explain` skill:** loads when you need to understand something: it bridges from what you know, shows one concrete case before the mechanism, and gives the source of every number.
 - **The `retro` skill:** once a non-trivial change is finished or given up, you say what you would do differently, then a fresh agent reads the session's transcript against the loop. You get at most 5 findings, each with a quote from the session, what it cost and what to type next time, to keep or drop. An agent mistake becomes a proposed `AGENTS.md` line.
 - **The `review` skill:** before a non-trivial change is merged or opened as a pull request, or when you ask, a fresh agent reviews the diff against what you asked for, a second proves or drops each finding, and you get each kept finding in one line. The agent fixes the blocking ones test-first, and after 3 rounds it stops and asks you.
-- **4 agents:** a design reviewer attacks a spec, design or plan before any code, a code reviewer reads the diff, a verifier proves or drops each finding, and a delegator (Sonnet) runs a non-coding task in parallel and returns only its status, result, and what it created or deleted.
 - **House rules:** at session start, and again after `/clear` or a compaction, a hook prints [`hooks/working-agreement.md`](hooks/working-agreement.md): how the agent works with you, asks you questions and explains things.
 - **8 hooks,** all in [`hooks/guard.py`](hooks/guard.py):
   - **Done check:** when the agent stops, the definition of done runs in each worktree that changed: the `Definition of done:` command of `AGENTS.md` if it has one, else the repository's own test and lint commands. A failure sends it back.

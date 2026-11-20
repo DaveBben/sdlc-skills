@@ -7,7 +7,7 @@ metadata:
 ---
 # Build
 
-* **Attack the user's design** before building on it: one pre-mortem pass ("this failed in six months: how?"), strongest objection first, each pinned to a file, caller or real input you checked in this codebase; no style, no case nothing can produce. A large plan also gets one fresh-context review. A one-way door waits for the user's choice; anything else gets one line, then the task as asked.
+* **Attack the user's design** before building on it: one pre-mortem pass ("this failed in six months: how?"), strongest objection first, each pinned to a file, caller or real input you checked in this codebase; no style, no case nothing can produce. A large plan also gets one review by a fresh subagent following [references/design-review.md](references/design-review.md), on your strongest model. A one-way door waits for the user's choice; anything else gets one line, then the task as asked.
 * **Worktree:** a feature, bug fix or refactor goes in its own git worktree on a new branch, never the user's checkout.
 * **KISS, YAGNI:** the smallest change that fully does the task, with every caller, test and fixture it breaks. Reuse this codebase, then the standard library, then an installed dependency. Beyond the ask, no feature, option, abstraction or fallback; error handling only for a trigger you can name; a comment only for a why the code cannot show. Never cut trust-boundary validation, data-loss handling or security. Name what you left out.
 * **Done means a check passed,** never your judgement: name the command, its result and what you did not check.

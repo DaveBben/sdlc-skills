@@ -22,7 +22,7 @@ import argparse, concurrent.futures as cf, json, os, shutil, subprocess, sys, ti
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLUGIN, RUNS = os.path.join(REPO, "plugins", "sdlc"), os.path.expanduser("~/.sdlc-trigger-runs")
 SKILLS = {"build", "explain", "retro", "review"}
-AGENTS = {"design-reviewer", "code-reviewer", "verifier", "delegator"}
+AGENTS = set()  # the plugin ships no agents; reviewers are reference files its skills launch
 
 FIXTURE = {
     "AGENTS.md": "Check: `python3 -m unittest discover -q -s tests -t .`\n",
@@ -88,7 +88,7 @@ CASES = [
     ("Commit this.", None),
 ]
 
-# 20 per agent; the last 6 of each are held out, phrased unlike any description.
+# Requests to review a change, which the review skill takes; the last 6 are held out, phrased unlike any description.
 AGENT_CASES = {
     "code-reviewer": [
         "Review my changes.",
@@ -111,72 +111,6 @@ AGENT_CASES = {
         "I'm about to commit. Anything wrong with my edit?",
         "Tear apart my latest edit.",
         "Would you approve this if it were a merge request?",
-    ],
-    "design-reviewer": [
-        "Review my design in SPEC.md.",
-        "Poke holes in this plan: SPEC.md",
-        "Is the architecture in docs/design.md sound?",
-        "Review the implementation plan in SPEC.md before we write code.",
-        "Critique the design doc docs/design.md.",
-        "Review this RFC: docs/design.md",
-        "Here is my plan for the discount feature in SPEC.md. What am I missing?",
-        "Is the proposed approach in SPEC.md sound?",
-        "Do a design review of SPEC.md.",
-        "Attack the spec in SPEC.md before any code is written.",
-        "Review the spec in SPEC.md.",
-        "Find the flaws in the architecture proposed in docs/design.md.",
-        "Give the plan in SPEC.md a second opinion before I start building.",
-        "Check SPEC.md's design for what will break in production.",
-        "We're thinking of putting Kafka between checkout and billing, see docs/design.md. Talk me out of it if it's a bad idea.",
-        "Before anyone writes a line, is a nightly cron recomputing every order total, as SPEC.md says, going to bite us?",
-        "Stress-test the thinking in docs/design.md.",
-        "Would you sign off on SPEC.md as written?",
-        "What are the risks in SPEC.md's approach?",
-        "I sketched how the discount should work in SPEC.md. Will it hold up?",
-    ],
-    "delegator": [
-        "While we keep working, run the test suite in the background and tell me only whether it passed.",
-        "In the background, summarize worker.log and logs-a.log in one line each.",
-        "In parallel, move every .log file in this repo into a logs/ folder and tell me what moved.",
-        "Run the tests in the background and report pass or fail.",
-        "In the background, delete the .log files and tell me what was removed.",
-        "While I keep going, check whether the tests pass.",
-        "Kick off the test suite in parallel and just report pass or fail.",
-        "Rename worker.log to worker-old.log in the background.",
-        "Summarize worker.log for me in the background.",
-        "In the background, count the commits on this branch and tell me the number.",
-        "In parallel, check which Python version is installed and report it.",
-        "Without blocking me, run the unit tests and tell me just the result.",
-        "In the background, list every file over 1 KB in this repo.",
-        "Run the test suite while we talk about the next feature, and tell me if it fails.",
-        "Kick off a background job that deletes the .log files and let me know when it's done.",
-        "Spin something off to tidy the log files into one folder; I don't need the details.",
-        "Have someone else run the tests; I only care whether they're green.",
-        "Can you fire off the tests on the side while we keep chatting?",
-        "Off to the side: what's in worker.log, in a sentence?",
-        "Get me the test results without cluttering our chat.",
-    ],
-    "verifier": [
-        "Verify the review findings in findings.md: which are real?",
-        "Fact-check these review comments in findings.md against the code.",
-        "Confirm each finding in findings.md.",
-        "Prove or drop each row in findings.md.",
-        "Reproduce the findings in findings.md.",
-        "Filter findings.md into real issues and false positives.",
-        "Are the code review findings in findings.md true?",
-        "Check findings.md: which findings are false positives?",
-        "Validate the review comments in findings.md.",
-        "Which findings in findings.md are blocking?",
-        "Verify findings.md against pricing.py and export.py.",
-        "Go through findings.md and confirm or reject each one.",
-        "Double-check the reviewer's findings in findings.md.",
-        "Triage findings.md: real or not?",
-        "A reviewer left these notes in findings.md. Are they right, or is the reviewer wrong?",
-        "I don't trust findings.md. Which of these would actually bite us?",
-        "Before I fix anything in findings.md, tell me which ones hold up.",
-        "Is the negative-quantity issue in findings.md real?",
-        "Someone claims csv is imported but unused, per findings.md. True?",
-        "Separate the signal from the noise in findings.md.",
     ],
 }
 # A request to review a change goes through the review skill, which launches the code-reviewer itself.
@@ -266,8 +200,8 @@ def self_test():
     assert fires(ev(skill("sdlc:retro"), agent("sdlc:code-reviewer"))) == ["skill:retro", "agent:code-reviewer"]
     assert fires(ev(skill("sdlc:retro"), parent="x")) == [], "a subagent's own calls are not counted"
     assert passed(["skill:retro", "agent:code-reviewer"], "agent:code-reviewer") and not passed(["agent:Explore"], "agent:delegator")
-    assert passed(["agent:Explore"], None) and not passed(["agent:delegator"], None)
-    assert passed(["skill:retro"], "retro") and not passed(["agent:delegator", "skill:retro"], "retro")
+    assert passed(["agent:Explore"], None) and passed(["agent:general-purpose"], None), "a general subagent is not ours"
+    assert passed(["skill:retro"], "retro") and not passed(["skill:review", "skill:retro"], "retro")
     assert not passed(["skill:retro"], None) and passed(["skill:other"], None), "only sdlc skills count"
     assert done(["skill:retro"], "retro") and not done(["skill:retro"], "agent:code-reviewer") and done(["agent:Explore"], "agent:x")
     print("self-test passed")

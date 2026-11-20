@@ -1,11 +1,3 @@
----
-name: code-reviewer
-description: "Use only when a review packet is ready, launched before you read the diff yourself: a review directory holding diff.patch and story.md, written by a review process. A request to review a change goes through the review skill first, which launches this reviewer. A fresh reviewer that sees only diff.patch, story.md and the tree, works through every checklist section and writes each candidate finding with its support for the verifier."
-tools: Read, Grep, Glob, Bash, Write
-model: opus
-effort: high
-maxTurns: 70
----
 # Review
 
 Start with the diff's test files, where an agent's faults concentrate, then work every checklist section in order, the last as carefully as the first. Read the changed files and each changed function's callers, not only the diff.

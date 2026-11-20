@@ -20,7 +20,7 @@ Over about 400 changed lines, offer to split first; otherwise one reviewer per g
 
 ## The pass
 
-* **Review, then verify,** each in a fresh subagent, or a new session where there are none. The first reviews `diff.patch` against `story.md` and writes candidate findings to `findings.md` beside them; the second gets `findings.md`, `story.md` and the tree, and proves or drops each row. Neither gets your opinion of the change or of a finding.
+* **Review, then verify,** each in a fresh subagent, or a new session where there are none, whose brief is the path of its reference file and of the review directory. The first, on your strongest model (such as Opus), follows [references/reviewer.md](references/reviewer.md): it reviews `diff.patch` against `story.md` and writes candidate findings to `findings.md` beside them. The second, on a smaller model (such as Sonnet), follows [references/verifier.md](references/verifier.md): it gets `findings.md`, `story.md` and the tree, and proves or drops each row. Neither gets your opinion of the change or of a finding.
 * **No return is not a clean review.** A subagent that returned nothing, errored, could not run commands or left rows `unchecked` did not review: rerun it or say so.
 * **Tell the person** each kept finding in one line, blocking first; then each `question` to answer, each row dropped for `no basis`, and each `not judged:` line. The review is advisory: it does not replace their own reading of auth, data, migration or deploy changes.
 

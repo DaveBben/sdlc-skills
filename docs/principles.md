@@ -45,11 +45,11 @@ Whoever made it, someone else attacks it, and a machine decides when it's done. 
 
 | Principle | Enforced by |
 |---|---|
-| 1, 2 | The `design-reviewer` agent, when you ask for a design review |
-| 5 | The working agreement's Frame lines |
-| 3 | The `code-reviewer` and `verifier` agents, when you hand them work |
+| 1, 2 | The `build` skill's pre-mortem and fresh design review of a large plan |
+| 5 | The working agreement's Ask section: grill a vague request |
+| 3 | The `review` skill: a fresh reviewer and a fresh verifier |
 | 6 | Done-check hook at every stop |
-| 8 | The `code-reviewer` agent |
+| 8 | The `review` skill's reviewer, and the test-tamper gate hook |
 | 18, in part | The `retro` skill and its reminder hook: findings from the session after each non-trivial change |
 | 10 | Leftovers and silencer gate hooks |
 | 11 | You |
