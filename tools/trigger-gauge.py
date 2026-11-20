@@ -21,7 +21,7 @@ import argparse, concurrent.futures as cf, json, os, shutil, subprocess, sys, ti
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLUGIN, RUNS = os.path.join(REPO, "plugins", "sdlc"), os.path.expanduser("~/.sdlc-trigger-runs")
-SKILLS = {"ticket", "spike", "build"}
+SKILLS = {"ticket", "spike", "build", "slicing"}
 AGENTS = {"design-reviewer", "implementer", "code-reviewer", "verifier", "delegator"}
 
 FIXTURE = {
@@ -71,6 +71,10 @@ CASES = [
     ("Do a spike on using Polars for the export.", "spike"),
     ("How hard would it be to make the export async?", "spike"),
     ("Try the decimal module for money and see if it fixes the rounding.", "spike"),
+    ("Break the order-history PRD in docs/prd/history.md into stories.", "slicing"),
+    ("Split this epic into slices we can ship one at a time: saved carts, shared carts and cart reminders.", "slicing"),
+    ("This is too big for one PR: moving orders from a JSON blob to proper tables. Plan the pieces.", "slicing"),
+    ("How should we slice the reporting feature?", "slicing"),
     # Held out: phrased unlike any description, to catch wording tuned to the cases above.
     ("Customers keep asking for a way to save their carts for later. Can we spec that out properly first?", "build"),
     ("Here are my notes on saved carts. Park them as a proper user story for next sprint.", "ticket"),
@@ -79,6 +83,8 @@ CASES = [
     ("Something is off: the second export of the day always has duplicate rows.", "build"),
     ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "build"),
     ("Is it realistic to move the export to a background worker? I want to know before we commit to it.", "spike"),
+    ("We want multi-currency pricing across checkout, invoices and the admin screens. Where do we even start?", "slicing"),
+    ("What's the first thing we should ship for a brand-new notifications service, and what comes after?", "slicing"),
     ("What does pricing.py do?", None),
     ("Find every caller of total.", None),
     ("Explain what a property-based test is.", None),

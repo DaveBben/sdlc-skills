@@ -3,47 +3,54 @@ name: build
 description: "Use first, before reading or editing code, for any change to code, however small: a feature, story or ticket, a bug or wrong output, a refactor, a new flag, or a chore such as a dependency bump or a runtime upgrade, like 'add a CSV export', 'implement the ticket in docs/tickets/x.md', 'the export crashes on an empty order list', 'rename total to order_total everywhere' or 'bump the requests dependency'. Not for making failing tests that are already committed pass: a fresh subagent does that. Agrees with the person what to build, why, and one acceptance criterion per business rule, coaches them through the design and has it reviewed, writes failing tests first, has fresh agents implement and review, and ships once every test and the linter pass."
 license: MIT
 metadata:
-  version: "4.0.0"
+  version: "4.1.0"
 ---
 # Build
 
-You wear two hats in turn. As product owner, you agree with the person what to build and why. As engineer, you help them design it, then build it test-first with fresh agents and ship it once it meets the definition of done. A change with one obvious result, such as a colour or a config value, needs none of this.
+Take one change from request to main, test-first, with fresh agents. The person owns the why and the hard-to-reverse choices: data stored or sent, a contract others call, a new dependency, auth, how it deploys, how the parts are split. A change with one obvious result, such as a config value, needs none of this.
 
-* **Where:** a new worktree from main, on a branch named `<story|bug|refactor|chore>/<key>-<title-words>`. The key is the ticket's, else a short slug.
-* **Definition of done:** the one command every change must pass, every test and the linter. It is the `Definition of done:` line in `AGENTS.md`, else the repository's own test and lint commands, such as `npm test && npm run lint`.
-* **Record:** work built now is written down only in its commits and its merge. A ticket is for work left for later.
-* **Already red:** when failing tests are already committed for the change, its criteria are agreed: start at Implement.
+## Set up
 
-## Product owner
+A new worktree from main, on branch `<story|bug|refactor|chore>/<key>-<title-words>`, keyed by the ticket, else a short slug.
 
-1. **What and why.** Agree what to build, why, and for whom. Show what in the code bears on it, with `file:line`. When the request names a solution, ask for the problem behind it (the XY problem). Offer a cheaper way if there is one, including one with no code. A ticket that already answers this is the answer.
-2. **Acceptance criteria,** as in Example Mapping: one per business rule the change must hold to be right in real use and in this kind of project. A personal tool needs fewer rules than a service others rely on. The rules set the count. Under each rule go its key examples, as Given/When/Then in real values: one per group of inputs the rule treats differently, plus the boundary it states (equivalence partitioning and boundary values). A rule too obvious to get wrong needs no example. Propose a rule the person did not name only with the realistic case that breaks without it, and let them keep or drop it.
-   * Too many rules for one small change, or for one short conversation to settle, means the change is too big: offer a split.
-   * A rule that needs many examples is several rules, or a concept not yet named.
+`AGENTS.md` can hold:
 
-## Engineer
+* `Definition of done:` the one command every change must pass; else the repository's own test and lint commands.
+* `Ship: merge`; else a pull request.
+* `Deploy:` run after the merge.
+* `Mutation:` a mutation-testing command.
+* `Quality:` a command printing each function's complexity and linter warnings.
 
-3. **Design, by coaching.** The person designs; you help them think. Ask how they would build it, then bring in one option they may not know that fits this problem and this codebase: what it is, tied to what they know, and when it wins. Never a menu. Hard-to-reverse choices are theirs, with the options as equals: data stored or sent, a contract others call, a new dependency, auth, how it deploys, how the parts are split. "Just build it" ends the coaching, and you design.
-4. **Design review** by a fresh subagent, given a summary of the design (approach, files that change, interfaces, hard-to-reverse choices), the criteria and the worktree. Fix what blocks.
-5. **Failing tests:** one per example, through the public interface, each named after its criterion such as `test_ac2_<what>`, with fixtures a wrong implementation would fail. Each is an acceptance test, run at the level where its result shows: against the real database engine for a schema or query, through the running app for what a user sees, with only outside services replaced. Write none that no criterion asks for. See each fail for the right reason, then commit them alone as `test(red): <title>`, with every current criterion in the message as `AC<n>: <rule>` and its examples. When a criterion changes, make a new red commit holding the full set.
-6. **Implement** by a fresh subagent, given the worktree, the red commit, the definition of done and [references/refactor.md](references/refactor.md). Trust `git log` and the command output over its report. If `AGENTS.md` has a `Mutation:` line, run it on the changed files and add a test for each surviving mutant.
-7. **Code review** by fresh subagents. In a new `<temp>/review-<timestamp>/` folder, put `diff.patch`, the diff against main, and `story.md`, the criteria plus each test changed after the red commit and why. One reviews, another verifies its findings. Tell the person each kept finding in one line, and fix each blocking one test-first.
+## Paths
 
-## Done
+| Change | Steps |
+|---|---|
+| Feature | 1 to 9. |
+| Bug | Reproduce first, or ask for the missing fact and stop. The reproduction is AC1. With no hard-to-reverse choice, skip 3 and 4. |
+| Refactor | No criteria or red commit; tests pass unchanged. 1, [references/refactor.md](references/refactor.md), 7 to 9. |
+| Chore | No criteria. 1, the change, 7 to 9. |
+| Already red | 6 to 9. |
 
-8. **Definition of done:** run it on the branch, every test and not only the new ones, and the linter. All must pass before you ship. Fix what fails test-first, never the check or a criterion.
-9. **Ship** as the `Ship:` line in `AGENTS.md` says:
-   * `Ship: merge`: merge into main, and push main if it has a remote.
-   * Otherwise, a pull request titled `[<key>] <what it does>`, with the body from [references/pull-request.md](references/pull-request.md). Watch CI and review comments until it merges, fixing what fails and replying to each comment.
-   * After the merge, if `AGENTS.md` has a `Deploy:` line, run it, then smoke-test: one read-only check per criterion that its result shows where it was deployed, such as querying the new view. A failure goes to the person with how to roll back.
-   * Then remove the worktree and the branch.
+## Steps
 
-## Bugs, refactors and chores
-
-* **Bug:** reproduce it first, and the reproduction is AC1. If you cannot reproduce it, ask for the missing fact and stop.
-* **Refactor:** behaviour stays the same, so there are no new criteria and no red commit, and every existing test passes unchanged. Refactor by [references/refactor.md](references/refactor.md), then go on from code review.
-* **Chore,** such as a dependency bump: no criteria; the definition of done on the new version is the proof. Make the change, then go on from code review.
+1. **Problem.** Agree what, why and for whom, citing code as `file:line`. Check for the XY problem and a cheaper way, even one with no code.
+2. **Rules,** by Example Mapping: one acceptance criterion per business rule.
+   * **Missing rules:** look at order, duplicates, ties, equality and empty collections, where you miss them unaided. Propose each with the case it breaks.
+   * **Examples:** Given/When/Then in real values, by equivalence partitioning and boundary values. None, one and many are different groups.
+   * **Wording:** each Given says how its state came about: "an order placed through checkout", not "an order". Each Then states every result the rule decides that a caller can see: the new total and the changed line, not only the 200.
+   * **Too big** for one short conversation: offer the `slicing` skill.
+3. **Design, by coaching.** Ask how they would build it, then offer one option they may not know and when it wins, never a menu. "Just build it" means you design.
+4. **Design review** by a fresh subagent, given the criteria, the worktree and a summary of a page at most: approach, files changed, interfaces as signatures, constraints, hard-to-reverse choices, no codebase tour. The person settles what it could not check from the code.
+5. **Red tests,** one per example, named for its criterion, such as `test_ac2_<what>`: acceptance tests through the public interface, faking only outside services. Set up each Given through the project's own fixtures or entry points, not state the test builds. Assert every result in the Then. Write none that no criterion asks for. See each fail for the right reason, then commit them alone as `test(red): <title>`, with every current criterion as an `AC<n>: <rule>` line and its examples. When a criterion changes, make a new red commit holding the full set.
+6. **Implement** by a fresh subagent, given the worktree, the red commit, the definition of done and [references/refactor.md](references/refactor.md). Trust `git log` and command output over its report. With `Mutation:`, add a test for each surviving mutant.
+7. **Code review** by fresh subagents: one reviews, another verifies. In a new `<temp>/review-<timestamp>/` folder, put `diff.patch` against main and `story.md`: the criteria, or the problem from 1, and why any test changed after the red commit. With `Quality:`, add each changed function that scores worse than at the merge base. Above about 300 changed lines, split by group of related files: each gets its own reviewer and `<group>/` folder with its `diff.patch` and the same `story.md`, and the findings are joined and renumbered into one `findings.md`. Tell the person each kept finding in one line, and fix blocking ones test-first.
+8. **Definition of done** on the branch. Fix the code, never the check or a criterion.
+9. **Ship.**
+   * `Ship: merge`: show the person the diff summary, the kept findings and the open questions, and wait for their go. Merge, with the Risks and Decided by AI sections of [references/pull-request.md](references/pull-request.md) in the merge commit, and push.
+   * Otherwise a pull request titled `[<key>] <what it does>`, with the body from [references/pull-request.md](references/pull-request.md), seen through to merge.
+   * With `Deploy:`, ask before running it, then smoke-test each criterion read-only; report a failure with how to roll back.
+   * Remove the worktree and the branch.
 
 ## When to stop
 
-Wait for the person through the design. After that, stop only for a rule a criterion needs, code that contradicts a criterion, or a fact only the person has. Otherwise write `Decided: <choice>, because <reason>` and keep going. These lines go in the pull request or the merge commit.
+After the design, stop only for a rule a criterion needs, code that contradicts a criterion, or a fact only the person has. Otherwise write `Decided: <choice>, because <reason>` and keep going.

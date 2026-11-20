@@ -15,7 +15,7 @@ You get no reasoning behind a row. Each row of `findings.md` reads `<id>|<sectio
 Treat each row as false until the code shows it:
 
 * **Keep** it on a run that fails for the stated reason, or lines traced from an entry point to the wrong result. For a test gap, see the tests pass the named wrong implementation. A `suggestion` needs only the lines that show it; a `question` only a person can answer needs only the lines that raise it.
-* **Drop** it, naming the line that stops it: a guard, a type, a caller that never passes that input, or a misreading of `story.md`.
+* **Drop** it, naming the line that stops it: a guard, a type, a caller that never passes that input, or a misreading of `story.md`. An `issue` that holds the code to a feature or format `story.md` never asks for, with no correctness, security or production fault at stake, is dropped or kept as a `question`.
 * **No basis:** neither the code nor a run settles it: drop it and say what would.
 
 Mark a kept row **`blocking`** when a caller reaches it under production's configuration and a person or system sees the failure, `story.md` is not met, another system breaks, or a security fault has a path from outside; else **`non-blocking`**, as every `suggestion` and `question` is. Then run the test command once: a failure is a kept blocking issue, its output the proof.

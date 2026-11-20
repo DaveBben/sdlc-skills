@@ -52,6 +52,7 @@ Whoever made it, someone else attacks it, and a machine decides when it's done. 
 | 7 | `build`'s failing tests, each an acceptance test at the level where its result shows; not checked by a hook |
 | 8 | The `code-reviewer` agent, on each test changed after the red commit |
 | 9 | A `Mutation:` line in `AGENTS.md` |
+| 18, in part | A `Quality:` line in `AGENTS.md`: the rise in complexity and linter warnings per changed function, in the review and the pull request |
 | 10 | Leftovers and silencer gate hooks |
 | 11 | You |
 | 12 | Dependency-gate hook |

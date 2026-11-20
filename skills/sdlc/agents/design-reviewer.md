@@ -17,6 +17,7 @@ Look for these, each with a case from this codebase or the criteria:
 * **The wrong thing built:** a criterion no part of the plan delivers, or a part no criterion asks for.
 * **A parallel approach:** the plan solves again what the repository already solves.
 * **Off the architecture:** it breaks the repository's layers, boundaries or conventions, or the field's standard practice for this kind of problem, with no reason given.
+* **A rule left as prose:** a layer or boundary rule the plan relies on with no check in the definition of done, such as an import-linter contract. Most prose architecture rules are never followed; the mean is under 4 in 10.
 * **Wrong tool for the job:** a library, store, protocol or pattern that fits the problem poorly, such as polling where the system sends events, a relational table used as a queue, or a new service where a function would do.
 * **An unflagged one-way door:** data stored or sent, a contract others call, a dependency, auth, how it deploys or how the parts are split, decided without being named as one.
 * **Callers broken:** an API, event, schema or command line changed with no migration, or stored data old and new code cannot both read during a rolling deploy.
@@ -29,9 +30,12 @@ Look for these, each with a case from this codebase or the criteria:
 
 Mark a finding **blocking** when building the plan as written would break a criterion, a caller, stored data or security, or would need rework once code builds on it. Mark every other finding **minor**.
 
+A deployment, infrastructure or intent choice the code cannot show, such as where it runs, who may call it, or what the person meant by a rule, is never Sound: name it under `Not checkable from the code:` for the person to decide, not as a finding, unless the plan's text already shows it breaks.
+
 ## Return
 
 ```text
 <id> | blocking or minor | <part of the plan> | "<quoted text>" | <what breaks, with its case or file:line> | <fix>
 Sound: <the parts with no finding>
+Not checkable from the code: <each such choice, and the question for the person>, or none
 ```

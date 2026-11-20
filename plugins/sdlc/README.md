@@ -1,12 +1,13 @@
 # sdlc
 
-3 skills, 5 agents, 7 hooks and the house rules. Whoever made a change, someone else attacks it, and a machine decides when it is done.
+4 skills, 5 agents, 7 hooks and the house rules. Whoever made a change, someone else attacks it, and a machine decides when it is done.
 
 ## What runs in a session
 
-- **The `build` skill:** loads for any change: a feature, a bug or a refactor. It first agrees with you in chat what you want and why, offers a cheaper way if there is one, and agrees 1 to 3 Given/When/Then criteria in real values, proposing at most 2 more with the case behind each. Then it coaches you through the design, one option you may not know at a time, unless you say "just build it", and has the design reviewed. A bug is reproduced first; a refactor keeps every test unchanged. It commits failing tests with the criteria in the commit message, delegates the rest, and merges into main when `AGENTS.md` says `Ship: merge`, else opens a pull request. Nothing is written to a tracker for work done now.
+- **The `build` skill:** loads for any change: a feature, a bug or a refactor. It first agrees with you in chat what you want and why, offers a cheaper way if there is one, and agrees one criterion per business rule, each with Given/When/Then examples in real values, proposing a rule you did not name only with the case that breaks without it. Then it coaches you through the design, one option you may not know at a time, unless you say "just build it", and has the design reviewed. A bug is reproduced first; a refactor keeps every test unchanged. It commits failing tests with the criteria in the commit message, delegates the rest, and merges into main when `AGENTS.md` says `Ship: merge`, else opens a pull request. Nothing is written to a tracker for work done now. Two optional `AGENTS.md` lines add checks: `Mutation:` names a mutation-testing command run on the changed files, and `Quality:` a command that prints each function's complexity and linter warnings, such as `lizard` beside the linter, whose rise on each changed function is reported to the reviewer and in the pull request.
 - **The `ticket` skill:** a story, bug or spike written down for later, in at most 15 lines and 3 criteria.
 - **The `spike` skill:** "do a spike on X" frames a question that can fail, builds throwaway code in a scratch directory, records the findings and deletes the code.
+- **The `slicing` skill:** "break this down" splits work too big for one pull request into vertical slices, each shippable alone: a walking skeleton first for something new, else the simplest end-to-end case. A refactor goes by preparatory refactoring or the Mikado method, a schema change by expand-contract. It files the later slices as tickets and offers to build the first.
 - **5 agents:** a design reviewer attacks a spec, design or plan before any code, an implementer makes the tests pass, a code reviewer reads the diff, a verifier proves or drops each finding, and a delegator (Sonnet) runs a non-coding task in parallel and returns only its status, result, and what it created or deleted.
 - **House rules:** at session start, and again after `/clear` or a compaction, a hook prints [`hooks/working-agreement.md`](hooks/working-agreement.md): how the agent works with you, asks you questions and explains things.
 - **7 hooks,** all in [`hooks/guard.py`](hooks/guard.py):
@@ -33,4 +34,4 @@ Finish branches started under sdlc 3.x before upgrading: 4.0 reads criteria from
 | Red tests | agent | Writes a test per criterion, sees each fail, and commits them with the criteria in the message |
 | Implement | implementer | Makes the tests pass. A mutation run finds one weak test, and the agent adds a test that kills it |
 | Review | code-reviewer, verifier | 3 candidates found, 1 proved: a discount applied twice on retry |
-| Ship | agent | Fixes it test-first, then merges into main under `Ship: merge`, else opens a pull request under 400 lines |
+| Ship | agent | Fixes it test-first, then merges into main on your go under `Ship: merge`, else opens a pull request under 400 lines |

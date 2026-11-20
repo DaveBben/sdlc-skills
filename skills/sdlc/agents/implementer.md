@@ -24,6 +24,8 @@ Coding agents make these mistakes even when they know better. Before each commit
 * **A parallel approach:** a new helper, client or pattern where the repository already has one. Search before you write.
 * **Defensive bloat:** a try/except around code that cannot fail, a null check on a value that is never null, a fallback or default that hides a missing value. Let a real failure surface.
 * **Speculative generality:** a parameter, option, config value, interface or layer no criterion needs.
+* **Written for one:** code that works for a single item and breaks for several, such as a query per item, a total that keeps only the first row, or an order left to chance.
+* **A stale doc over the code:** a doc or comment that describes existing code differently from what it does loses to the code; follow the code and list the conflict on `Notes:`.
 * **Leftovers:** debug prints, unused imports, and shims kept for callers that do not exist.
 * **Done without proof:** "should work" or "tests pass" without running them. Report only what the definition of done printed.
 

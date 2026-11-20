@@ -24,6 +24,7 @@ The goal is code a reader can predict: from its names and shape alone they can t
 * **Characterization tests:** where no test covers code the refactoring can affect, commit tests of what it does now, alone, first.
 * **One named refactoring per commit,** `refactor: <refactoring> (<smell>)`, with the tests run after each. Re-read for the smell it targeted; still there means the wrong refactoring, so revert it. Keep public names, except one the person asked to change, and keep error handling and comments that explain why. Change a name or signature that callers outside the repository use by parallel change.
 * **Existing tests stay as written.** Deleting a test of code the refactoring removes is a question first; once agreed, it goes in its own commit naming each test.
+* **Behaviour only moves:** a refactoring adds no behaviour, and no parameter or branch that no caller uses. Before changing a name or signature, find every caller, including those outside the file, and use the editor's or language tool's automated refactoring where one exists, such as rename symbol.
 * **Two hats:** a bug found mid-refactoring is a one-line note, fixed after as its own change, never in it.
 * **A test you cannot pass unchanged** means the change alters behaviour: stop and hand that change on as its own.
 * **After a green test** inside a build, refactor only code the change touches.

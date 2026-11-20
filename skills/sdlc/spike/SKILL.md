@@ -3,7 +3,7 @@ name: spike
 description: "Use first, before answering, when the person asks whether something would work, how hard or how much work it would be, or what adopting a library or platform would do to the codebase, or wants to try an approach and see if it works, a prototype or a quick experiment, such as 'do a spike on X', 'how hard would it be to make the export async', 'would Postgres full-text search be fast enough' or 'try the decimal module and see if it fixes the rounding': frames a question that can fail, builds throwaway code in a scratch directory, records what it found and deletes the code."
 license: MIT
 metadata:
-  version: "4.0.0"
+  version: "4.1.0"
 ---
 # Spike
 
@@ -14,7 +14,7 @@ When a doc, the source or one command answers the question, answer it from there
 State these 4 in one message and start.
 
 1. **The decision:** the next step if it passes and if it fails. When both are the same step, skip the spike and say so.
-2. **The question:** a falsifiable outcome with its bar and the data size, load and environment it is measured under, such as "under 200 ms at 1,000 rows on staging".
+2. **The question:** a falsifiable outcome with its bar and the data size, load and environment it is measured under, on realistic data rather than one hand-made example, such as "under 200 ms at 1,000 rows on staging".
 3. **The finish line:** the signal that answers it; for a judgement only the person can make, such as a layout, their choice.
 4. **The timebox:** a number of attempts.
 

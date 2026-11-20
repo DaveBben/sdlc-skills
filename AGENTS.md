@@ -17,7 +17,7 @@ When an agent using the plugin fails, add a check that catches the failure. Do n
 ## Key files
 
 - `plugins/sdlc/hooks/guard.py` is the 7 hooks in one script: done check, size cap, dependency gate, pull request cap, acceptance gate, leftovers gate and silencer gate. `hooks.json` beside it registers the events.
-- `skills/sdlc/` holds the 3 skills: `build`, which takes a feature, bug or refactor from an agreed what and why to a merge, `ticket`, which writes work down for later, and `spike`, which runs a throwaway experiment. `build/references/` holds refactoring and the pull request body. Edit a skill only there.
+- `skills/sdlc/` holds the 4 skills: `build`, which takes a feature, bug or refactor from an agreed what and why to a merge, `ticket`, which writes work down for later, `spike`, which runs a throwaway experiment, and `slicing`, which splits work too big for one pull request. `build/references/` holds refactoring and the pull request body. Edit a skill only there.
 - **A skill as a stored prompt:** a skill also earns its place when it holds the owner's own conventions, which a capable model would follow but the owner would otherwise retype each time. Keep such a skill to those conventions.
 - `skills/sdlc/agents/` holds the 5 subagent prompts: `design-reviewer`, `implementer`, `code-reviewer`, `verifier` and `delegator`, which runs non-coding tasks in parallel. The skill describes each delegated step and never names an agent, because the harness picks the agent by its `description`.
 - `plugins/<plugin>/` is a thin Claude Code wrapper: a `.claude-plugin/plugin.json`, a README, and for `sdlc` the symlinks `skills` and `agents` into `skills/sdlc`. Do not replace the symlinks with real files.
