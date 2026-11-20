@@ -12,6 +12,8 @@
                      changes more than 400 lines asks the person.
   * Leftovers gate:  a commit that adds a debugger call, a TODO or commented-out code asks the person.
   * Silencer gate:   a commit that adds a line switching a type checker or linter off asks the person.
+  * Test-tamper gate: a commit that changes or removes a line of a test file the branch started with, or adds
+                     a skip or expected-failure marker to a test, asks the person.
   * Retro reminder:  once per branch, after a pull request is opened from it or it is merged, tells the agent to
                      run the retro skill when the branch changed more than RETRO_LINES lines of code.
 """
@@ -50,6 +52,9 @@ LEFTOVER = re.compile(r"\bconsole\.(?:log|debug)\(|^\s*debugger;?\s*$|\bbreakpoi
                       r"|[\w.]+\s*=\s*[^=\s]|[\w.]+\(.*\)\s*;?\s*$)")
 SILENCER = re.compile(r"#\s*type:\s*ignore|#\s*noqa|#\s*pyright:\s*ignore|#\s*pylint:\s*disable|eslint-disable"
                       r"|@ts-(?:ignore|nocheck|expect-error)|\bas\s+any\b|:\s*any\b|//\s*nolint|#\[allow\(|@SuppressWarnings")
+TEST_FILE = re.compile(r"(?:^|/)(?:tests?|__tests__|spec)/|(?:^|/)test_[^/]*$|_test\.[^/.]+$|[._-](?:test|spec)\.[^/.]+$")
+SKIP = re.compile(r"@pytest\.mark\.(?:skip|xfail)|\bpytest\.(?:skip|xfail)\(|@unittest\.(?:skip|expectedFailure)|\.skip\(|\bx(?:it|describe|test)\("
+                  r"|\b(?:it|test)\.todo\(|\bt\.Skip(?:Now|f)?\(|#\[ignore\]|@(?:Disabled|Ignore)\b")
 PROSE = (".md", ".txt", ".rst")
 CONFIG = (".json", ".toml", ".yaml", ".yml", ".ini", ".cfg", ".conf", ".env", ".lock")
 RETRO_LINES = 20  # this plugin's guess at "more than a couple of lines"; tune it
@@ -272,6 +277,21 @@ def added_lines(root):
     return [r for r in out if not r[0].endswith(PROSE) and os.path.basename(r[0]) not in LOCKFILES]
 
 
+def removed_test_lines(root):
+    """(path, old line number, text) for each line the tree changes or removes since HEAD in a test file the branch started with."""
+    base = merge_base(root) or "HEAD"
+    old = {f for f in (git(root, "ls-tree", "-r", "--name-only", base) or "").splitlines() if TEST_FILE.search(f)}
+    out, path, n = [], None, 0
+    for l in (git(root, "diff", "HEAD", "-U0", "--no-color", "--no-ext-diff", "--", *sorted(old)) or "").splitlines() if old else []:
+        if l.startswith("--- "):
+            path = l[6:] if l.startswith("--- a/") else None
+        elif l.startswith("@@"):
+            n = int(re.search(r"-(\d+)", l).group(1))
+        elif l.startswith("-") and path:
+            out.append((path, n, l[1:])); n += 1
+    return [r for r in out if r[2].strip()]
+
+
 def commit_gates(root):
     rows = added_lines(root)
     show = lambda hits: "; ".join(f"{p}:{n} `{t.strip()[:60]}`" for p, n, t in hits[:5])
@@ -283,6 +303,10 @@ def commit_gates(root):
     if quiet:
         reasons.append(f"This commit switches a checker off: {show(quiet)}. Fix the type or lint finding instead; "
                        "approve only when it cannot be fixed.")
+    tampered = removed_test_lines(root) + [r for r in rows if TEST_FILE.search(r[0]) and SKIP.search(r[2])]
+    if tampered:
+        reasons.append(f"This commit changes, removes or skips tests the branch started with: {show(tampered)}. Make the code "
+                       "pass the test as it was; approve only when the test itself is wrong, with the reason in the commit message.")
     return reasons
 
 
@@ -526,6 +550,23 @@ def self_test():
     assert not pre_bash("git status", t), "only a commit is checked"
     assert added_lines(t) and all(not p.endswith(".md") for p, _, _ in added_lines(t))
     os.remove(os.path.join(t, "src/app.py")); os.remove(os.path.join(t, "NOTES.md"))
+
+    # Test-tamper gate
+    tamper = lambda: (pre_bash("git commit -qam t", t) or {}).get("hookSpecificOutput", {}).get("permissionDecisionReason", "")
+    put("tests/test_a.py", "def test_a():\n    assert f(2) == 5\n")
+    assert "tests/test_a.py:2" in tamper(), "changing a test the branch started with asks"
+    os.remove(os.path.join(t, "tests/test_a.py"))
+    assert "tests/test_a.py:1" in tamper(), "deleting one asks"
+    run("git", "checkout", "-q", "--", "tests/test_a.py")
+    put("tests/test_new.py", "def test_b():\n    assert True\n")
+    assert "changes, removes or skips" not in tamper(), "a new test passes"
+    put("tests/test_new.py", "import pytest\n\n@pytest.mark.skip\ndef test_b():\n    assert True\n")
+    assert "tests/test_new.py:3" in tamper(), "a skip marker asks"
+    put("tests/test_a.py", "def test_a():\n    assert f(2) == 4\n\n\ndef test_c():\n    assert f(0) == 0\n")
+    os.remove(os.path.join(t, "tests/test_new.py"))
+    assert "changes, removes or skips" not in tamper(), "adding to a test file passes"
+    assert SKIP.search("  xit('x', () => {})") and SKIP.search("    t.Skip(\"later\")") and not SKIP.search("def skip_rows():")
+    run("git", "checkout", "-q", "--", "tests/test_a.py")
 
     # Retro reminder
     run("git", "checkout", "-qb", "feat/r")

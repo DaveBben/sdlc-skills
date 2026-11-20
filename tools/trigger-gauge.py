@@ -21,7 +21,7 @@ import argparse, concurrent.futures as cf, json, os, shutil, subprocess, sys, ti
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLUGIN, RUNS = os.path.join(REPO, "plugins", "sdlc"), os.path.expanduser("~/.sdlc-trigger-runs")
-SKILLS = {"retro"}
+SKILLS = {"build", "explain", "retro", "review"}
 AGENTS = {"design-reviewer", "code-reviewer", "verifier", "delegator"}
 
 FIXTURE = {
@@ -57,17 +57,33 @@ CASES = [
     # Held out: phrased unlike any description, to catch wording tuned to the cases above.
     ("That refactor of pricing.py is done. Any lessons for how I prompt you?", "retro"),
     ("The new JSON endpoint shipped. Where did we lose time, and what should I do differently?", "retro"),
+    ("The empty-cart change to pricing.py is finished. Review it and fix what really matters before I open the pull request.", "review"),
+    ("Take my uncommitted change through review: verify what the reviewer finds and fix the blocking findings.", "review"),
+    ("Get my working-tree change reviewed and ready to merge.", "review"),
+    # Held out.
+    ("I think the pricing edit is good to go. Have it checked properly and sort out anything serious first.", "review"),
+    # Talk about review, with no finished change to review, gets none.
+    ("What should a good code review checklist cover?", "explain"),  # a question about review, not a change to review
+    ("Summarise what my uncommitted change does, for a pull request description.", None),
+    ("Bump the requests dependency to the latest version.", "build"),
+    # Held out.
+    ("Can you wire up a new endpoint that returns order totals as JSON?", "build"),
+    ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "build"),
+    ("Why does total give 9.999999 instead of 10 for some carts? I want to understand it before anything changes.", "explain"),
+    ("How does the export decide which columns to write?", "explain"),
+    # Held out.
+    ("I don't get what a merge base is. Walk me through it.", "explain"),
     # A change about to start, or a trivial one, gets no retro.
-    ("Add a CSV export to the orders page.", None),
-    ("The export crashes on an empty order list. Fix it.", None),
-    ("Rename total to order_total everywhere.", None),
+    ("Add a CSV export to the orders page.", "build"),
+    ("The export crashes on an empty order list. Fix it.", "build"),
+    ("Rename total to order_total everywhere.", "build"),
     ("Write a story for letting customers download their order history.", None),
     ("Do a spike on using Polars for the export.", None),
     ("Break the order-history PRD in docs/prd/history.md into stories.", None),
     ("I just bumped the export timeout in AGENTS.md from 30 to 60 seconds. Done.", None),
-    ("What does pricing.py do?", None),
+    ("What does pricing.py do?", "explain"),
     ("Find every caller of total.", None),
-    ("Explain what a property-based test is.", None),
+    ("Explain what a property-based test is.", "explain"),
     ("How do I run the tests here?", None),
     ("Commit this.", None),
 ]
@@ -163,7 +179,8 @@ AGENT_CASES = {
         "Separate the signal from the noise in findings.md.",
     ],
 }
-CASES += [(p, "agent:" + a) for a, ps in AGENT_CASES.items() for p in ps]
+# A request to review a change goes through the review skill, which launches the code-reviewer itself.
+CASES += [(p, "review" if a == "code-reviewer" else "agent:" + a) for a, ps in AGENT_CASES.items() for p in ps]
 
 
 def git(work, *args):

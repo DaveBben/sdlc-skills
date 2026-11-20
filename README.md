@@ -4,7 +4,7 @@ One plugin for coding agents, built on one rule: you drive a loose loop, Frame, 
 
 ## What you get
 
-- **Framing:** the agent grills you one question at a time when a change is vague, and looks first where gaps hide, such as one item where the job meets many.
+- **Framing:** the agent grills you when a change is vague, asking only what you alone know, and looks first where gaps hide, such as one item where the job meets many.
 - **A retro after each non-trivial change:** a fresh agent reads the session and tells you, with cases from it, what to do next time to get better output.
 - **Fresh agents on call:** one reviews a design, one reviews the diff, and one proves or drops each finding.
 - **Hooks enforce the rest:** the definition of done, every test and the linter, must pass before the agent stops, first-seen packages ask you, `AGENTS.md` stays under 100 lines, a pull request over 400 changed lines asks you, and so does a commit that leaves in a debugger call or TODO or switches a checker off.
@@ -26,7 +26,7 @@ Other agents: run `npx skills add DaveBben/sdlc-skills --all` and register `skil
 
 ## How to use it
 
-Ask for the change as you would a colleague. When it is vague, the agent asks you one question at a time until you agree what done looks like; then you plan, build and verify it in small steps. When the change is finished, the agent runs a retro on the session, or say "run a retro". The definition of done is your repository's own test and lint commands, such as `npm test && npm run lint`. To name it yourself, add a line to `AGENTS.md`, such as ``Definition of done: `make lint test` ``; an older `Check:` line still works. More detail is in [plugins/sdlc](plugins/sdlc/README.md).
+Ask for the change as you would a colleague. When it is vague, the agent asks what only you know until you confirm its play-back of what done looks like; then you plan, build and verify it in small steps. When the change is finished, the agent runs a retro on the session, or say "run a retro". The definition of done is your repository's own test and lint commands, such as `npm test && npm run lint`. To name it yourself, add a line to `AGENTS.md`, such as ``Definition of done: `make lint test` ``; an older `Check:` line still works. More detail is in [plugins/sdlc](plugins/sdlc/README.md).
 
 At session start, a hook also adds house rules for how the agent works with you, such as one decision per question and plain explanations. They are in [`plugins/sdlc/hooks/working-agreement.md`](plugins/sdlc/hooks/working-agreement.md). If you installed the old `working-agreement` plugin, uninstall it: `claude plugin uninstall working-agreement@sdlc-skills`.
 
