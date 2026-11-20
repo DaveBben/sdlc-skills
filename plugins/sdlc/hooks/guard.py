@@ -10,19 +10,16 @@
                      lockfile in the repository holds asks the person (slopsquatting).
   * Pull request cap: opening a pull request or pushing a branch whose diff from the default branch
                      changes more than 400 lines asks the person.
-  * Acceptance gate: pushing, opening a pull request from or merging a branch whose latest `test(red):`
-                     commit message holds `AC<n>` criteria checks that a test changed on the branch names each
-                     criterion, then runs the definition of done, and refuses on any failure. A story/ or bug/
-                     branch with no red commit asks the person.
   * Leftovers gate:  a commit that adds a debugger call, a TODO or commented-out code asks the person.
   * Silencer gate:   a commit that adds a line switching a type checker or linter off asks the person.
+  * Retro reminder:  once per branch, after a pull request is opened from it or it is merged, tells the agent to
+                     run the retro skill when the branch changed more than RETRO_LINES lines of code.
 """
-import hashlib, json, os, re, shlex, subprocess, sys, tempfile, time
+import hashlib, json, os, re, shlex, subprocess, sys, tempfile
 
 MAX_LINES, MAX_BYTES = 100, 8 * 1024  # this plugin's choice, sized for a root file of commands, constraints and traps
 MAX_BLOCKS = 5  # this plugin's choice: failed checks in a row before the agent may stop anyway
 CHECK_SECONDS = 300
-GATE_SECONDS = 600  # the whole acceptance gate; hooks.json gives PreToolUse a little more
 DIFF_CAP = 400  # this plugin's choice: past about 400 changed lines a reviewer reads less of each line
 INSTRUCTIONS = {"AGENTS.md", "CLAUDE.md"}
 CHECK = re.compile(r"^\s*(?:[-*]\s+)?(?:\*\*)?(?:Definition of done|Check):(?:\*\*)?\s*`([^`\n]+)`", re.M | re.I)
@@ -45,10 +42,6 @@ INSTALL = re.compile(PREFIX + r"(?:(?:python[\d.]*\s+-m\s+|uv\s+)?pip[\d.]*\s+in
 RUNNER = re.compile(PREFIX + r"(?:npx|uvx|bunx|pipx\s+run|pnpm\s+dlx|npm\s+exec|uv\s+tool\s+run)\s+(.*)$")
 PR = re.compile(PREFIX + r"(?:gh\s+pr\s+create|glab\s+mr\s+create|tea\s+(?:pr|pulls?)\s+create|git\s+push)\b")
 MERGE = re.compile(PREFIX + r"git\s+(?:-C\s+\S+\s+)?merge\s+(.*)$")
-# The red commit: its message holds every current criterion as an `AC<n>:` line.
-RED = re.compile(r"^test\(red\):")
-AC = re.compile(r"^[^\w\n]*(?:\d+\.\s+)?(?:\*\*)?AC(\d+)\b.*$", re.M)
-TEST_FILE = re.compile(r"(?:^|/)(?:tests?|__tests__|spec)/|(?:^|/)test_[^/]*$|[._-](?:test|spec)\.[^/.]+$")
 COMMIT = re.compile(PREFIX + r"git\s+(?:-\S+\s+\S+\s+)*commit\b")
 # shortcut: matched by pattern per added line; a print() left in, an unused import or a shim passes and rests on the reviewer.
 LEFTOVER = re.compile(r"\bconsole\.(?:log|debug)\(|^\s*debugger;?\s*$|\bbreakpoint\(\)|\bi?pdb\.set_trace\(|binding\.pry|\bdbg!\("
@@ -58,6 +51,9 @@ LEFTOVER = re.compile(r"\bconsole\.(?:log|debug)\(|^\s*debugger;?\s*$|\bbreakpoi
 SILENCER = re.compile(r"#\s*type:\s*ignore|#\s*noqa|#\s*pyright:\s*ignore|#\s*pylint:\s*disable|eslint-disable"
                       r"|@ts-(?:ignore|nocheck|expect-error)|\bas\s+any\b|:\s*any\b|//\s*nolint|#\[allow\(|@SuppressWarnings")
 PROSE = (".md", ".txt", ".rst")
+CONFIG = (".json", ".toml", ".yaml", ".yml", ".ini", ".cfg", ".conf", ".env", ".lock")
+RETRO_LINES = 20  # this plugin's guess at "more than a couple of lines"; tune it
+SHIP = re.compile(PREFIX + r"(?:gh\s+pr\s+create|glab\s+mr\s+create|tea\s+(?:pr|pulls?)\s+create)\b")
 INSTALLERS = {"pip", "setuptools", "wheel"}
 VALUE_FLAGS = {"-r", "-c", "-e", "-i", "-f", "-t", "-p", "--requirement", "--constraint", "--editable", "--index-url",
                "--extra-index-url", "--find-links", "--target", "--prefix", "--python", "--group", "--registry",
@@ -234,6 +230,33 @@ def changed_lines(root):
                and os.path.basename(r[2]) not in LOCKFILES) + sum(read(os.path.join(root, f)).count("\n") for f in new)
 
 
+def code_lines(root, spec):
+    """Lines added plus removed by `git diff spec`, prose, config and lockfiles left out."""
+    rows = (l.split("\t") for l in (git(root, "diff", "--numstat", spec, "--") or "").splitlines())
+    return sum(int(r[0]) + int(r[1]) for r in rows if len(r) == 3 and r[0].isdigit() and r[1].isdigit()
+               and not r[2].endswith(PROSE + CONFIG) and os.path.basename(r[2]) not in LOCKFILES)
+
+
+def retro_due(command, root):
+    """Once per branch: after a pull request from it or a merge of it, the change it holds is finished."""
+    parts = [part.strip() for part in re.split(r"&&|\|\||[;|\n]", command)]
+    merges = [m.group(1) for part in parts for m in [MERGE.match(part)] if m]
+    ref = next((a for a in shlex.split(merges[0], comments=True) if not a.startswith("-")), None) if merges else None
+    if ref:  # the merge has run, so ORIG_HEAD is where it started
+        branch, n = ref, code_lines(root, f"ORIG_HEAD...{ref}")
+    elif any(SHIP.match(part) for part in parts) and merge_base(root):
+        branch, n = (git(root, "rev-parse", "--abbrev-ref", "HEAD") or "").strip(), code_lines(root, merge_base(root))
+    else:
+        return None
+    state = load(root)
+    if n <= RETRO_LINES or branch in state.get("retro", []):
+        return None
+    state.setdefault("retro", []).append(branch)
+    save(root, state)
+    return (f"This change touched {n} lines of code. Run the retro skill now, before you tell the person it is done; "
+            "if it is not finished, run it when it is.")
+
+
 def added_lines(root):
     """(path, line number, text) for each line the tree adds since HEAD, untracked files included, prose and lockfiles left out."""
     out, path, n = [], None, 0
@@ -263,66 +286,6 @@ def commit_gates(root):
     return reasons
 
 
-def run(cmd, cwd, seconds):
-    try:
-        r = subprocess.run(cmd, shell=True, cwd=cwd, capture_output=True, text=True, errors="replace", timeout=max(1, seconds))
-        return r.returncode == 0, "\n".join((r.stdout + r.stderr).splitlines()[-20:])
-    except subprocess.TimeoutExpired:
-        return False, f"timed out after {max(1, seconds):.0f} s"
-
-
-def red_message(root, base):
-    """The newest `test(red):` commit message on the branch: it holds every current criterion."""
-    log = git(root, "log", "--format=%B%x00", f"{base}..HEAD") or ""
-    return next((m.strip() for m in log.split("\0") if RED.match(m.strip())), None)
-
-
-def acceptance_gate(root, branch=None):
-    """(refusals, questions) for a push, pull request or merge, from the branch's latest red commit."""
-    base = merge_base(root)
-    branch = branch or (git(root, "branch", "--show-current") or "").strip()
-    text = red_message(root, base) if base else None
-    if not text or not AC.search(text):
-        return [], ([f"Branch {branch} has no `test(red):` commit holding its `AC<n>:` criteria, "
-                     "so nothing shows it is done. Approve only when this branch needs none."]
-                    if re.match(r"(?:story|bug)/", branch) else [])
-    files = (git(root, "diff", "--name-only", base, "--") or "").splitlines() + \
-        (git(root, "ls-files", "-o", "--exclude-standard") or "").splitlines()
-    files = [f for f in dict.fromkeys(files) if os.path.isfile(os.path.join(root, f))]
-    tests = "\n".join(f + "\n" + read(os.path.join(root, f)) for f in files if TEST_FILE.search(f))
-    refusals, end = [], time.time() + GATE_SECONDS
-    missing = [n for n in dict.fromkeys(AC.findall(text))
-               if not re.search(rf"(?<![A-Za-z0-9])ac_?{n}(?![0-9])", tests, re.I)]
-    if missing:
-        refusals.append(f"No test changed on this branch names {', '.join('AC' + n for n in missing)} from the red commit. "
-                        "Put `ac<n>` in the name of each criterion's tests, such as `test_ac3_<what>`.")
-    cmd = check_command(root)
-    if cmd and not refusals:
-        ok, out = run(cmd, root, end - time.time())
-        if not ok:
-            refusals.append(f"The definition of done fails: `{cmd}`:\n{out}")
-    return refusals, []
-
-
-def merge_gate(root, args):
-    """The acceptance gate for `git merge <branch>`, run where that branch's committed state is checked out."""
-    ref = next((a for a in shlex.split(args, comments=True) if not a.startswith("-")), None) if args else None
-    if not ref or not git(root, "rev-parse", "--verify", "-q", ref + "^{commit}"):
-        return [], []
-    for block in (git(root, "worktree", "list", "--porcelain") or "").split("\n\n"):
-        lines = block.splitlines()
-        # A clean worktree of the branch keeps its installed dependencies; a dirty one would be judged on uncommitted work.
-        if f"branch refs/heads/{ref}" in lines and not git(lines[0][len("worktree "):], "status", "--porcelain"):
-            return acceptance_gate(lines[0][len("worktree "):], ref)
-    tmp = os.path.join(tempfile.mkdtemp(), "merge")
-    if git(root, "worktree", "add", "-q", "--detach", tmp, ref) is None:
-        return [], []
-    try:
-        return acceptance_gate(tmp, ref)
-    finally:
-        git(root, "worktree", "remove", "--force", tmp)
-
-
 def pre_bash(command, root):
     reasons = []
     names = unknown(installs(command), known_text(root))
@@ -332,21 +295,11 @@ def pre_bash(command, root):
     parts = [part.strip() for part in re.split(r"&&|\|\||[;|\n]", command)]
     if any(COMMIT.match(part) for part in parts):
         reasons += commit_gates(root)
-    refusals = []
     if any(PR.match(part) for part in parts):
         n = changed_lines(root)
         if n > DIFF_CAP:
             reasons.append(f"This branch changes {n} lines, over the {DIFF_CAP}-line cap for one pull request. "
-                           "Approve only when it cannot be split by criterion.")
-        refusals, questions = acceptance_gate(root)
-        reasons += questions
-    merges = [m.group(1) for part in parts for m in [MERGE.match(part)] if m]
-    if merges and not refusals:
-        refusals, questions = merge_gate(root, merges[0])
-        reasons += questions
-    if refusals:
-        return deny("Not done:\n" + "\n".join(refusals) + "\nFix the code, test-first. A criterion or a "
-                    "definition of done that is itself wrong goes to the person.")
+                           "Approve only when it cannot be split.")
     return ask(" ".join(reasons)) if reasons else None
 
 
@@ -355,7 +308,8 @@ def post_bash(command, root):
     if big:
         return {"decision": "block", "reason": f"{', '.join(big)} is now over {MAX_LINES} lines or {MAX_BYTES // 1024} KB. "
                 "Rewrite it shorter: delete lines a check enforces or the repository already shows."}
-    return None
+    due = retro_due(command, root)
+    return {"decision": "block", "reason": due} if due else None
 
 
 def check_command(root):
@@ -420,7 +374,7 @@ def trees(root):
 
 
 def start(root):
-    save(root, {"check": check_command(root), "trees": {p: {"baseline": fingerprint(p)} for p in trees(root)}})
+    save(root, {"retro": load(root).get("retro", []), "check": check_command(root), "trees": {p: {"baseline": fingerprint(p)} for p in trees(root)}})
 
 
 def new_turn(root):  # a tree only the person changed this turn runs no check
@@ -573,46 +527,26 @@ def self_test():
     assert added_lines(t) and all(not p.endswith(".md") for p, _, _ in added_lines(t))
     os.remove(os.path.join(t, "src/app.py")); os.remove(os.path.join(t, "NOTES.md"))
 
-    # Acceptance gate
-    red = "test(red): export\n\nAC1: A rule.\n  Given a\n  When b\n  Then c\n\n**AC2:** Another.\n"
-    run("git", "checkout", "-qb", "story/x-export")
-    put("tests/test_x.py", "def test_ac1_rule():\n    pass\n")
-    run("git", "add", "-A"); run("git", "commit", "-qm", red)
-    r = pre_bash("git push -u origin story/x-export", t)
-    assert decision(r) == "deny", "a criterion with no test refuses the push"
-    reason = r["hookSpecificOutput"]["permissionDecisionReason"]
-    assert "AC2" in reason and "AC1" not in reason, reason
-    put("tests/test_x.py", "def test_ac1_rule():\n    pass\n\ndef test_ac2_other():\n    pass\n")
-    assert decision(pre_bash("gh pr create --fill", t)) != "deny", "met criteria and a passing test command pass"
-    put("flag", "no")
-    assert "definition of done fails" in pre_bash("tea pr create", t)["hookSpecificOutput"]["permissionDecisionReason"]
-    put("flag", "ok")
-    assert decision(pre_bash("git status", t)) is None, "only a push, pull request or merge runs the gate"
-    run("git", "add", "-A"); run("git", "commit", "-qm", "feat: export")
-    run("git", "commit", "-q", "--allow-empty", "-m", "test(red): export, looser\n\nAC1: A rule.\nAC3: New.\n")
-    assert "AC3" in pre_bash("git push", t)["hookSpecificOutput"]["permissionDecisionReason"], "the latest red commit rules"
-    run("git", "commit", "-q", "--allow-empty", "-m", "test(red): export, looser\n\nAC1: A rule.\n")
-    assert decision(pre_bash("git push", t)) != "deny", "the latest red commit holds the current criteria"
-    run("git", "checkout", "-q", "-")
-    assert decision(pre_bash("git merge --no-ff story/x-export", t)) != "deny", "a merge whose criteria hold passes"
-    run("git", "checkout", "-q", "story/x-export"); put(".gitignore", "deps\n"); put("AGENTS.md", "Definition of done: `test -f deps`\n")
-    run("git", "add", "-A"); run("git", "commit", "-qm", "chore: deps")
-    run("git", "checkout", "-q", "-")
-    r = pre_bash("git merge story/x-export", t)
-    assert decision(r) == "deny" and "test -f deps" in r["hookSpecificOutput"]["permissionDecisionReason"], \
-        "a merge is judged on the branch's committed state, in a temporary worktree"
-    assert len(trees(t)) == 1, "the temporary worktree is removed"
-    wt = t + "-merge"
-    run("git", "worktree", "add", "-q", wt, "story/x-export"); open(os.path.join(wt, "deps"), "w").write("")
-    assert decision(pre_bash("git merge story/x-export", t)) != "deny", "a clean worktree of the branch keeps its ignored files"
-    open(os.path.join(wt, "wip.py"), "w").write("")
-    assert decision(pre_bash("git merge story/x-export", t)) == "deny", "a dirty worktree is not trusted"
-    run("git", "worktree", "remove", "--force", wt)
-    assert decision(pre_bash("git merge --abort", t)) is None, "a merge with no branch runs no gate"
-    run("git", "checkout", "-qb", "bug/y")
-    assert decision(pre_bash("git push", t)) == "ask", "a story or bug branch with no red commit asks"
-    run("git", "checkout", "-q", "-")
-    run("git", "branch", "-qD", "story/x-export", "bug/y")
+    # Retro reminder
+    run("git", "checkout", "-qb", "feat/r")
+    put("r.py", "x = 1\n" * (RETRO_LINES + 1)); put("r.json", "{}\n" * 50); put("R.md", "y\n" * 50)
+    run("git", "add", "r.py", "r.json", "R.md"); run("git", "commit", "-qm", "r")
+    assert not post_bash("git push", t), "a push is not a finished change"
+    assert str(RETRO_LINES + 1) in post_bash("gh pr create --fill", t)["reason"], "config and prose do not count"
+    assert not post_bash("gh pr create --fill", t), "once per branch"
+    start(t)
+    assert not post_bash("gh pr create --fill", t), "a new session remembers it"
+    run("git", "checkout", "-qb", "feat/s", "main"); put("s.json", "{}\n" * 50)
+    run("git", "add", "s.json"); run("git", "commit", "-qm", "s")
+    assert not post_bash("gh pr create", t), "a config-only change is trivial"
+    run("git", "checkout", "-qb", "feat/u", "main"); put("u.py", "x = 1\n" * (RETRO_LINES + 5))
+    run("git", "add", "u.py"); run("git", "commit", "-qm", "u"); run("git", "checkout", "-q", "main")
+    run("git", "merge", "-q", "--no-ff", "-m", "m", "feat/u")
+    assert "retro skill" in post_bash("git merge --no-ff feat/u", t)["reason"], "a merge of a big branch reminds"
+    run("git", "reset", "-q", "--hard", "HEAD~1")
+    run("git", "branch", "-qD", "feat/r", "feat/s", "feat/u")
+    for f in ("r.py", "r.json", "R.md"):
+        os.path.exists(os.path.join(t, f)) and os.remove(os.path.join(t, f))
 
     # Done check
     start(t)

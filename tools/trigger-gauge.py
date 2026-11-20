@@ -14,15 +14,15 @@ outside the system temp directory, where skills do not load. Each run is a short
 API money. Usage:
 
     python3 tools/trigger-gauge.py                       # every case once, on Sonnet
-    python3 tools/trigger-gauge.py --only build --runs 3
+    python3 tools/trigger-gauge.py --only retro --runs 3
     python3 tools/trigger-gauge.py --self-test
 """
 import argparse, concurrent.futures as cf, json, os, shutil, subprocess, sys, time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLUGIN, RUNS = os.path.join(REPO, "plugins", "sdlc"), os.path.expanduser("~/.sdlc-trigger-runs")
-SKILLS = {"ticket", "spike", "build", "slicing"}
-AGENTS = {"design-reviewer", "implementer", "code-reviewer", "verifier", "delegator"}
+SKILLS = {"retro"}
+AGENTS = {"design-reviewer", "code-reviewer", "verifier", "delegator"}
 
 FIXTURE = {
     "AGENTS.md": "Check: `python3 -m unittest discover -q -s tests -t .`\n",
@@ -50,46 +50,25 @@ DIRTY = {"pricing.py": FIXTURE["pricing.py"].replace("    return", "    if not l
 
 # (prompt, expected): a skill name, "agent:<name>", or None.
 CASES = [
-    ("Write a story for letting customers download their order history.", "ticket"),
-    ("Critique the story in docs/stories/export.md.", "ticket"),
-    ("Log a spike on Polars for the export, for later.", "ticket"),
-    ("Review this story before we build it: docs/stories/export.md", "build"),
-    ("Add a CSV export to the orders page.", "build"),
-    ("Implement the story in docs/stories/export.md.", "build"),
-    ("Just build a bulk discount: orders of 10 or more items get 5% off.", "build"),
-    ("Bump the requests dependency to the latest version.", "build"),
-    ("Add a --dry-run flag to the export.", "build"),
-    ("total() returns a negative number when a quantity is negative. It should reject it.", "build"),
-    ("File a bug: the export crashes on an empty order list.", "ticket"),
-    ("The export crashes on an empty order list. Fix it.", "build"),
-    ("Exports over 10k orders time out in production.", "build"),
-    ("Why does total give 9.999999 instead of 10 for some carts?", "build"),
-    ("Clean up export.py, it's hard to follow.", "build"),
-    ("Rename total to order_total everywhere.", "build"),
-    ("Extract the line-total calculation in pricing.py into its own function.", "build"),
-    ("Would SQLite full-text search be fast enough for a million orders?", "spike"),
-    ("Do a spike on using Polars for the export.", "spike"),
-    ("How hard would it be to make the export async?", "spike"),
-    ("Try the decimal module for money and see if it fixes the rounding.", "spike"),
-    ("Break the order-history PRD in docs/prd/history.md into stories.", "slicing"),
-    ("Split this epic into slices we can ship one at a time: saved carts, shared carts and cart reminders.", "slicing"),
-    ("This is too big for one PR: moving orders from a JSON blob to proper tables. Plan the pieces.", "slicing"),
-    ("How should we slice the reporting feature?", "slicing"),
+    ("Run a retro on the export change we just finished.", "retro"),
+    ("The bulk discount is merged. What could I do better next time when working with you?", "retro"),
+    ("Look back over the change we just made to pricing.py and tell me how to get better output from you.", "retro"),
+    ("We gave up on the async export. Review how we worked on it.", "retro"),
     # Held out: phrased unlike any description, to catch wording tuned to the cases above.
-    ("Customers keep asking for a way to save their carts for later. Can we spec that out properly first?", "build"),
-    ("Here are my notes on saved carts. Park them as a proper user story for next sprint.", "ticket"),
-    ("Can you wire up a new endpoint that returns order totals as JSON?", "build"),
-    ("Upgrade us to Python 3.13.", "build"),
-    ("Something is off: the second export of the day always has duplicate rows.", "build"),
-    ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "build"),
-    ("Is it realistic to move the export to a background worker? I want to know before we commit to it.", "spike"),
-    ("We want multi-currency pricing across checkout, invoices and the admin screens. Where do we even start?", "slicing"),
-    ("What's the first thing we should ship for a brand-new notifications service, and what comes after?", "slicing"),
+    ("That refactor of pricing.py is done. Any lessons for how I prompt you?", "retro"),
+    ("The new JSON endpoint shipped. Where did we lose time, and what should I do differently?", "retro"),
+    # A change about to start, or a trivial one, gets no retro.
+    ("Add a CSV export to the orders page.", None),
+    ("The export crashes on an empty order list. Fix it.", None),
+    ("Rename total to order_total everywhere.", None),
+    ("Write a story for letting customers download their order history.", None),
+    ("Do a spike on using Polars for the export.", None),
+    ("Break the order-history PRD in docs/prd/history.md into stories.", None),
+    ("I just bumped the export timeout in AGENTS.md from 30 to 60 seconds. Done.", None),
     ("What does pricing.py do?", None),
     ("Find every caller of total.", None),
     ("Explain what a property-based test is.", None),
     ("How do I run the tests here?", None),
-    ("What's the time complexity of Python's sorted()?", None),
     ("Commit this.", None),
 ]
 
@@ -183,28 +162,6 @@ AGENT_CASES = {
         "Someone claims csv is imported but unused, per findings.md. True?",
         "Separate the signal from the noise in findings.md.",
     ],
-    "implementer": [
-        "Make the failing tests in tests/test_bulk.py pass.",
-        "Go green on the red commit.",
-        "Implement against the committed tests.",
-        "Write the code for the red commit.",
-        "The bulk-discount test fails; make it pass.",
-        "Implement pricing.py so tests/test_bulk.py passes.",
-        "Get tests/test_bulk.py green.",
-        "There's a red commit on this branch; implement it.",
-        "Make test_ten_or_more_get_five_percent_off pass.",
-        "Make the red tests pass without touching the tests.",
-        "Implement the bulk discount the committed test describes.",
-        "Turn the red test green.",
-        "Write the minimum code to pass tests/test_bulk.py.",
-        "Implement against the test(red): bulk discount commit.",
-        "The tests are written; now write the code that satisfies them.",
-        "test_bulk is failing on purpose. Finish the job.",
-        "The spec is the test in tests/test_bulk.py. Build to it.",
-        "I committed a failing test for the 5% discount. Your turn.",
-        "Fill in the implementation the last commit is waiting for.",
-        "Get us from red to green.",
-    ],
 }
 CASES += [(p, "agent:" + a) for a, ps in AGENT_CASES.items() for p in ps]
 
@@ -289,12 +246,13 @@ def self_test():
     ev = lambda *blocks, parent=None: {"type": "assistant", "parent_tool_use_id": parent, "message": {"content": list(blocks)}}
     skill = lambda s: {"type": "tool_use", "name": "Skill", "input": {"skill": s}}
     agent = lambda a: {"type": "tool_use", "name": "Agent", "input": {"subagent_type": a}}
-    assert fires(ev(skill("sdlc:build"), agent("sdlc:implementer"))) == ["skill:build", "agent:implementer"]
-    assert fires(ev(skill("sdlc:build"), parent="x")) == [], "a subagent's own calls are not counted"
-    assert passed(["skill:build", "agent:implementer"], "agent:implementer") and not passed(["agent:Explore"], "agent:delegator")
+    assert fires(ev(skill("sdlc:retro"), agent("sdlc:code-reviewer"))) == ["skill:retro", "agent:code-reviewer"]
+    assert fires(ev(skill("sdlc:retro"), parent="x")) == [], "a subagent's own calls are not counted"
+    assert passed(["skill:retro", "agent:code-reviewer"], "agent:code-reviewer") and not passed(["agent:Explore"], "agent:delegator")
     assert passed(["agent:Explore"], None) and not passed(["agent:delegator"], None)
-    assert passed(["skill:spike"], "spike") and not passed(["skill:build", "skill:spike"], "spike")
-    assert done(["skill:build"], "build") and not done(["skill:build"], "agent:implementer") and done(["agent:Explore"], "agent:x")
+    assert passed(["skill:retro"], "retro") and not passed(["agent:delegator", "skill:retro"], "retro")
+    assert not passed(["skill:retro"], None) and passed(["skill:other"], None), "only sdlc skills count"
+    assert done(["skill:retro"], "retro") and not done(["skill:retro"], "agent:code-reviewer") and done(["agent:Explore"], "agent:x")
     print("self-test passed")
 
 
