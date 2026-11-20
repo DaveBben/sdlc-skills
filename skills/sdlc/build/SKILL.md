@@ -1,6 +1,6 @@
 ---
 name: build
-description: "Use first, before reading or editing code, for any change to code, however small: a feature, a bug or wrong output, a refactor, a new flag or a chore such as a dependency bump, like 'add a CSV export', 'the export crashes on an empty order list', 'rename total to order_total everywhere' or 'bump the requests dependency'. Not for reviewing a finished change, an experiment, or a question about code. How to change code here: attack the design with a pre-mortem, make the smallest complete change in its own worktree, and call it done only when a check passed."
+description: "Use once the frame skill has agreed what to build now, or when the person says to go ahead on a change already framed in this session. Never the first step for a new change to code: that is the frame skill's. How to change code here: attack the design with a pre-mortem, make the smallest complete change in its own worktree, and call it done only when a check passed."
 license: MIT
 metadata:
   version: "5.0.0"
