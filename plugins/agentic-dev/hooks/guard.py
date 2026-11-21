@@ -14,10 +14,12 @@
   * Silencer gate:   a commit that adds a line switching a type checker or linter off asks the person.
   * Test-tamper gate: a commit that changes or removes a line of a test file the branch started with, or adds
                      a skip or expected-failure marker to a test, asks the person.
-  * Plan gate:       the first file edit after the building skill loads asks the person when nothing since that load
-                     asked them anything (no question tool call, no message from them): its plan steps come first.
-  * Skill gate:      the first file edit in a repository in a session that loaded none of the skills that frame a
-                     change (story, chore, bug, spike, building, reviewing) asks the person, once per session.
+  * Grill gate:      the first file edit after the building skill loads asks the person when nothing since that load
+                     asked them anything (no question tool call, no message from them): its grilling comes first.
+  * Skill gate:      the first file edit in a repository in a session that loaded neither the building nor the
+                     reviewing skill asks the person, once per session.
+  * Review gate:     opening a pull request, or merging a branch into the default branch, with more than RETRO_LINES
+                     lines of code and no reviewing skill loaded in the session asks the person.
   * Retro reminder:  once per branch, after a pull request is opened from it or it is merged, tells the agent to
                      run the reflecting skill when the branch changed more than RETRO_LINES lines of code.
 """
@@ -222,7 +224,7 @@ def building_unasked(transcript):
     return load if load is not None and not asked else None
 
 
-FRAMING_SKILLS = {"story", "chore", "bug", "spike", "building", "reviewing"}
+FRAMING_SKILLS = {"building", "reviewing"}  # the skills an edit may follow: one frames a change, one fixes its findings
 
 
 def skills_loaded(transcript):
@@ -257,9 +259,8 @@ def skill_gate(inp, ti, cwd):
         return None
     state.setdefault("skill_asked", []).append(transcript)
     save(root, state)
-    return ask("This edit changes a file before any skill framed the change. Allow to edit anyway; deny to have the "
-               "agent load the story skill first for a change a user would notice, or the chore skill for one no "
-               "user would notice.")
+    return ask("This edit changes a file before the building skill framed the change. Allow to edit anyway, as for a "
+               "written artifact such as a story or a bug report; deny to have the agent load the building skill first.")
 
 
 def plan_gate(inp, ti, cwd):
@@ -275,9 +276,9 @@ def plan_gate(inp, ti, cwd):
         return None
     state.setdefault("plan_asked", []).append(key)
     save(root, state)
-    return ask("The building skill is about to edit a file without having asked you anything since it loaded. Its plan "
-               "steps come first: the design decisions only you can make, and the plan in chat. Allow to let it edit "
-               "anyway; deny to have it ask you first.")
+    return ask("The building skill is about to edit a file without having asked you anything since it loaded. Its "
+               "grilling comes first: what the request leaves open, and the one-way doors only you can decide. Allow "
+               "to let it edit anyway; deny to have it ask you first.")
 
 
 def state_path(root):
@@ -337,11 +338,31 @@ def code_lines(root, spec):
                and not r[2].endswith(PROSE + CONFIG) and os.path.basename(r[2]) not in LOCKFILES)
 
 
+def merge_ref(parts):
+    """The branch the command's first `git merge` names, or None."""
+    merges = [m.group(1) for part in parts for m in [MERGE.match(part)] if m]
+    try:
+        return next((a for a in shlex.split(merges[0], comments=True) if not a.startswith("-")), None) if merges else None
+    except ValueError:
+        return None
+
+
+def unreviewed_lines(parts, root, transcript):
+    """Lines of code the command ships when the session loaded no reviewing skill, else 0."""
+    loaded = skills_loaded(transcript)
+    if loaded is None or "reviewing" in loaded:
+        return 0
+    ref, base = merge_ref(parts), merge_base(root)
+    # A merge of the default branch into a feature branch ships nothing, so only a merge into it counts.
+    if ref and (git(root, "rev-parse", "--abbrev-ref", "HEAD") or "").strip() in ("main", "master"):
+        return code_lines(root, f"HEAD...{ref}")
+    return code_lines(root, base) if base and any(SHIP.match(part) for part in parts) else 0
+
+
 def retro_due(command, root):
     """Once per branch: after a pull request from it or a merge of it, the change it holds is finished."""
     parts = [part.strip() for part in re.split(r"&&|\|\||[;|\n]", command)]
-    merges = [m.group(1) for part in parts for m in [MERGE.match(part)] if m]
-    ref = next((a for a in shlex.split(merges[0], comments=True) if not a.startswith("-")), None) if merges else None
+    ref = merge_ref(parts)
     if ref:  # the merge has run, so ORIG_HEAD is where it started
         branch, n = ref, code_lines(root, f"ORIG_HEAD...{ref}")
     elif any(SHIP.match(part) for part in parts) and merge_base(root):
@@ -405,7 +426,7 @@ def commit_gates(root):
     return reasons
 
 
-def pre_bash(command, root):
+def pre_bash(command, root, transcript=None):
     reasons = []
     names = unknown(installs(command), known_text(root))
     if names:
@@ -419,6 +440,10 @@ def pre_bash(command, root):
         if n > DIFF_CAP:
             reasons.append(f"This branch changes {n} lines, over the {DIFF_CAP}-line cap for one pull request. "
                            "Approve only when it cannot be split.")
+    n = unreviewed_lines(parts, root, transcript)
+    if n > RETRO_LINES:
+        reasons.append(f"This ships {n} lines of code that the reviewing skill has not reviewed in this session. "
+                       "Approve only when it was reviewed elsewhere; deny to have the agent load the reviewing skill first.")
     return ask(" ".join(reasons)) if reasons else None
 
 
@@ -559,7 +584,7 @@ def main():
     elif not root:
         return
     elif event == "PreToolUse" and tool == "Bash":
-        out = pre_bash(ti.get("command", ""), root)
+        out = pre_bash(ti.get("command", ""), root, inp.get("transcript_path"))
     elif event == "PostToolUse" and tool == "Bash":
         out = post_bash(ti.get("command", ""), root)
     elif event == "SessionStart":
@@ -663,13 +688,13 @@ def self_test():
     assert SKIP.search("  xit('x', () => {})") and SKIP.search("    t.Skip(\"later\")") and not SKIP.search("def skip_rows():")
     run("git", "checkout", "-q", "--", "tests/test_a.py")
 
-    # Plan gate
+    # Grill gate
     tr = os.path.join(t, "transcript.jsonl")
     msg = lambda kind, content, **kw: json.dumps({"type": kind, "message": {"content": content}, **kw})
     use = lambda name, **i: msg("assistant", [{"type": "tool_use", "name": name, "input": i}])
     gate = lambda lines: (open(tr, "w").write("\n".join(lines) + "\n"),
                           plan_gate({"transcript_path": tr}, {"file_path": os.path.join(t, "src.py")}, t))[1]
-    begin = [msg("user", "Add a CSV export."), use("Skill", skill="agentic-dev:story")]
+    begin = [msg("user", "Add a CSV export."), use("Skill", skill="agentic-dev:reflecting")]
     loaded = begin + [use("Skill", skill="agentic-dev:building"),
                       msg("user", [{"type": "text", "text": "Base directory for this skill: x"}], isMeta=True),
                       msg("user", "<task-notification>done</task-notification>")]
@@ -690,12 +715,13 @@ def self_test():
     bare = [msg("user", "Add a note to AGENTS.md that we merge straight to main.")]
     assert decision(sg(bare, "s1")) == "ask", "an edit no skill framed asks"
     assert not sg(bare, "s1"), "the same session is asked once"
-    assert not sg(bare + [use("Skill", skill="agentic-dev:chore")], "s2"), "an edit after the chore skill passes"
-    assert not sg(bare + [use("Skill", skill="explaining"), use("Skill", skill="story")], "s3"), "after the story skill passes"
-    assert decision(sg(bare + [use("Skill", skill="agentic-dev:explaining")], "s4")) == "ask", "explaining frames no change"
+    assert not sg(bare + [use("Skill", skill="agentic-dev:building")], "s2"), "an edit after the building skill passes"
+    assert not sg(bare + [use("Skill", skill="reflecting"), use("Skill", skill="reviewing")], "s3"), "after the reviewing skill passes"
+    assert decision(sg(bare + [use("Skill", skill="agentic-dev:reflecting")], "s4")) == "ask", "reflecting frames no change"
+    assert decision(sg(bare + [use("Skill", skill="other-plugin:story")], "s5")) == "ask", "another plugin's skill frames no change"
     assert not skill_gate({"transcript_path": os.path.join(t, "s1.jsonl")}, {"file_path": "/tmp/x.md"}, "/tmp"), \
         "outside a repository passes"
-    for n in ("s1", "s2", "s3", "s4"):
+    for n in ("s1", "s2", "s3", "s4", "s5"):
         os.remove(os.path.join(t, n + ".jsonl"))
 
     # Retro reminder
@@ -703,6 +729,16 @@ def self_test():
     put("r.py", "x = 1\n" * (RETRO_LINES + 1)); put("r.json", "{}\n" * 50); put("R.md", "y\n" * 50)
     run("git", "add", "r.py", "r.json", "R.md"); run("git", "commit", "-qm", "r")
     assert not post_bash("git push", t), "a push is not a finished change"
+    # Review gate
+    rv = os.path.join(tempfile.mkdtemp(), "review.jsonl")
+    ship = lambda cmd, *lines: (open(rv, "w").write("\n".join(lines) + "\n"), pre_bash(cmd, t, rv))[1]
+    built = use("Skill", skill="agentic-dev:building")
+    assert "not reviewed" in ship("gh pr create --fill", built)["hookSpecificOutput"]["permissionDecisionReason"], \
+        "a pull request no review preceded asks"
+    assert not ship("gh pr create --fill", built, use("Skill", skill="agentic-dev:reviewing")), "after the reviewing skill it passes"
+    assert not ship("git push", built), "a push ships nothing"
+    assert not ship("git merge main", built), "merging the default branch into a feature branch passes"
+    assert not pre_bash("gh pr create --fill", t), "an unreadable transcript passes"
     assert str(RETRO_LINES + 1) in post_bash("gh pr create --fill", t)["reason"], "config and prose do not count"
     assert not post_bash("gh pr create --fill", t), "once per branch"
     start(t)
@@ -712,6 +748,8 @@ def self_test():
     assert not post_bash("gh pr create", t), "a config-only change is trivial"
     run("git", "checkout", "-qb", "feat/u", "main"); put("u.py", "x = 1\n" * (RETRO_LINES + 5))
     run("git", "add", "u.py"); run("git", "commit", "-qm", "u"); run("git", "checkout", "-q", "main")
+    assert decision(ship("git merge --no-ff feat/u", built)) == "ask", "merging an unreviewed branch into the default branch asks"
+    assert not ship("git merge --no-ff feat/s", built), "a config-only branch is trivial"
     run("git", "merge", "-q", "--no-ff", "-m", "m", "feat/u")
     assert "reflecting skill" in post_bash("git merge --no-ff feat/u", t)["reason"], "a merge of a big branch reminds"
     run("git", "reset", "-q", "--hard", "HEAD~1")
