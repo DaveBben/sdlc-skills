@@ -27,7 +27,7 @@ Why: <who hits this, what they do today, why now; 1 or 2 sentences>
 
 ## Dependencies
 
-- <who must review, sign off or supply data, and the wait; or the story this waits on>
+- <who must review, sign off or supply data, and the wait; the story this waits on; or a spike that blocks it>
 
 ## Open questions
 
