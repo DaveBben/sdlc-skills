@@ -151,12 +151,12 @@
  },
  {
   "prompt": "Let's launch a spike to test early results. Something we can get an early reading back within an hour",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "mined"
  },
  {
   "prompt": "Execute the following spike: docs/stories/export.md",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "mined"
  },
  {
@@ -658,62 +658,62 @@
  },
  {
   "prompt": "do a spike on async export",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "generated"
  },
  {
   "prompt": "try the decimal module and see if it fixes the rounding",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "generated"
  },
  {
   "prompt": "quick experiment: can pandas write this csv faster than the csv module",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "generated"
  },
  {
   "prompt": "could we stream the export instead of building it in memory? try it and see",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "generated"
  },
  {
   "prompt": "prototype an export to parquet, throwaway is fine",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "generated"
  },
  {
   "prompt": "spike: does orjson speed up serialising 1M orders? timebox 30 min",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "generated"
  },
  {
   "prompt": "Orchestrator: run a timeboxed spike on whether multiprocessing speeds up export_orders; delete the code after and report the finding.",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "generated"
  },
  {
   "prompt": "hack together something to see if gzip on the fly works with export_orders",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "generated"
  },
  {
   "prompt": "rough estimate of effort to add i18n, try a bit of it first",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "generated"
  },
  {
   "prompt": "spik on moving the pricing rules to a yaml file, see if it works",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "generated"
  },
  {
   "prompt": "can we do this without a db, just test it quickly in a scratch dir",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "generated"
  },
  {
   "prompt": "um so i was thinking maybe we could cache total() results and i want to know if that would actually help or just add complexity can you try something",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "generated"
  },
  {
@@ -838,12 +838,27 @@
  },
  {
   "prompt": "Is it feasible to swap the csv module for pandas? Try it quick and tell me.",
-  "expected": "building",
+  "expected": "prototyping",
   "source": "confusion"
  },
  {
   "prompt": "The plan above is agreed, go ahead and build it",
   "expected": "building",
+  "source": "confusion"
+ },
+ {
+  "prompt": "the orjson spike proved it, now switch export_orders to orjson for real",
+  "expected": "building",
+  "source": "confusion"
+ },
+ {
+  "prompt": "does the stripe client retry on a 429 by itself? check by actually calling it against the test key",
+  "expected": "prototyping",
+  "source": "confusion"
+ },
+ {
+  "prompt": "write a spike ticket for whether we can stream the export, don't run it",
+  "expected": null,
   "source": "confusion"
  }
 ]
