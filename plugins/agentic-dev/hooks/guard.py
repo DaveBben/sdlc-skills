@@ -608,6 +608,9 @@ def main():
         print(json.dumps(out))
 
 
+TEST_A = "ROWS = [1, 2]\n\n\ndef test_a():\n    assert f(2) == 4\n\n\ndef test_b():\n    assert f(3) == 6\n"
+
+
 def self_test():
     t = os.path.realpath(tempfile.mkdtemp())
     run = lambda *a: subprocess.run(a, cwd=t, check=True, capture_output=True)
@@ -615,7 +618,7 @@ def self_test():
                               open(os.path.join(t, name), "w").write(text))
     run("git", "init", "-q")
     run("git", "config", "user.email", "t@t"); run("git", "config", "user.name", "t")
-    put("tests/test_a.py", "def test_a():\n    assert f(2) == 4\n")
+    put("tests/test_a.py", TEST_A)
     put("pyproject.toml", '[project]\ndependencies = [\n    "httpx>=0.27",\n]\n')
     put("package.json", '{\n  "scripts": {"test": "vitest"},\n  "dependencies": {\n    "react": "^19.0.0"\n  }\n}\n')
     put("AGENTS.md", "Check: `python3 -c \"import sys; sys.exit(open('flag').read() != 'ok')\"`\n")
@@ -682,17 +685,25 @@ def self_test():
     os.remove(os.path.join(t, "src/app.py")); os.remove(os.path.join(t, "NOTES.md"))
 
     # Test-tamper gate
-    tamper = lambda: (pre_bash("git commit -qam t", t) or {}).get("hookSpecificOutput", {}).get("permissionDecisionReason", "")
-    put("tests/test_a.py", "def test_a():\n    assert f(2) == 5\n")
-    assert "tests/test_a.py:2" in tamper(), "changing a test the branch started with asks"
-    os.remove(os.path.join(t, "tests/test_a.py"))
-    assert "tests/test_a.py:1" in tamper(), "deleting one asks"
+    tamper = lambda c="git commit -qam t": (pre_bash(c, t) or {}).get("hookSpecificOutput", {}).get("permissionDecisionReason", "")
+    put("tests/test_a.py", TEST_A.replace("[1, 2]", "[1, 3]"))
+    assert "changes, removes or skips" not in tamper(), "changing a fixture passes"
+    put("tests/test_a.py", TEST_A.replace("f(3) == 6", "f(3) == 7"))
+    assert "changes, removes or skips" not in tamper("git commit -qm t"), "a commit that leaves the test out passes"
+    assert "tests/test_a.py:9" in tamper("git add tests/test_a.py && git commit -qm t"), "changing an assertion asks"
+    assert "changes, removes or skips" not in tamper("git add tests/test_a.py && git commit -qm t"), "a line asked about is not asked again"
+    put("tests/test_a.py", TEST_A.replace("f(2) == 4", "f(2) == 5"))
+    run("git", "add", "tests/test_a.py")
+    assert "tests/test_a.py:5" in tamper("git commit -qm t"), "a staged change asks"
+    run("git", "reset", "-q")
+    put("tests/test_a.py", "ROWS = [1, 2]\n")
+    assert "tests/test_a.py:4" in tamper(), "deleting a test asks"
     run("git", "checkout", "-q", "--", "tests/test_a.py")
     put("tests/test_new.py", "def test_b():\n    assert True\n")
     assert "changes, removes or skips" not in tamper(), "a new test passes"
     put("tests/test_new.py", "import pytest\n\n@pytest.mark.skip\ndef test_b():\n    assert True\n")
     assert "tests/test_new.py:3" in tamper(), "a skip marker asks"
-    put("tests/test_a.py", "def test_a():\n    assert f(2) == 4\n\n\ndef test_c():\n    assert f(0) == 0\n")
+    put("tests/test_a.py", TEST_A + "\n\ndef test_c():\n    assert f(0) == 0\n")
     os.remove(os.path.join(t, "tests/test_new.py"))
     assert "changes, removes or skips" not in tamper(), "adding to a test file passes"
     assert SKIP.search("  xit('x', () => {})") and SKIP.search("    t.Skip(\"later\")") and not SKIP.search("def skip_rows():")
