@@ -191,7 +191,7 @@
  },
  {
   "prompt": "Close this issue",
-  "expected": null,
+  "expected": "tracker",
   "source": "mined"
  },
  {
@@ -347,7 +347,8 @@
  {
   "prompt": "agreed, proceed with the implementation as framed",
   "expected": "building",
-  "source": "generated"
+  "source": "generated",
+  "needs_context": true
  },
  {
   "prompt": "Framing complete. Acceptance criteria are in the conversation above. Hand over to building and implement the change now.",
