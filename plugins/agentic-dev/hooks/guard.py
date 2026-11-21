@@ -17,7 +17,7 @@
   * Grill gate:      the first file edit after the building skill loads asks the person when nothing since that load
                      asked them anything (no question tool call, no message from them): its grilling comes first.
   * Skill gate:      the first file edit in a repository in a session that loaded none of the building, prototyping
-                     and reviewing skills asks the person, once per session.
+                     and reviewing skills, nor an xp-templates skill, asks the person, once per session.
   * Review gate:     opening a pull request, or merging a branch into the default branch, with more than RETRO_LINES
                      lines of code and no reviewing skill loaded in the session asks the person.
   * Retro reminder:  once per branch, after a pull request is opened from it or it is merged, tells the agent to
@@ -224,7 +224,8 @@ def building_unasked(transcript):
     return load if load is not None and not asked else None
 
 
-FRAMING_SKILLS = {"building", "prototyping", "reviewing"}  # the skills an edit may follow: frame a change, run a throwaway experiment, fix findings
+FRAMING_SKILLS = {"building", "prototyping", "reviewing",  # frame a change, run a throwaway experiment, fix findings
+                  "story", "spike", "bug", "tracker"}  # xp-templates: write an artifact
 
 
 def skills_loaded(transcript):
@@ -719,10 +720,11 @@ def self_test():
     assert not sg(bare + [use("Skill", skill="reflecting"), use("Skill", skill="reviewing")], "s3"), "after the reviewing skill passes"
     assert not sg(bare + [use("Skill", skill="agentic-dev:prototyping")], "s6"), "an edit after the prototyping skill passes"
     assert decision(sg(bare + [use("Skill", skill="agentic-dev:reflecting")], "s4")) == "ask", "reflecting frames no change"
-    assert decision(sg(bare + [use("Skill", skill="other-plugin:story")], "s5")) == "ask", "another plugin's skill frames no change"
+    assert decision(sg(bare + [use("Skill", skill="other-plugin:deploy")], "s5")) == "ask", "another plugin's skill frames no change"
+    assert not sg(bare + [use("Skill", skill="xp-templates:story")], "s7"), "an edit after an xp-templates skill passes"
     assert not skill_gate({"transcript_path": os.path.join(t, "s1.jsonl")}, {"file_path": "/tmp/x.md"}, "/tmp"), \
         "outside a repository passes"
-    for n in ("s1", "s2", "s3", "s4", "s5", "s6"):
+    for n in ("s1", "s2", "s3", "s4", "s5", "s6", "s7"):
         os.remove(os.path.join(t, n + ".jsonl"))
 
     # Retro reminder
