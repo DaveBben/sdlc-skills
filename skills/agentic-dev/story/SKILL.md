@@ -3,7 +3,7 @@ name: story
 description: "Use first, before editing any file, for every request that changes code, configuration, dependencies or tooling, however small, clear or casually phrased, even a one-line change or a quick tweak to a value, format or threshold: a feature, a bug or wrong output to fix, a refactor, deleting unused code, a new flag, adding a tool or bumping a dependency, or implementing a story or a spec section, like 'add a CSV export', 'the export crashes on an empty order list, fix it', 'rename total to order_total everywhere' or 'implement docs/stories/export.md'. Also when work is to be written down for later or for others, critiqued, split or forecast, like 'write a story for X', 'critique the story in docs/stories/x.md', 'break this PRD into stories' or 'how many weeks for the remaining stories'. Not for reviewing a finished change, an experiment, or a question about code. Every change starts as a user story: who it is for, why, and acceptance criteria; then the building skill builds it now, or it is written down for later."
 license: MIT
 metadata:
-  version: "6.7.0"
+  version: "6.7.1"
 ---
 # Story
 
@@ -11,7 +11,7 @@ Every change starts as a user story: who it is for, why, and how done is checked
 
 ## Start
 
-* **No new rule** (a rename, refactor, dependency bump or config value): no story and no criteria, one `Done when:` line, such as the existing tests unchanged and green. Before a refactor, add characterization tests where the tests miss the moved code.
+* **A chore** (no change a user would notice: a refactor, rename, dependency bump or formatting) gets no story, criteria or play-back: one `Done when:` line, such as the existing tests unchanged and green, then load the building skill. Before a refactor, add characterization tests where the tests miss the moved code.
 * **Treat a story or bug report in the request as already framed:** ask only what it leaves open.
 * **Critique a story someone wrote** by [references/write.md](references/write.md).
 * **How long will it take:** [references/forecast.md](references/forecast.md).

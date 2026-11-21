@@ -3,7 +3,7 @@ name: building
 description: "Use once the story skill has framed a change and the person chose to build it now, or when the person says a change framed or agreed earlier in this session should now be built, such as 'that's agreed, go ahead and build it'. Never the first step for a new change to code: that is the story skill's. How to change code here: attack the design with a pre-mortem, make the smallest complete change in its own worktree, and call it done only when a check passed, then hand a non-trivial change to the reviewing skill."
 license: MIT
 metadata:
-  version: "6.7.0"
+  version: "6.7.1"
 ---
 # Building
 
@@ -25,7 +25,7 @@ metadata:
 ## Writing the Code
 
 * **Build on a new branch in its own git worktree,** never in the person's checkout.
-* **Build in this order** when the frame has acceptance criteria or a bug's reproduction; a change with no new rule keeps its `Done when:` line:
+* **Build in this order** when the frame has acceptance criteria or a bug's reproduction; a chore keeps its `Done when:` line:
   1. **Interfaces with no implementation:** each new name's signature and a stub that returns an empty value, committed alone.
   2. **Red:** failing tests first, by [references/tests.md](references/tests.md): one per criterion example, each seen failing on its assertion, committed alone as `test(red): <title>`. After that commit a test changes only with the person's word.
   3. **Green:** implement until those tests pass, changing no test.
