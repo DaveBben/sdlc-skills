@@ -65,10 +65,10 @@ CASES = [
     # Talk about review, with no finished change to review, gets none.
     ("What should a good code review checklist cover?", "explaining"),  # a question about review, not a change to review
     ("Summarise what my uncommitted change does, for a pull request description.", None),
-    ("Bump the requests dependency to the latest version.", "story"),
+    ("Bump the requests dependency to the latest version.", "chore"),
     # Held out.
     ("Can you wire up a new endpoint that returns order totals as JSON?", "story"),
-    ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "story"),
+    ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "chore"),
     ("Why does total give 9.999999 instead of 10 for some carts? I want to understand it before anything changes.", "explaining"),
     ("How does the export decide which columns to write?", "explaining"),
     # Held out.
@@ -76,7 +76,7 @@ CASES = [
     # A change about to start, or a trivial one, gets no retro.
     ("Add a CSV export to the orders page.", "story"),
     ("The export crashes on an empty order list. Fix it.", "story"),
-    ("Rename total to order_total everywhere.", "story"),
+    ("Rename total to order_total everywhere.", "chore"),
     ("Write a story for letting customers download their order history.", "story"),
     ("Break the order-history PRD in docs/prd/history.md into stories.", "story"),
     ("Critique the story in docs/stories/export.md before the team picks it up.", "story"),
