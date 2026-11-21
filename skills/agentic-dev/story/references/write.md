@@ -21,6 +21,8 @@ Why: <who hits this, what they do today, why now; 1 or 2 sentences>
    Then the request succeeds and the response says 0 remain
    Check: <the command or test that will show it, or `by eye: <what to look at>`>
 
+UAT: <how the person sees the story work on the live system: the credentials, services and data it uses, and read-only, dry run or a write they approve>
+
 ## Out of scope
 
 - <what a reader would expect here and this story will not do>

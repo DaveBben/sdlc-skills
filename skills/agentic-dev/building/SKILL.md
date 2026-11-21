@@ -3,7 +3,7 @@ name: building
 description: "Use once the story skill has framed a change and the person chose to build it now, or when the person says a change framed or agreed earlier in this session should now be built, such as 'that's agreed, go ahead and build it'. Never the first step for a new change to code: that is the story skill's. How to change code here: attack the design with a pre-mortem, make the smallest complete change in its own worktree, and call it done only when a check passed, then hand a non-trivial change to the reviewing skill."
 license: MIT
 metadata:
-  version: "6.5.0"
+  version: "6.7.0"
 ---
 # Building
 
@@ -11,7 +11,7 @@ metadata:
 
 * **Read the code the change touches first, and its definition of done:** the exact names, paths and the data's real shape, what to reuse and the patterns to follow, and the CI jobs, linters, type checker, import rules and coverage floor the change must pass.
 * **Read the docs of each library or API the plan calls,** each answer marked `doc`, with the link, or `memory`.
-* **Ask for what the real-input check needs,** such as a test credential, a sandbox or read-only access, before you build, so it runs against the real services and not only fakes.
+* **Ask for what the UAT needs,** such as a test credential, a sandbox or read-only access, before you build, so it runs against the real services and not only fakes.
 * **Ask the design decisions only the person can make,** after reading the code and its ADRs: each one-way door (architecturally significant decision) the story and its walking skeleton imply, implementation choices included. Decide the two-way doors yourself as `Decided: X, because Y`.
 
 ## Writing a Plan
@@ -33,6 +33,6 @@ metadata:
 
 ## Finishing
 
-* **Report done with a passing check:** its command, its result and what you did not check. Done needs each criterion's check run, the real-input one included, and each `memory` answer checked against its doc or a real call; name each still unverified.
+* **Report done with a passing check:** its command, its result and what you did not check. Done is every test green and the UAT run on the live system, with the person accepting its result. Check each `memory` answer against its doc or a real call, and name each still unverified.
 * **On the second correction of the same mistake,** propose a check, hook or test that catches it.
 * **Once the check passes,** load the reviewing skill for any change beyond a one- or two-line edit.
