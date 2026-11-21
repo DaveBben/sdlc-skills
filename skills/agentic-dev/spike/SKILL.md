@@ -49,7 +49,7 @@ Write each finding as it surfaces, in `docs/spikes/<question-slug>.md` or on the
 
 ## File one for later
 
-A spike that waits its turn is a ticket labelled `spike` holding the 4 frame lines and the story or epic it unblocks.
+A spike that waits its turn is a ticket labelled `spike`, filed by the tracker skill as blocking the story or epic it unblocks, holding the 4 frame lines.
 
 * **Timebox it in calendar time:** a day by default, 3 at most, and no story points.
 * **Schedule it** ahead of the story it feeds, in the same iteration. When the answer could kill the idea, write the epic's stories after it.

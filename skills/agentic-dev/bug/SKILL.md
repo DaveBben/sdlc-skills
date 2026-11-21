@@ -21,7 +21,7 @@ A bug is merged behaviour that contradicts what the code was built to do: an acc
 
 ## Report
 
-One bug per report, as an issue labelled `bug` where a tool here reaches the team's tracker, else `docs/bugs/<slug>.md`:
+One bug per report, as an issue labelled `bug`, filed by the tracker skill where a tool here reaches the team's tracker, else `docs/bugs/<slug>.md`:
 
 ```text
 Title: <what goes wrong, not the fix; under 60 characters>
