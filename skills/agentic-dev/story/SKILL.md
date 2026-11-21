@@ -1,9 +1,9 @@
 ---
 name: story
-description: "Use first, before editing any file, for every request that changes code, configuration, dependencies or tooling, however small, clear or casually phrased, even a one-line change or a quick tweak to a value, format or threshold: a feature, a bug or wrong output to fix, a refactor, deleting unused code, a new flag, adding a tool or bumping a dependency, or implementing a story or a spec section, like 'add a CSV export', 'the export crashes on an empty order list, fix it', 'rename total to order_total everywhere' or 'implement docs/stories/export.md'. Also when work is to be written down for later or for others, critiqued, split or forecast, like 'write a story for X', 'critique the story in docs/stories/x.md', 'break this PRD into stories' or 'how many weeks for the remaining stories'. Not for reviewing a finished change, an experiment, or a question about code. Every change starts as a user story: who it is for, why, and acceptance criteria; then the building skill builds it now, or it is written down for later."
+description: "Use first, before editing any file, for every request that changes something a user of the software would notice, however small, clear or casually phrased, even a one-line change or a quick tweak to a value, format or threshold: a feature, a bug or wrong output to fix, a new flag or option, a changed limit, message or layout, or implementing a story or a spec section, like 'add a CSV export', 'the export crashes on an empty order list, fix it', 'show prices with two decimals' or 'implement docs/stories/export.md'. Also when work is to be written down for later or for others, critiqued, split or forecast, like 'write a story for X', 'critique the story in docs/stories/x.md', 'break this PRD into stories' or 'how many weeks for the remaining stories'. Not for a chore no user would notice, such as a refactor, a rename, a dependency bump, formatting, CI or a dev tool: that is the chore skill's. Not for reviewing a finished change, an experiment, or a question about code. Every user-visible change starts as a user story: who it is for, why, and acceptance criteria; then the building skill builds it now, or it is written down for later."
 license: MIT
 metadata:
-  version: "6.7.1"
+  version: "7.0.0"
 ---
 # Story
 
@@ -11,7 +11,7 @@ Every change starts as a user story: who it is for, why, and how done is checked
 
 ## Start
 
-* **A chore** (no change a user would notice: a refactor, rename, dependency bump or formatting) gets no story, criteria or play-back: one `Done when:` line, such as the existing tests unchanged and green, then load the building skill. Before a refactor, add characterization tests where the tests miss the moved code.
+* **A chore** (no change a user would notice: a refactor, rename, dependency bump or formatting): load the chore skill instead.
 * **Treat a story or bug report in the request as already framed:** ask only what it leaves open.
 * **Critique a story someone wrote** by [references/write.md](references/write.md).
 * **How long will it take:** [references/forecast.md](references/forecast.md).
@@ -60,5 +60,5 @@ Check the request, and any story you are given or write, for these. Each one fou
 
 * **Play back** the goal, the criteria and what this change will not do. End the play-back by asking whether to build it now or write it down for later. "I want to build X" says what the person wants, not when.
 * **More than one story:** write each down by [references/write.md](references/write.md), in build order, and build at most the first now. Each later story is built in a fresh session: several in one session run out of context.
-* **Built now:** offer up to 3 parts to explore, new to this codebase or to the person, each with the question that matters for this task. Then load the building skill; the story stays in the conversation, with no file.
+* **Built now:** offer up to 3 parts to explore, new to this codebase or to the person, each with the question that matters for this task. Then load the building skill; the story stays in the conversation, with no file. Spike an unknown that could change the build: run it now in a subagent when it fits this session; when it needs a day, or someone else's access or data, file it blocking the story and stop.
 * **For later or for others:** name up to 3 unknowns that could change the build fundamentally, to explore, test or verify. File each as a spike with the spike skill, listed under the story's `Dependencies` as blocking it, then write the story down by [references/write.md](references/write.md).

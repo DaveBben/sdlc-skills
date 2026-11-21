@@ -1,9 +1,9 @@
 ---
 name: building
-description: "Use once the story skill has framed a change and the person chose to build it now, or when the person says a change framed or agreed earlier in this session should now be built, such as 'that's agreed, go ahead and build it'. Never the first step for a new change to code: that is the story skill's. How to change code here: attack the design with a pre-mortem, make the smallest complete change in its own worktree, and call it done only when a check passed, then hand a non-trivial change to the reviewing skill."
+description: "Use once the story or chore skill has framed a change and, for a story, the person chose to build it now, or when the person says a change agreed earlier should now be built, such as 'that's agreed, go ahead and build it'. Never the first step for a change: that is the story skill's, or the chore skill's for a change no user would notice. How to change code here: plan, pre-mortem, build test-first in its own worktree, and call it done only when a check passed, then hand a non-trivial change to the reviewing skill."
 license: MIT
 metadata:
-  version: "6.7.1"
+  version: "7.0.0"
 ---
 # Building
 
