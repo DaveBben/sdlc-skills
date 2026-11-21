@@ -8,10 +8,10 @@ Look for security holes, missing failure paths and these, each finding with a ca
 * **Hidden assumptions,** such as ordering, uniqueness, a single writer, a synchronized clock or a reliable network, each with what breaks when it is false.
 * **The wrong thing built:** a criterion no part delivers, or a part no criterion asks for.
 * **Off the architecture:** a parallel approach to what the repository already solves, or a break with its layers, boundaries or conventions or the field's standard practice, unexplained.
-* **A rule left as prose:** a layer or boundary rule with no check in the definition of done, such as an import-linter contract.
+* **A rule left as prose:** a layer or boundary rule with no architectural fitness function in the definition of done, such as an ArchUnit or import-linter rule.
 * **Wrong tool,** such as polling where the system sends events, or a table as a queue.
 * **An unflagged one-way door:** data stored or sent, a contract others call, a dependency, auth, how it deploys or how the parts are split.
-* **Callers broken:** an API, event, schema or command line changed with no migration, or stored data old and new code cannot both read in a rolling deploy.
+* **Callers broken:** an API, event, schema or command line changed with no migration, or stored data the old or new version cannot read.
 * **Speculative generality:** a layer, option or abstraction no criterion needs. Name the simpler approach.
 * **Untestable parts:** a part with no way to show it works, or a criterion with no test level or double named.
 * **No way back:** an irreversible migration, or a rollout with no flag or rollback.

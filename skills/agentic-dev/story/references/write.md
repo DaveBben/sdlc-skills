@@ -16,9 +16,9 @@ Why: <who hits this, what they do today, why now; 1 or 2 sentences>
 ## Acceptance criteria
 
 1. <one business rule>
-   Given a cart of 3 items at 10.00, added through the product page
-   When the shopper applies code SAVE10
-   Then the total shows 27.00 and the order summary lists SAVE10 −3.00
+   Given a key that made 99 requests in the last minute, through the public API
+   When it makes one more
+   Then the request succeeds and the response says 0 remain
    Check: <the command or test that will show it, or `by eye: <what to look at>`>
 
 ## Out of scope

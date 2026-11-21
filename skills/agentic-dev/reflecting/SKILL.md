@@ -3,7 +3,7 @@ name: reflecting
 description: "Use whenever the person looks back on work just done with you, and once a non-trivial code change is finished, after its review, or given up: a retro or post-mortem, what went well or wrong, lessons from the session, where time was lost, why it took so many rounds, whether their instructions caused rework, or how to prompt or steer you better next time, however casually asked, such as 'what's the takeaway?'. Not after a one- or two-line edit, and not for reviewing the code itself. Reviews the session against the loop (Frame, Explore, Build, Verify, Review) and tells the person what to do next time to get better output from you."
 license: MIT
 metadata:
-  version: "6.0.0"
+  version: "6.2.0"
 ---
 # Reflecting
 
@@ -13,7 +13,7 @@ Give findings with cases from this session, never a score.
 
 **Frame:** the goal and why (theirs), the context, and a done-check they can watch run.
 * A goal the platform cannot do; no check, or one that tests something else.
-* A noun hiding the data's shape, such as "a table" that is a view with a row per item per night.
+* An overloaded term never pinned to one meaning (ubiquitous language), such as "account" for both the customer and the user.
 * Edge cases unstated: none or many, order, duplicates, ties, equality, or how it runs (unattended, a credential, a metered API, a second or missed run).
 * A Then that states part of the result.
 * The why written by you, not them.
@@ -26,8 +26,8 @@ Give findings with cases from this session, never a score.
 * A prototype judged on one hand-made example.
 * A spike whose answer could not change the plan, or a step nobody could say how to do, built without one.
 
-**Build:** the design decisions only they can make asked first; one step at a time, each a readable diff, risk rising down the list, a commit before each risky one.
-* A decision only they could make (who reads it, where it is stored, what a run costs) decided by you, or an implementation choice put to them.
+**Build:** the one-way doors asked first; one step at a time, each a readable diff, risk rising down the list, a commit before each risky one.
+* A one-way door (architecturally significant decision) decided by you, or a two-way door put to them.
 * Risks only they knew, never asked for in the pre-mortem.
 * A step too big to read, writes before reads, or the real target before a test one.
 * The same correction given twice.

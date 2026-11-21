@@ -6,7 +6,7 @@ Check each row of `findings.md` against `story.md` and the tree. A row reads `<i
 
 A row is false until the code shows it:
 
-* **Keep** it on a run that fails for the stated reason, else on lines traced from an entry point to the wrong result. Keep a test gap when the tests pass the named wrong implementation. A `suggestion` or `question` needs only the lines that show it.
+* **Keep** it on a run that fails for the stated reason, else on lines traced from an entry point to the wrong result. Keep a test gap when its named mutant survives the tests. A `suggestion` or `question` needs only the lines that show it.
 * **Drop** it, naming the line that stops it: a guard, a type, a caller that never passes that input, or a misreading of `story.md`. An `issue` that holds the code to a feature or format `story.md` never asks for, with no correctness, security or production fault at stake, becomes a `question` or is dropped.
 * **No basis:** drop a row that neither the code nor a run settles, and say what would.
 * **Unchecked:** list a row you did not reach; never drop it.
