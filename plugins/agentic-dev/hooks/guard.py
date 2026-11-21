@@ -51,6 +51,7 @@ RUNNER = re.compile(PREFIX + r"(?:npx|uvx|bunx|pipx\s+run|pnpm\s+dlx|npm\s+exec|
 PR = re.compile(PREFIX + r"(?:gh\s+pr\s+create|glab\s+mr\s+create|tea\s+(?:pr|pulls?)\s+create|git\s+push)\b")
 MERGE = re.compile(PREFIX + r"git\s+(?:-C\s+\S+\s+)?merge\s+(.*)$")
 COMMIT = re.compile(PREFIX + r"git\s+(?:-\S+\s+\S+\s+)*commit\b")
+ADD = re.compile(PREFIX + r"git\s+(?:-\S+\s+\S+\s+)*add\b")
 # shortcut: matched by pattern per added line; a print() left in, an unused import or a shim passes and rests on the reviewer.
 LEFTOVER = re.compile(r"\bconsole\.(?:log|debug)\(|^\s*debugger;?\s*$|\bbreakpoint\(\)|\bi?pdb\.set_trace\(|binding\.pry|\bdbg!\("
                       r"|\b(?:TODO|FIXME|XXX)\b"
@@ -61,6 +62,9 @@ SILENCER = re.compile(r"#\s*type:\s*ignore|#\s*noqa|#\s*pyright:\s*ignore|#\s*py
 TEST_FILE = re.compile(r"(?:^|/)(?:tests?|__tests__|spec)/|(?:^|/)test_[^/]*$|_test\.[^/.]+$|[._-](?:test|spec)\.[^/.]+$")
 SKIP = re.compile(r"@pytest\.mark\.(?:skip|xfail)|\bpytest\.(?:skip|xfail)\(|@unittest\.(?:skip|expectedFailure)|\.skip\(|\bx(?:it|describe|test)\("
                   r"|\b(?:it|test)\.todo\(|\bt\.Skip(?:Now|f)?\(|#\[ignore\]|@(?:Disabled|Ignore)\b")
+# shortcut: one line at a time, so an expected value inside a multi-line literal or a parametrize row passes.
+ASSERTION = re.compile(r"\bassert|\bexpect\(|\.should\b|\braises\(|\bt\.(?:Error|Fatal|Fail)|\bdef test|\b(?:it|test|describe)\("
+                       r"|\bfunc Test|#\[test\]|@Test\b")
 PROSE = (".md", ".txt", ".rst")
 CONFIG = (".json", ".toml", ".yaml", ".yml", ".ini", ".cfg", ".conf", ".env", ".lock")
 RETRO_LINES = 20  # this plugin's guess at "more than a couple of lines"; tune it
@@ -409,7 +413,12 @@ def removed_test_lines(root):
     return [r for r in out if r[2].strip()]
 
 
-def commit_gates(root):
+def commit_paths(root, parts):
+    """The changed paths the commit in these command parts takes in, or None for every one."""
+    return None
+
+
+def commit_gates(root, parts):
     rows = added_lines(root)
     show = lambda hits: "; ".join(f"{p}:{n} `{t.strip()[:60]}`" for p, n, t in hits[:5])
     left, quiet = [r for r in rows if LEFTOVER.search(r[2])], [r for r in rows if SILENCER.search(r[2])]
@@ -435,7 +444,7 @@ def pre_bash(command, root, transcript=None):
                        "Confirm each name exists on its registry and is the package you mean.")
     parts = [part.strip() for part in re.split(r"&&|\|\||[;|\n]", command)]
     if any(COMMIT.match(part) for part in parts):
-        reasons += commit_gates(root)
+        reasons += commit_gates(root, parts)
     if any(PR.match(part) for part in parts):
         n = changed_lines(root)
         if n > DIFF_CAP:
