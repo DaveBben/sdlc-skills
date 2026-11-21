@@ -3,7 +3,7 @@ name: story
 description: "Use first, before editing any file, for every request that changes code, configuration, dependencies or tooling, however small, clear or casually phrased, even a one-line change or a quick tweak to a value, format or threshold: a feature, a bug or wrong output to fix, a refactor, deleting unused code, a new flag, adding a tool or bumping a dependency, or implementing a story or a spec section, like 'add a CSV export', 'the export crashes on an empty order list, fix it', 'rename total to order_total everywhere' or 'implement docs/stories/export.md'. Also when work is to be written down for later or for others, critiqued, split or forecast, like 'write a story for X', 'critique the story in docs/stories/x.md', 'break this PRD into stories' or 'how many weeks for the remaining stories'. Not for reviewing a finished change, an experiment, or a question about code. Every change starts as a user story: who it is for, why, and acceptance criteria; then the building skill builds it now, or it is written down for later."
 license: MIT
 metadata:
-  version: "6.5.0"
+  version: "6.7.0"
 ---
 # Story
 
@@ -33,7 +33,8 @@ The person writes the criteria. Critique them against these rules and fill the g
 
 * **One per business rule,** in the product's words, measurable: not "is fast" but "under 200 ms at 1,000 rows".
 * **A Given/When/Then example in real values.** The Given says how its state came about, the When is one action, and the Then states every result the rule decides. A rule with several cases gets a table, one row per case.
-* **A check someone can run or watch.** When the change reads real data or calls another system, one check runs on real input, read-only or as a dry run.
+* **A check someone can run** for each criterion.
+* **A user acceptance test (UAT)** for the story: how the person will see it work on the live system, with real credentials and services, read-only or as a dry run where it writes.
 * **Follow the person's rule,** not what the code does today.
 * **Add a criterion with its reason,** why you think it is needed, and keep it only once the person agrees.
 * **Mark an open question `unknown`.**
