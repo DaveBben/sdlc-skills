@@ -1,14 +1,14 @@
 # Guide for agents
 
-`sdlc-skills` is one plugin, `sdlc`, built on one rule: whoever made a change, someone else attacks it, and a machine decides when it is done. A session-start hook also adds house rules for how the agent works with the user.
+`sdlc-skills` is one plugin, `agentic-dev`, built on one rule: the person drives a loose loop (Frame, Explore, Build, Verify, Review), and a machine decides when it is done. A session-start hook also adds house rules for how the agent works with the user.
 
-Definition of done: `python3 plugins/sdlc/hooks/guard.py --self-test`
+Definition of done: `python3 plugins/agentic-dev/hooks/guard.py --self-test`
 
 ## The test for every change
 
 [docs/principles.md](docs/principles.md) is the owner's cheat sheet of 18 principles, and it says which ones the plugin enforces. Most principles are habits for the person, so they stay out of the plugin. Before adding anything, apply these tests in order:
 
-1. **Can a hook, script or check enforce it?** Then put it in `plugins/sdlc/hooks/guard.py` with a self-test case, and write no instruction.
+1. **Can a hook, script or check enforce it?** Then put it in `plugins/agentic-dev/hooks/guard.py` with a self-test case, and write no instruction.
 2. **Does a capable model already do it when asked?** Then leave it out.
 3. **Does it beat a plain prompt?** Run `python3 tools/baseline.py`. A part that does not beat the `prompted` arm, a plain prompt plus one sentence of the plugin's rule, gets cut. Rerun it whenever a new model ships.
 
@@ -16,14 +16,14 @@ When an agent using the plugin fails, add a check that catches the failure. Do n
 
 ## Key files
 
-- `plugins/sdlc/hooks/guard.py` is the 7 hooks in one script: done check, size cap, dependency gate, pull request cap, acceptance gate, leftovers gate and silencer gate. `hooks.json` beside it registers the events.
-- `skills/sdlc/` holds the 3 skills: `build`, which takes a feature, bug or refactor from an agreed what and why to a merge, `ticket`, which writes work down for later, and `spike`, which runs a throwaway experiment. `build/references/` holds refactoring and the pull request body. Edit a skill only there.
+- `plugins/agentic-dev/hooks/guard.py` is the 8 hooks in one script: done check, size cap, dependency gate, pull request cap, leftovers gate, silencer gate, test-tamper gate and retro reminder. `hooks.json` beside it registers the events.
+- `skills/agentic-dev/` holds 8 skills. `framing` is the entry for any change to code: it agrees what to build and how done is checked, then hands to `building` (the house rules for changing code) or `story`; `explaining` holds how to teach an idea; both were moved out of the working agreement so they load only when needed. `reviewing` takes a finished change through one fresh review, a verification of each finding and test-first fixes of the blocking ones, within 3 rounds; it owns the review directory (`diff.patch`, `story.md`, `findings.md`) that its reviewer and verifier reference files read. `reflecting` reads the session of a finished non-trivial change against the loop (Frame, Explore, Build, Verify, Review) and tells the person what to do next time. `story`, `bug` and `spike` write work down before it is built and never build it: a story is the Frame step written ahead, whose criteria become the build's done-check and the review's `story.md`; a bug report's reproduction is the build's first failing check; a spike is the Explore step run as a throwaway experiment. The loop itself lives in the working agreement's Frame lines and in the person's head, not in a skill. Edit a skill only there.
 - **A skill as a stored prompt:** a skill also earns its place when it holds the owner's own conventions, which a capable model would follow but the owner would otherwise retype each time. Keep such a skill to those conventions.
-- `skills/sdlc/agents/` holds the 5 subagent prompts: `design-reviewer`, `implementer`, `code-reviewer`, `verifier` and `delegator`, which runs non-coding tasks in parallel. The skill describes each delegated step and never names an agent, because the harness picks the agent by its `description`.
-- `plugins/<plugin>/` is a thin Claude Code wrapper: a `.claude-plugin/plugin.json`, a README, and for `sdlc` the symlinks `skills` and `agents` into `skills/sdlc`. Do not replace the symlinks with real files.
-- `plugins/sdlc/hooks/working-agreement.md` is the house rules, printed at session start. A skill's own rules win where they differ, so no skill repeats them.
+- **Reviewer prompts are reference files, not agents:** `reviewing/references/reviewer.md` and `verifier.md`, and `building/references/design-review.md`. A skill launches each as a fresh general subagent on a named model, so the plugin ships no agents and nothing competes with a skill's trigger.
+- `plugins/<plugin>/` is a thin Claude Code wrapper: a `.claude-plugin/plugin.json`, a README, and for `agentic-dev` the symlink `skills` into `skills/agentic-dev`. Do not replace the symlink with a real directory.
+- `plugins/agentic-dev/hooks/working-agreement.md` is the house rules, printed at session start. A skill's own rules win where they differ, so no skill repeats them.
 - `tools/baseline.py` compares the plugin against a plain prompt on the tasks in `tools/tasks/`.
-- `tools/trigger-gauge.py` checks that each skill and agent fires on its requests and stays quiet on others, with a target of 9 hits in 10 each. Rerun it after changing a `description`, and keep its held-out cases unlike any description's wording.
+- `tools/trigger-gauge.py` checks that each skill fires on its requests and stays quiet on others, over the cases in `tools/trigger-cases.json` (generated, mined from real sessions, and cross-skill confusions; a case with `needs_context` is listed but not run), with a target of 9 hits in 10 each. Rerun it after changing a `description`, and keep its held-out cases unlike any description's wording.
 - `research/` is local and git-ignored. `research/design-history.md` holds the rationale for each design.
 
 ## Rules for changes

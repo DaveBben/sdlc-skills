@@ -45,17 +45,16 @@ Whoever made it, someone else attacks it, and a machine decides when it's done. 
 
 | Principle | Enforced by |
 |---|---|
-| 1, 2 | `build`'s design step, which coaches you, and the `design-reviewer` agent |
-| 5 | `build`'s align and criteria steps, and the acceptance gate hook: each `AC<n>` in the red commit needs a test |
-| 3 | The `build` skill and its agents |
-| 6 | Done-check hook at every stop, and the acceptance gate hook at push, pull request and merge |
-| 7 | `build`'s failing tests, each an acceptance test at the level where its result shows; not checked by a hook |
-| 8 | The `code-reviewer` agent, on each test changed after the red commit |
-| 9 | A `Mutation:` line in `AGENTS.md` |
+| 1, 2 | The `building` skill's pre-mortem and fresh design review of a large plan |
+| 5 | The working agreement's Ask section: grill a vague request |
+| 3 | The `reviewing` skill: a fresh reviewer and a fresh verifier |
+| 6 | Done-check hook at every stop |
+| 8 | The `reviewing` skill's reviewer, and the test-tamper gate hook |
+| 18, in part | The `reflecting` skill and its reminder hook: findings from the session after each non-trivial change |
 | 10 | Leftovers and silencer gate hooks |
 | 11 | You |
 | 12 | Dependency-gate hook |
 | 13 | Size-cap hook, 100 lines or 8 KB |
 | 16 | Pull request cap hook, 400 changed lines |
 | 17 | `tools/baseline.py` |
-| 1, 4, 10, 14, 15, 18 | You |
+| 4, 7, 9, 14, 15, 18 | You |
