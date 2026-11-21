@@ -12,8 +12,9 @@
                      changes more than 400 lines asks the person.
   * Leftovers gate:  a commit that adds a debugger call, a TODO or commented-out code asks the person.
   * Silencer gate:   a commit that adds a line switching a type checker or linter off asks the person.
-  * Test-tamper gate: a commit that changes or removes a line of a test file the branch started with, or adds
-                     a skip or expected-failure marker to a test, asks the person.
+  * Test-tamper gate: a commit that changes or removes an assertion or a test in a test file the branch started
+                     with, or adds a skip or expected-failure marker to a test, asks the person, once per line per branch.
+                     It and the leftovers and silencer gates read only the files the commit takes in.
   * Grill gate:      the first file edit after the building skill loads asks the person when nothing since that load
                      asked them anything (no question tool call, no message from them): its grilling comes first.
   * Skill gate:      the first file edit in a repository in a session that loaded none of the building, prototyping
@@ -415,11 +416,27 @@ def removed_test_lines(root):
 
 def commit_paths(root, parts):
     """The changed paths the commit in these command parts takes in, or None for every one."""
-    return None
+    # shortcut: paths are matched from the repository root, so `cd sub && git add f` misses f; parse cwd if it bites.
+    words = []
+    for part in parts:
+        if COMMIT.match(part) or ADD.match(part):
+            try:
+                words += shlex.split(part)
+            except ValueError:
+                words += part.split()
+    adds_all = any(ADD.match(p) for p in parts) and {"-A", "--all", "-u", "--update", ".", "*"} & set(words)
+    if adds_all or any(w == "--all" or re.match(r"-[^-]*a", w) for w in words if w.startswith("-")):
+        return None
+    names = [w.rstrip("/") for w in words if not w.startswith("-")]
+    changed = set((git(root, "diff", "HEAD", "--name-only") or "").splitlines() +
+                  (git(root, "ls-files", "-o", "--exclude-standard") or "").splitlines())
+    staged = set((git(root, "diff", "--cached", "--name-only") or "").splitlines())
+    return staged | {f for f in changed if any(f == n or f.startswith(n + "/") for n in names)}
 
 
 def commit_gates(root, parts):
-    rows = added_lines(root)
+    paths = commit_paths(root, parts)
+    rows = [r for r in added_lines(root) if paths is None or r[0] in paths]
     show = lambda hits: "; ".join(f"{p}:{n} `{t.strip()[:60]}`" for p, n, t in hits[:5])
     left, quiet = [r for r in rows if LEFTOVER.search(r[2])], [r for r in rows if SILENCER.search(r[2])]
     reasons = []
@@ -429,8 +446,16 @@ def commit_gates(root, parts):
     if quiet:
         reasons.append(f"This commit switches a checker off: {show(quiet)}. Fix the type or lint finding instead; "
                        "approve only when it cannot be fixed.")
-    tampered = removed_test_lines(root) + [r for r in rows if TEST_FILE.search(r[0]) and SKIP.search(r[2])]
+    tampered = [r for r in removed_test_lines(root) if (paths is None or r[0] in paths) and ASSERTION.search(r[2])]
+    tampered += [r for r in rows if TEST_FILE.search(r[0]) and SKIP.search(r[2])]
+    # Ask about each line once per branch, so a retried or split commit does not ask again.
+    branch, state = (git(root, "rev-parse", "--abbrev-ref", "HEAD") or "").strip(), load(root)
+    key = lambda r: hashlib.sha256(f"{branch}\0{r[0]}\0{r[2].strip()}".encode()).hexdigest()[:16]
+    seen = set(state.get("tamper", []))
+    tampered = [r for r in tampered if key(r) not in seen]
     if tampered:
+        state["tamper"] = sorted(seen | {key(r) for r in tampered})
+        save(root, state)
         reasons.append(f"This commit changes, removes or skips tests the branch started with: {show(tampered)}. Make the code "
                        "pass the test as it was; approve only when the test itself is wrong, with the reason in the commit message.")
     return reasons

@@ -38,7 +38,7 @@ The `xp-templates` plugin writes, reviews and files XP artifacts, and builds not
 All in [`plugins/agentic-dev/hooks/guard.py`](plugins/agentic-dev/hooks/guard.py):
 
 * **Done check:** your `Definition of done:` command from `AGENTS.md`, else the repository's own test and lint commands, at every stop.
-* **Test-tamper gate:** a commit that changes, removes or skips a test the branch started with asks you.
+* **Test-tamper gate:** a commit that changes or removes an assertion or a test the branch started with, or skips a test, asks you once per line.
 * **Dependency gate:** a package no manifest or lockfile holds asks you.
 * **Pull request cap:** a branch over 400 changed lines asks you.
 * **Leftovers and silencer gates:** a commit that adds a debugger call, a TODO, commented-out code or a switched-off checker asks you.
