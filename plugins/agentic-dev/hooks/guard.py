@@ -14,6 +14,8 @@
   * Silencer gate:   a commit that adds a line switching a type checker or linter off asks the person.
   * Test-tamper gate: a commit that changes or removes a line of a test file the branch started with, or adds
                      a skip or expected-failure marker to a test, asks the person.
+  * Plan gate:       the first file edit after the building skill loads asks the person when nothing since that load
+                     asked them anything (no question tool call, no message from them): its plan steps come first.
   * Retro reminder:  once per branch, after a pull request is opened from it or it is merged, tells the agent to
                      run the reflecting skill when the branch changed more than RETRO_LINES lines of code.
 """
@@ -183,6 +185,57 @@ def pre_edit(tool, inp, cwd):
             return ask(f"First-seen dependency: {', '.join(names)} is in no manifest or lockfile of this repository. "
                        "Confirm each name exists on its registry and is the package you mean.")
     return None
+
+
+# Text a person did not type, though it arrives as a user message.
+NOT_THE_PERSON = ("<task-notification", "<system-reminder", "[Request interrupted", "Another Claude session")
+
+
+def building_unasked(transcript):
+    """The transcript line of the last building-skill load, when nothing since it asked the person anything."""
+    try:
+        lines = open(transcript).read().splitlines()
+    except (OSError, TypeError):
+        return None
+    load, asked = None, False
+    for n, line in enumerate(lines):
+        try:
+            d = json.loads(line)
+        except ValueError:
+            continue
+        content = (d.get("message") or {}).get("content") if isinstance(d, dict) else None
+        blocks = content if isinstance(content, list) else [{"type": "text", "text": content}] if isinstance(content, str) else []
+        blocks = [b for b in blocks if isinstance(b, dict)]
+        if d.get("type") == "assistant":
+            for b in blocks:
+                if b.get("type") != "tool_use":
+                    continue
+                if b.get("name") == "Skill" and str((b.get("input") or {}).get("skill", "")).split(":")[-1] == "building":
+                    load, asked = n, False
+                elif b.get("name") == "AskUserQuestion" and load is not None:
+                    asked = True
+        elif d.get("type") == "user" and load is not None and not d.get("isMeta"):
+            if any(b.get("type") == "text" and not str(b.get("text", "")).lstrip().startswith(NOT_THE_PERSON) for b in blocks):
+                asked = True
+    return load if load is not None and not asked else None
+
+
+def plan_gate(inp, ti, cwd):
+    path = os.path.join(cwd, ti.get("file_path", ""))
+    where = os.path.dirname(path) if os.path.isdir(os.path.dirname(path)) else cwd
+    root = (git(where, "rev-parse", "--show-toplevel") or "").strip()
+    transcript = inp.get("transcript_path")
+    line = building_unasked(transcript) if root else None
+    if line is None:
+        return None
+    state, key = load(root), f"{transcript}:{line}"
+    if key in state.get("plan_asked", []):  # once per building load, so an allowed edit is not asked again
+        return None
+    state.setdefault("plan_asked", []).append(key)
+    save(root, state)
+    return ask("The building skill is about to edit a file without having asked you anything since it loaded. Its plan "
+               "steps come first: the design decisions only you can make, and the plan in chat. Allow to let it edit "
+               "anyway; deny to have it ask you first.")
 
 
 def state_path(root):
@@ -460,7 +513,7 @@ def main():
     root = (git(cwd, "rev-parse", "--show-toplevel") or "").strip()
     out = None
     if event == "PreToolUse" and tool in ("Edit", "Write", "MultiEdit"):
-        out = pre_edit(tool, ti, cwd)
+        out = pre_edit(tool, ti, cwd) or plan_gate(inp, ti, cwd)
     elif not root:
         return
     elif event == "PreToolUse" and tool == "Bash":
@@ -567,6 +620,25 @@ def self_test():
     assert "changes, removes or skips" not in tamper(), "adding to a test file passes"
     assert SKIP.search("  xit('x', () => {})") and SKIP.search("    t.Skip(\"later\")") and not SKIP.search("def skip_rows():")
     run("git", "checkout", "-q", "--", "tests/test_a.py")
+
+    # Plan gate
+    tr = os.path.join(t, "transcript.jsonl")
+    msg = lambda kind, content, **kw: json.dumps({"type": kind, "message": {"content": content}, **kw})
+    use = lambda name, **i: msg("assistant", [{"type": "tool_use", "name": name, "input": i}])
+    gate = lambda lines: (open(tr, "w").write("\n".join(lines) + "\n"),
+                          plan_gate({"transcript_path": tr}, {"file_path": os.path.join(t, "src.py")}, t))[1]
+    begin = [msg("user", "Add a CSV export."), use("Skill", skill="agentic-dev:story")]
+    loaded = begin + [use("Skill", skill="agentic-dev:building"),
+                      msg("user", [{"type": "text", "text": "Base directory for this skill: x"}], isMeta=True),
+                      msg("user", "<task-notification>done</task-notification>")]
+    assert not gate(begin), "no building load passes"
+    assert decision(gate(loaded)) == "ask", "an edit before any question asks"
+    assert not gate(loaded), "the same building load is asked once"
+    assert not gate(loaded + [use("AskUserQuestion", questions=[])]), "a question tool call passes"
+    assert not gate(loaded + [msg("user", "Store it in the warehouse.")]), "a message from the person passes"
+    assert decision(gate(loaded + [msg("user", "ok"), use("Skill", skill="building")])) == "ask", "a new building load asks again"
+    assert not plan_gate({"transcript_path": tr}, {"file_path": "/tmp/x.py"}, "/tmp"), "outside a repository passes"
+    os.remove(tr)
 
     # Retro reminder
     run("git", "checkout", "-qb", "feat/r")
