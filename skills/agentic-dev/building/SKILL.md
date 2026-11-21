@@ -3,7 +3,7 @@ name: building
 description: "Use once the story skill has framed a change and the person chose to build it now, or when the person says a change framed or agreed earlier in this session should now be built, such as 'that's agreed, go ahead and build it'. Never the first step for a new change to code: that is the story skill's. How to change code here: attack the design with a pre-mortem, make the smallest complete change in its own worktree, and call it done only when a check passed, then hand a non-trivial change to the reviewing skill."
 license: MIT
 metadata:
-  version: "6.2.3"
+  version: "6.2.4"
 ---
 # Building
 
@@ -15,11 +15,10 @@ metadata:
 ## Writing a Plan
 
 * **Only write a plan** when you cannot state the diff in one sentence.
-* **Present it in chat** for the person to review, in plain English, at the level of intent, not code.
-* **Start with a pre-mortem:** the bug reports this change would get, each pinned to a file, caller or real input you checked, and the defence the plan builds against each. Skip cases nothing can produce.
-* **Then the design:** the components and how they connect, then small steps, each a readable diff, risk rising down the list.
-* **End with the one-way doors** for the person to decide.
-* **Have a fresh subagent review the plan** before you build, on your strongest model, by [references/design-review.md](references/design-review.md), when it touches security (auth, permissions, secrets, a trust boundary), stored data (a schema change or migration) or concurrency (shared state, retries, ordering), or is large (more than about 400 changed lines).
+* **Design it:** the components and how they connect, then small steps, each a readable diff, risk rising down the list.
+* **Pre-mortem the design:** the bug reports it would get, each pinned to a file, caller or real input you checked, and add the defence against each to the steps. Skip cases nothing can produce.
+* **Have a fresh subagent review the plan** before you present it, on your strongest model, by [references/design-review.md](references/design-review.md), when it touches security (auth, permissions, secrets, a trust boundary), stored data (a schema change or migration) or concurrency (shared state, retries, ordering), or is large (more than about 400 changed lines).
+* **Present it in chat** for the person to review, in plain English, at the level of intent, not code, ending with the one-way doors for them to decide.
 
 ## Writing the Code
 
