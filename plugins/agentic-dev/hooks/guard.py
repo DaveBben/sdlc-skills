@@ -12,8 +12,9 @@
                      changes more than 400 lines asks the person.
   * Leftovers gate:  a commit that adds a debugger call, a TODO or commented-out code asks the person.
   * Silencer gate:   a commit that adds a line switching a type checker or linter off asks the person.
-  * Test-tamper gate: a commit that changes or removes a line of a test file the branch started with, or adds
-                     a skip or expected-failure marker to a test, asks the person.
+  * Test-tamper gate: a commit that changes or removes an assertion or a test in a test file the branch started
+                     with, or adds a skip or expected-failure marker to a test, asks the person, once per line per branch.
+                     It and the leftovers and silencer gates read only the files the commit takes in.
   * Grill gate:      the first file edit after the building skill loads asks the person when nothing since that load
                      asked them anything (no question tool call, no message from them): its grilling comes first.
   * Skill gate:      the first file edit in a repository in a session that loaded none of the building, prototyping
@@ -23,7 +24,7 @@
   * Retro reminder:  once per branch, after a pull request is opened from it or it is merged, tells the agent to
                      run the reflecting skill when the branch changed more than RETRO_LINES lines of code.
 """
-import hashlib, json, os, re, shlex, subprocess, sys, tempfile
+import fnmatch, hashlib, json, os, re, shlex, subprocess, sys, tempfile
 
 MAX_LINES, MAX_BYTES = 100, 8 * 1024  # this plugin's choice, sized for a root file of commands, constraints and traps
 MAX_BLOCKS = 5  # this plugin's choice: failed checks in a row before the agent may stop anyway
@@ -51,6 +52,7 @@ RUNNER = re.compile(PREFIX + r"(?:npx|uvx|bunx|pipx\s+run|pnpm\s+dlx|npm\s+exec|
 PR = re.compile(PREFIX + r"(?:gh\s+pr\s+create|glab\s+mr\s+create|tea\s+(?:pr|pulls?)\s+create|git\s+push)\b")
 MERGE = re.compile(PREFIX + r"git\s+(?:-C\s+\S+\s+)?merge\s+(.*)$")
 COMMIT = re.compile(PREFIX + r"git\s+(?:-\S+\s+\S+\s+)*commit\b")
+ADD = re.compile(PREFIX + r"git\s+(?:-\S+\s+\S+\s+)*add\b")
 # shortcut: matched by pattern per added line; a print() left in, an unused import or a shim passes and rests on the reviewer.
 LEFTOVER = re.compile(r"\bconsole\.(?:log|debug)\(|^\s*debugger;?\s*$|\bbreakpoint\(\)|\bi?pdb\.set_trace\(|binding\.pry|\bdbg!\("
                       r"|\b(?:TODO|FIXME|XXX)\b"
@@ -61,6 +63,9 @@ SILENCER = re.compile(r"#\s*type:\s*ignore|#\s*noqa|#\s*pyright:\s*ignore|#\s*py
 TEST_FILE = re.compile(r"(?:^|/)(?:tests?|__tests__|spec)/|(?:^|/)test_[^/]*$|_test\.[^/.]+$|[._-](?:test|spec)\.[^/.]+$")
 SKIP = re.compile(r"@pytest\.mark\.(?:skip|xfail)|\bpytest\.(?:skip|xfail)\(|@unittest\.(?:skip|expectedFailure)|\.skip\(|\bx(?:it|describe|test)\("
                   r"|\b(?:it|test)\.todo\(|\bt\.Skip(?:Now|f)?\(|#\[ignore\]|@(?:Disabled|Ignore)\b")
+# shortcut: one line at a time, so an expected value inside a multi-line literal or a parametrize row passes.
+TEST_DEF = re.compile(r"\bdef test|\b(?:it|test|describe)\(|\bfunc Test|#\[test\]|@Test\b")
+ASSERTION = re.compile(r"\bassert|\bexpect\(|\.should\b|\braises\(|\bt\.(?:Error|Fatal|Fail)|" + TEST_DEF.pattern)
 PROSE = (".md", ".txt", ".rst")
 CONFIG = (".json", ".toml", ".yaml", ".yml", ".ini", ".cfg", ".conf", ".env", ".lock")
 RETRO_LINES = 20  # this plugin's guess at "more than a couple of lines"; tune it
@@ -409,8 +414,32 @@ def removed_test_lines(root):
     return [r for r in out if r[2].strip()]
 
 
-def commit_gates(root):
-    rows = added_lines(root)
+def commit_paths(root, parts):
+    """The changed paths the commit in these command parts takes in, or None for every one."""
+    # shortcut: paths are matched from the repository root, so `cd sub && git add f` misses f; parse cwd if it bites.
+    def words(match):
+        out = []
+        for part in parts:
+            if match.match(part):
+                try:
+                    out += shlex.split(part)
+                except ValueError:
+                    out += part.split()
+        return out
+    added, committed = words(ADD), words(COMMIT)
+    if (any(w in ("--all", "--update", ".", "*") or w.startswith(":") or re.match(r"-[^-]*[Au]", w) for w in added)
+            or any(w == "--all" or re.match(r"-[^-]*a", w) for w in committed)):
+        return None
+    names = [w.rstrip("/") for w in added + committed if not w.startswith("-")]
+    changed = set((git(root, "diff", "HEAD", "--name-only") or "").splitlines() +
+                  (git(root, "ls-files", "-o", "--exclude-standard") or "").splitlines())
+    staged = set((git(root, "diff", "--cached", "--name-only") or "").splitlines())
+    return staged | {f for f in changed if any(f == n or f.startswith(n + "/") or fnmatch.fnmatch(f, n) for n in names)}
+
+
+def commit_gates(root, parts):
+    paths = commit_paths(root, parts)
+    rows = [r for r in added_lines(root) if paths is None or r[0] in paths]
     show = lambda hits: "; ".join(f"{p}:{n} `{t.strip()[:60]}`" for p, n, t in hits[:5])
     left, quiet = [r for r in rows if LEFTOVER.search(r[2])], [r for r in rows if SILENCER.search(r[2])]
     reasons = []
@@ -420,8 +449,22 @@ def commit_gates(root):
     if quiet:
         reasons.append(f"This commit switches a checker off: {show(quiet)}. Fix the type or lint finding instead; "
                        "approve only when it cannot be fixed.")
-    tampered = removed_test_lines(root) + [r for r in rows if TEST_FILE.search(r[0]) and SKIP.search(r[2])]
+    # Each line is keyed with the test it sits in, so two tests' identical `assert r.ok` lines stay apart.
+    head = lambda f: (git(root, "show", f"HEAD:{f}") or "").splitlines()
+    tree = lambda f: read(os.path.join(root, f)).splitlines()
+    test_of = lambda lines, n, up: next((l.strip() for l in (reversed(lines[:n]) if up else lines[n - 1:]) if TEST_DEF.search(l)), "")
+    tampered = [(r, test_of(head(r[0]), r[1], True)) for r in removed_test_lines(root)
+                if (paths is None or r[0] in paths) and ASSERTION.search(r[2])]
+    tampered += [(r, test_of(tree(r[0]), r[1], False)) for r in rows if TEST_FILE.search(r[0]) and SKIP.search(r[2])]
+    # Ask about each line once per branch, so a retried or split commit does not ask again.
+    branch, state = (git(root, "rev-parse", "--abbrev-ref", "HEAD") or "").strip(), load(root)
+    key = lambda r, test: hashlib.sha256(f"{branch}\0{r[0]}\0{test}\0{r[2].strip()}".encode()).hexdigest()[:16]
+    seen = set(state.get("tamper", []))
+    tampered = [(r, test) for r, test in tampered if key(r, test) not in seen]
     if tampered:
+        state["tamper"] = sorted(seen | {key(r, test) for r, test in tampered})
+        save(root, state)
+        tampered = [r for r, _ in tampered]
         reasons.append(f"This commit changes, removes or skips tests the branch started with: {show(tampered)}. Make the code "
                        "pass the test as it was; approve only when the test itself is wrong, with the reason in the commit message.")
     return reasons
@@ -435,7 +478,7 @@ def pre_bash(command, root, transcript=None):
                        "Confirm each name exists on its registry and is the package you mean.")
     parts = [part.strip() for part in re.split(r"&&|\|\||[;|\n]", command)]
     if any(COMMIT.match(part) for part in parts):
-        reasons += commit_gates(root)
+        reasons += commit_gates(root, parts)
     if any(PR.match(part) for part in parts):
         n = changed_lines(root)
         if n > DIFF_CAP:
@@ -519,7 +562,8 @@ def trees(root):
 
 
 def start(root):
-    save(root, {"retro": load(root).get("retro", []), "check": check_command(root), "trees": {p: {"baseline": fingerprint(p)} for p in trees(root)}})
+    old = load(root)
+    save(root, {"retro": old.get("retro", []), "tamper": old.get("tamper", []), "check": check_command(root), "trees": {p: {"baseline": fingerprint(p)} for p in trees(root)}})
 
 
 def new_turn(root):  # a tree only the person changed this turn runs no check
@@ -599,6 +643,9 @@ def main():
         print(json.dumps(out))
 
 
+TEST_A = "ROWS = [1, 2]\n\n\ndef test_a():\n    assert f(2) == 4\n\n\ndef test_b():\n    assert f(3) == 6\n"
+
+
 def self_test():
     t = os.path.realpath(tempfile.mkdtemp())
     run = lambda *a: subprocess.run(a, cwd=t, check=True, capture_output=True)
@@ -606,7 +653,7 @@ def self_test():
                               open(os.path.join(t, name), "w").write(text))
     run("git", "init", "-q")
     run("git", "config", "user.email", "t@t"); run("git", "config", "user.name", "t")
-    put("tests/test_a.py", "def test_a():\n    assert f(2) == 4\n")
+    put("tests/test_a.py", TEST_A)
     put("pyproject.toml", '[project]\ndependencies = [\n    "httpx>=0.27",\n]\n')
     put("package.json", '{\n  "scripts": {"test": "vitest"},\n  "dependencies": {\n    "react": "^19.0.0"\n  }\n}\n')
     put("AGENTS.md", "Check: `python3 -c \"import sys; sys.exit(open('flag').read() != 'ok')\"`\n")
@@ -673,17 +720,41 @@ def self_test():
     os.remove(os.path.join(t, "src/app.py")); os.remove(os.path.join(t, "NOTES.md"))
 
     # Test-tamper gate
-    tamper = lambda: (pre_bash("git commit -qam t", t) or {}).get("hookSpecificOutput", {}).get("permissionDecisionReason", "")
-    put("tests/test_a.py", "def test_a():\n    assert f(2) == 5\n")
-    assert "tests/test_a.py:2" in tamper(), "changing a test the branch started with asks"
-    os.remove(os.path.join(t, "tests/test_a.py"))
-    assert "tests/test_a.py:1" in tamper(), "deleting one asks"
+    tamper = lambda c="git commit -qam t": (pre_bash(c, t) or {}).get("hookSpecificOutput", {}).get("permissionDecisionReason", "")
+    put("tests/test_a.py", TEST_A.replace("[1, 2]", "[1, 3]"))
+    assert "changes, removes or skips" not in tamper(), "changing a fixture passes"
+    put("tests/test_a.py", TEST_A.replace("f(3) == 6", "f(3) == 7"))
+    assert "changes, removes or skips" not in tamper("git commit -qm t"), "a commit that leaves the test out passes"
+    assert "tests/test_a.py:9" in tamper("git add tests/test_a.py && git commit -qm t"), "changing an assertion asks"
+    assert "changes, removes or skips" not in tamper("git add tests/test_a.py && git commit -qm t"), "a line asked about is not asked again"
+    put("tests/test_a.py", TEST_A.replace("f(2) == 4", "f(2) == 5"))
+    run("git", "add", "tests/test_a.py")
+    assert "tests/test_a.py:5" in tamper("git commit -qm t"), "a staged change asks"
+    run("git", "reset", "-q")
+    put("tests/test_a.py", "ROWS = [1, 2]\n")
+    assert "tests/test_a.py:4" in tamper(), "deleting a test asks"
+    run("git", "checkout", "-q", "--", "tests/test_a.py")
+    put("tests/test_a.py", TEST_A.replace("f(2) == 4", "f(2) == 8"))
+    start(t)
+    assert "changes, removes or skips" not in tamper(), "a new session on the branch does not ask again"
+    same = TEST_A.replace("f(2) == 4", "r.ok").replace("f(3) == 6", "r.ok")
+    put("tests/test_a.py", same); run("git", "commit", "-qam", "same text")
+    put("tests/test_a.py", same.replace("r.ok", "r", 1))
+    assert "tests/test_a.py:5" in tamper(); run("git", "commit", "-qam", "first")
+    put("tests/test_a.py", same.replace("r.ok", "r"))
+    assert "tests/test_a.py:9" in tamper(), "a second assertion with the same text asks"
+    run("git", "reset", "-q", "--hard", "HEAD~2")
+    for c in ("git add tests/*.py && git commit -qm t", "git add '*.py' && git commit -qm t", "git add -fA && git commit -qm t",
+              "git add :/ && git commit -qm t", "git add -u && git commit -qm t"):
+        save(t, {**load(t), "tamper": []})
+        put("tests/test_a.py", TEST_A.replace("f(2) == 4", "f(2) == 9"))
+        assert "tests/test_a.py:5" in tamper(c), f"{c} takes the test in"
     run("git", "checkout", "-q", "--", "tests/test_a.py")
     put("tests/test_new.py", "def test_b():\n    assert True\n")
     assert "changes, removes or skips" not in tamper(), "a new test passes"
     put("tests/test_new.py", "import pytest\n\n@pytest.mark.skip\ndef test_b():\n    assert True\n")
     assert "tests/test_new.py:3" in tamper(), "a skip marker asks"
-    put("tests/test_a.py", "def test_a():\n    assert f(2) == 4\n\n\ndef test_c():\n    assert f(0) == 0\n")
+    put("tests/test_a.py", TEST_A + "\n\ndef test_c():\n    assert f(0) == 0\n")
     os.remove(os.path.join(t, "tests/test_new.py"))
     assert "changes, removes or skips" not in tamper(), "adding to a test file passes"
     assert SKIP.search("  xit('x', () => {})") and SKIP.search("    t.Skip(\"later\")") and not SKIP.search("def skip_rows():")
