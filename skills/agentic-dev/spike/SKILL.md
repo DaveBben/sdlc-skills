@@ -3,7 +3,7 @@ name: spike
 description: "Use first, before answering or building, when the person asks whether something would work, how much work or how hard a change would be, whether it would break something, or what adopting a library or platform would do to the codebase, or wants a prototype, a quick test in a scratch directory, an experiment or a spike filed for later, such as 'do a spike on X', 'how hard would it be to make the export async', 'would Postgres full-text search be fast enough' or 'try the decimal module and see if it fixes the rounding'. Not for the real change: a request to build it is the building skill's. Frames a question that can fail and the decision it changes, runs throwaway code in a scratch directory inside a timebox, records the finding and deletes the code."
 license: MIT
 metadata:
-  version: "6.0.0"
+  version: "6.2.0"
 ---
 # Spike
 
@@ -15,14 +15,14 @@ State these 4 in one message, then start without waiting for answers.
 
 1. **The decision:** the next step if it passes and if it fails. When both are the same step, there is no spike: say so.
 2. **The question:** a falsifiable outcome with its bar, on realistic data at a stated size, load and environment, such as "under 200 ms at 1,000 rows on staging".
-3. **The finish line:** the signal that answers it, or the person's choice for a judgement only they can make, such as a layout.
+3. **The finish line:** the signal that answers it, or the person's choice for a judgement only they can make, such as which of two designs reads better.
 4. **The timebox:** a number of attempts. Narrow a question that will not fit it.
 
 ## Build it
 
 * **Work in a scratch directory,** or in a detached worktree when it needs the repository's code. Write no tests except the one the question is observed through.
-* **Run a negative control first:** the measurement on the baseline or on an input past the bar, to show it can fail.
-* **Compare approaches** through the same measurement, each at its smallest, in parallel subagents.
+* **Run a negative control first:** the measurement on the baseline or on an input past the bar.
+* **Compare approaches** through the same measurement, each at its smallest, in parallel, such as in subagents.
 * **Never fake a missing credential** or point the spike at a live system.
 * **Claim only the question measured.**
 * **A new third-party API or platform:** follow [references/integration.md](references/integration.md).
@@ -44,7 +44,7 @@ Write each finding as it surfaces, in `docs/spikes/<question-slug>.md` or on the
 ```
 
 * **Stop when the timebox is spent:** mark it inconclusive and give your pick of extend by a stated amount, drop or defer.
-* **Delete the code** and its worktree, and commit the findings file alone. Kept code is an exception the `Code:` line names, never merged as it is.
+* **Delete the code** and its worktree, and commit the findings file alone, unless it is a tracer bullet: kept at the path the `Code:` line names and grown into the real build through the story and building skills.
 * **To build:** the real change starts from the finding in a fresh session, at the story skill. `Quirks` and `Open questions` go into its frame; `Follow-ups` become stories by the `story` skill.
 
 ## File one for later

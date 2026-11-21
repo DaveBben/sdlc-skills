@@ -3,7 +3,7 @@ name: reviewing
 description: "Use first, before launching any reviewer or reading the diff yourself, for any review of a code change, however small, asked by a person or another agent: a diff, branch, commit or uncommitted change, such as 'review my changes', 'find the bugs in my working-tree diff', 'check my diff for bugs before I push' or 'get this branch ready to merge', and once the building skill's check passes on a non-trivial change, before it is merged or opened as a pull request. Not for a design or plan, a one- or two-line edit, or a question about code. Packs the diff and its intent for a fresh reviewer, has a second fresh agent prove or drop each finding, shows the person what was kept, fixes the blocking findings test-first and stops after 3 rounds."
 license: MIT
 metadata:
-  version: "6.0.0"
+  version: "6.2.0"
 ---
 # Review
 
@@ -22,7 +22,7 @@ Over about 400 changed lines, give each group of files that change together its 
 * **The reviewer,** on your strongest model (such as Opus), follows [references/reviewer.md](references/reviewer.md) and writes `findings.md` in the review directory.
 * **The verifier,** on a smaller model (such as Sonnet), follows [references/verifier.md](references/verifier.md) and rewrites `findings.md` with the rows it kept.
 * **No return is not a clean review:** a subagent that returned nothing, errored, could not run commands or left rows `unchecked` did not review. Rerun it or say so.
-* **Tell the person** each kept finding in one line, blocking first; then each `question`, each row dropped for `no basis`, and each `not judged:` line. Say the review does not replace their own reading of auth, data, migration or deploy changes.
+* **Tell the person** each kept finding in one line, blocking first; then each `question`, each row dropped for `no basis`, and each `not judged:` line. Say the review does not replace their own reading of one-way doors (architecturally significant decisions).
 
 ## The fixes
 

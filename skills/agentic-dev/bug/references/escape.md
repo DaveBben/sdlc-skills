@@ -1,6 +1,6 @@
 # Why a bug escaped
 
-Ask which check should have caught the bug, and whether adding it costs less than the bug did. Pick the kind that the reproduction and git history show:
+Find the escape point (8D): the first check after the fault entered that should have caught it, and whether closing it costs less than the bug did. Pick its kind from the reproduction and git history:
 
 * **No criterion:** no example in the story covered the input that failed. Name the kind of input.
 * **No test:** a criterion covered it and no test did.
