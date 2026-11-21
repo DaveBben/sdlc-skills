@@ -10,7 +10,7 @@
       "name": "agentic-dev",
       "source": "./plugins/agentic-dev",
       "description": "You drive a loose loop, Frame, Explore, Plan, Build, Verify, Review, and a machine decides when it is done: a story skill where every change starts as a user story: before any change to code it grills you when it is vague, looks where gaps hide and how a story fails, and agrees the acceptance criteria, then writes it down for later or hands to a building skill with the house rules for changing code (a pre-mortem on the design, the smallest complete change in its own worktree, done only when a check passed), an explaining skill for teaching an idea so it sticks, a reflecting skill that, once a non-trivial change is finished, has a fresh agent read the session and tells you, with cases from it, what to do next time to get better output; a reviewing skill that has a fresh agent review a finished change and a second prove or drop each finding, then fixes the blocking ones test-first within 3 rounds; bug and spike skills for work that is examined before it is built (a bug report built on a reproduction that fails, a spike as a throwaway experiment that ends in a decision); plus hooks for a done check that runs every test and the linter, an AGENTS.md size cap, a dependency gate, a pull request size cap, gates on commits that leave in debugging leftovers, switch a checker off, or change, remove or skip a test the branch started with, and a reminder to run the reflecting skill once a branch with more than a few lines of code is merged or opened as a pull request.",
-      "version": "6.0.1",
+      "version": "6.1.0",
       "license": "MIT",
       "skills": [
         "./skills/building",
