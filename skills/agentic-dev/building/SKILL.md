@@ -3,13 +3,15 @@ name: building
 description: "Use first, before editing any file, for every request that changes code, configuration, dependencies or tooling, however small, clear or casually phrased: a feature, a bug or wrong output to fix, a new flag, a changed limit or format, a refactor, a rename, a dependency bump, CI or dev-tool setup, implementing a story, ticket or spec section, or an experiment to see whether something would work, like 'add a CSV export', 'the export crashes on an empty order list, fix it', 'rename total to order_total everywhere', 'implement docs/stories/export.md' or 'try the decimal module and see if it fixes the rounding'. Not for reviewing a finished change or a question about code. Grills the request before any code for what the person does not know or has not said (silent assumptions, the walking skeleton, lifecycles, edge cases, failing integration points, one-way doors, untestable criteria), then builds test-first in its own worktree, done only when a check passed."
 license: MIT
 metadata:
-  version: "8.0.1"
+  version: "8.0.2"
 ---
 # Building
 
 The grilling is the work. The person gains most from what they do not know, are missing, or do not know that they do not know, so find it before any code.
 
-## Frame
+Follow these steps in order. Skip a step only when its heading says it does not apply.
+
+## 1. Frame
 
 * **Read before asking:** the code the change touches and its ADRs, its definition of done (CI jobs, linters, type checker, coverage floor), and the docs of each library or API it calls.
 * **Mark each answer** about an unfamiliar library or API `doc`, with the link, or `memory`.
@@ -17,7 +19,7 @@ The grilling is the work. The person gains most from what they do not know, are 
 * **Take a story, ticket or bug report the person brings as the frame,** and grill it like any request. A bug report's reproduction is the first red test; its expected and unchanged behaviour are the criteria.
 * **Sort it:** a story changes something a user would notice; a chore does not (a refactor, rename, dependency bump, formatting, CI or a dev tool). A chore gets one `Done when:` line, such as the existing tests unchanged and green, in place of acceptance criteria and a UAT.
 
-## Grill
+## 2. Grill
 
 Run every line against the request and the code. Each hit is a question with a concrete case from this codebase, or a gap you fill as `Assumed: X, because Y`.
 
@@ -49,7 +51,7 @@ Run every line against the request and the code. Each hit is a question with a c
 * **Stop for** a gap whose readings lead to materially different work, and for a one-way door. Give the rest as notes and go on.
 * **Ask in one round.** A question that hangs on an open answer waits a round.
 
-## Criteria
+## 3. Criteria (a story or a bug fix; a chore has its `Done when:` line)
 
 The person writes the acceptance criteria. Critique them against these and fill the gaps.
 
@@ -63,19 +65,19 @@ The person writes the acceptance criteria. Critique them against these and fill 
 * **Keep design out:** files, tables and layout wait for the plan.
 * **Play back** for the person to confirm: the goal, the criteria, each `Assumed:` line and what this change will not do.
 
-## Explore
+## 4. Explore (when an unknown could change the plan, or the UAT needs access)
 
 * **Spike an unknown** that questions and docs cannot settle and that could change the plan, by [references/spike.md](references/spike.md): now, in a subagent, when it fits this session. When it needs a day, or someone else's access or data, write it down as blocking the change and stop.
 * **Ask for what the UAT needs,** such as a test credential, a sandbox or read-only access, before you build.
 
-## Plan
+## 5. Plan (when you cannot state the diff in one sentence)
 
-* **Write a plan** only when you cannot state the diff in one sentence: the components and how they connect, then small steps, each a readable diff, risk rising down the list.
+* **Write a plan:** the components and how they connect, then small steps, each a readable diff, risk rising down the list.
 * **Run a pre-mortem on it:** the bug reports it would get, each pinned to a file, caller, doc or real input you checked. Add the defence against each to the steps. Skip cases nothing can produce.
 * **Have a fresh subagent review the plan,** on your strongest model, by [references/design-review.md](references/design-review.md), when it touches security (auth, permissions, secrets, a trust boundary), stored data (a schema change or migration) or concurrency (shared state, retries, ordering), or is over about 400 changed lines.
 * **Present it in chat,** in plain English, as intent, not code, ending with the one-way doors for the person to decide.
 
-## Build
+## 6. Build
 
 * **Work on a new branch in its own git worktree,** never in the person's checkout.
 * **Add characterization tests** before a refactor, where the tests miss the code that moves.
@@ -85,7 +87,7 @@ The person writes the acceptance criteria. Critique them against these and fill 
   3. **Green:** implement until those tests pass, changing no test.
 * **Make the smallest complete change (KISS, YAGNI):** the whole task with every caller, test and fixture it breaks. Add error handling only for a trigger you can name. Never cut trust-boundary validation, data-loss handling or security. Name what you left out.
 
-## Finish
+## 7. Finish
 
 * **Check each `memory` answer** against its doc or a real call, and name each still unverified.
 * **Report done with a passing check:** its command, its result and what you did not check. Done is every test green and the UAT run on the live system, with the person accepting its result.
