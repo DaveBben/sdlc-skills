@@ -724,6 +724,22 @@ def self_test():
     put("tests/test_a.py", "ROWS = [1, 2]\n")
     assert "tests/test_a.py:4" in tamper(), "deleting a test asks"
     run("git", "checkout", "-q", "--", "tests/test_a.py")
+    put("tests/test_a.py", TEST_A.replace("f(2) == 4", "f(2) == 8"))
+    start(t)
+    assert "changes, removes or skips" not in tamper(), "a new session on the branch does not ask again"
+    same = TEST_A.replace("f(2) == 4", "r.ok").replace("f(3) == 6", "r.ok")
+    put("tests/test_a.py", same); run("git", "commit", "-qam", "same text")
+    put("tests/test_a.py", same.replace("r.ok", "r", 1))
+    assert "tests/test_a.py:5" in tamper(); run("git", "commit", "-qam", "first")
+    put("tests/test_a.py", same.replace("r.ok", "r"))
+    assert "tests/test_a.py:9" in tamper(), "a second assertion with the same text asks"
+    run("git", "reset", "-q", "--hard", "HEAD~2")
+    for c in ("git add tests/*.py && git commit -qm t", "git add '*.py' && git commit -qm t", "git add -fA && git commit -qm t",
+              "git add :/ && git commit -qm t"):
+        save(t, {**load(t), "tamper": []})
+        put("tests/test_a.py", TEST_A.replace("f(2) == 4", "f(2) == 9"))
+        assert "tests/test_a.py:5" in tamper(c), f"{c} takes the test in"
+    run("git", "checkout", "-q", "--", "tests/test_a.py")
     put("tests/test_new.py", "def test_b():\n    assert True\n")
     assert "changes, removes or skips" not in tamper(), "a new test passes"
     put("tests/test_new.py", "import pytest\n\n@pytest.mark.skip\ndef test_b():\n    assert True\n")
