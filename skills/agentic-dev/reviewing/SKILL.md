@@ -3,7 +3,7 @@ name: reviewing
 description: "Use first, before launching any reviewer or reading the diff yourself, for any review of a code change, however small, asked by a person or another agent: a diff, branch, commit or uncommitted change, such as 'review my changes', 'find the bugs in my working-tree diff', 'check my diff for bugs before I push' or 'get this branch ready to merge', and once the building skill's check passes on a non-trivial change, before it is merged or opened as a pull request. Not for a design or plan, a one- or two-line edit, or a question about code. Packs the diff and its intent for a fresh reviewer, has a second fresh agent prove or drop each finding, shows the person what was kept, fixes the blocking findings test-first and stops after 3 rounds."
 license: MIT
 metadata:
-  version: "8.0.0"
+  version: "8.1.0"
 ---
 # Review
 

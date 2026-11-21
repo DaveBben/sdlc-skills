@@ -21,7 +21,7 @@ import argparse, concurrent.futures as cf, json, os, shutil, subprocess, sys, ti
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLUGIN, RUNS = os.path.join(REPO, "plugins", "agentic-dev"), os.path.expanduser("~/.sdlc-trigger-runs")
-SKILLS = {"building", "reflecting", "reviewing"}
+SKILLS = {"building", "prototyping", "reflecting", "reviewing"}
 AGENTS = set()  # the plugin ships no agents; reviewers are reference files its skills launch
 
 FIXTURE = {
