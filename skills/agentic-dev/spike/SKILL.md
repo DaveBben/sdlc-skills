@@ -25,6 +25,7 @@ State these 4 in one message and start.
 * **Several approaches:** each through one measurement at its smallest, in parallel subagents.
 * **A missing credential:** never fake one or point the spike at a live system.
 * **A working prototype** is evidence for the question measured and nothing else.
+* **A new third-party API or platform:** follow [references/integration.md](references/integration.md).
 
 ## Record and finish
 
