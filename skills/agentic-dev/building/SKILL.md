@@ -3,7 +3,7 @@ name: building
 description: "Use first, before editing any file, for every request that changes code, configuration, dependencies or tooling, however small, clear or casually phrased: a feature, a bug or wrong output to fix, a new flag, a changed limit or format, a refactor, a rename, a dependency bump, CI or dev-tool setup, or implementing a story, ticket or spec section, like 'add a CSV export', 'the export crashes on an empty order list, fix it', 'rename total to order_total everywhere', 'implement docs/stories/export.md'. Not for reviewing a finished change, a question about code, or a throwaway experiment or spike, which is the prototyping skill's. Grills the request before any code for what the person does not know or has not said (silent assumptions, the walking skeleton, lifecycles, edge cases, failing integration points, one-way doors, untestable criteria), then builds test-first in its own worktree, done only when a check passed."
 license: MIT
 metadata:
-  version: "8.1.0"
+  version: "8.1.1"
 ---
 # Building
 
@@ -32,7 +32,7 @@ Run every line against the request and the code. Each hit is a question with a c
 
 ### How big it is
 
-* **Split** several asks joined by "and", several features, or more than about 400 changed lines or 5 criteria into vertical slices. Grill and build the first; write the rest down, each for a fresh session.
+* **Split** several asks joined by "and", several features, or more than about 400 changed lines or 5 criteria into vertical slices. Grill and build the first; record the rest for later, each for a fresh session, with the tracker skill where it is installed.
 * **Reject a layer as a slice:** each slice has a page, route or command where a person or test meets it.
 * **Name each conflict:** a rule another story also states, or one main already meets.
 
@@ -65,7 +65,7 @@ The person writes the acceptance criteria. Critique them against these and fill 
 
 ## Explore
 
-* **Spike an unknown** that questions and docs cannot settle and that could change the plan, with the prototyping skill: now, in a subagent, when it fits this session. When it needs a day, or someone else's access or data, write it down as blocking the change and stop.
+* **Spike an unknown** that questions and docs cannot settle and that could change the plan, with the prototyping skill: now, in a subagent, when it fits this session. When it needs a day, or someone else's access or data, record it for later as blocking the change, with the tracker skill where it is installed, and stop.
 * **Ask for what the UAT needs,** such as a test credential, a sandbox or read-only access, before you build.
 
 ## Plan

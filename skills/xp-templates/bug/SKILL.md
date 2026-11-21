@@ -3,7 +3,7 @@ name: bug
 description: "Use when a bug is to be reported, reproduced, confirmed, reviewed, triaged or filed, not fixed: writing one up, checking whether behaviour is a bug or expected, confirming it is real before raising it, finding its cause for the report, critiquing a bug report, judging severity or which of several issues matters most, or explaining how one escaped, such as 'file a bug: Y', 'write this up, don't fix it yet', 'can you reproduce what the customer saw', 'is this bug report complete', 'triage the open bugs', 'how did this get past the tests and the review' or 'why do we keep getting bugs like this'. Not for fixing one. Holds the bug report template built on a reproduction that fails for the reported symptom, with a severity and a decision, the triage table, and the escape analysis for a bug that reached users."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 # Bug
 

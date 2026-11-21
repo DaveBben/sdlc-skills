@@ -3,7 +3,7 @@ name: spike
 description: "Use when a spike is to be written, reviewed, recorded or filed: framing an open question as a spike for later or for someone else, critiquing a spike someone wrote, writing up what an experiment found, or listing what to find out about a new third-party API or platform, such as 'write a spike for whether Postgres full-text search is fast enough', 'create a spike ticket that blocks the export story', 'is this spike well framed', 'write up what the Polars experiment found' or 'what do we need to learn about the Stripe API before we commit'. Not for running the experiment or building the real change. Holds the spike's 4 frame lines (decision, falsifiable question, finish line, timebox), the checks a spike is reviewed against, and the finding record."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 # Spike
 
