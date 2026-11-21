@@ -40,6 +40,7 @@ All in [`plugins/agentic-dev/hooks/guard.py`](plugins/agentic-dev/hooks/guard.py
 * **Pull request cap:** a branch over 400 changed lines asks you.
 * **Leftovers and silencer gates:** a commit that adds a debugger call, a TODO, commented-out code or a switched-off checker asks you.
 * **Size cap:** `AGENTS.md` and `CLAUDE.md` stay under 100 lines.
+* **Skill gate:** the first file edit in a session that loaded no story, chore, bug, spike, building or reviewing skill asks you.
 * **Plan gate:** the first file edit after the building skill loads asks you when the agent has asked you nothing since.
 * **Retro reminder:** once per branch, after a merge or pull request of more than a few lines of code.
 

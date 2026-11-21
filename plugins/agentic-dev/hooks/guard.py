@@ -16,6 +16,8 @@
                      a skip or expected-failure marker to a test, asks the person.
   * Plan gate:       the first file edit after the building skill loads asks the person when nothing since that load
                      asked them anything (no question tool call, no message from them): its plan steps come first.
+  * Skill gate:      the first file edit in a repository in a session that loaded none of the skills that frame a
+                     change (story, chore, bug, spike, building, reviewing) asks the person, once per session.
   * Retro reminder:  once per branch, after a pull request is opened from it or it is merged, tells the agent to
                      run the reflecting skill when the branch changed more than RETRO_LINES lines of code.
 """
@@ -218,6 +220,46 @@ def building_unasked(transcript):
             if any(b.get("type") == "text" and not str(b.get("text", "")).lstrip().startswith(NOT_THE_PERSON) for b in blocks):
                 asked = True
     return load if load is not None and not asked else None
+
+
+FRAMING_SKILLS = {"story", "chore", "bug", "spike", "building", "reviewing"}
+
+
+def skills_loaded(transcript):
+    """The plugin skills this session's transcript shows loaded, or None when it cannot be read."""
+    try:
+        lines = open(transcript).read().splitlines()
+    except (OSError, TypeError):
+        return None
+    names = set()
+    for line in lines:
+        try:
+            d = json.loads(line)
+        except ValueError:
+            continue
+        content = (d.get("message") or {}).get("content") if isinstance(d, dict) and d.get("type") == "assistant" else None
+        for b in content if isinstance(content, list) else []:
+            if isinstance(b, dict) and b.get("type") == "tool_use" and b.get("name") == "Skill":
+                names.add(str((b.get("input") or {}).get("skill", "")).split(":")[-1])
+    return names
+
+
+def skill_gate(inp, ti, cwd):
+    path = os.path.join(cwd, ti.get("file_path", ""))
+    where = os.path.dirname(path) if os.path.isdir(os.path.dirname(path)) else cwd
+    root = (git(where, "rev-parse", "--show-toplevel") or "").strip()
+    transcript = inp.get("transcript_path")
+    loaded = skills_loaded(transcript) if root else None
+    if loaded is None or loaded & FRAMING_SKILLS:
+        return None
+    state = load(root)
+    if transcript in state.get("skill_asked", []):  # once per session, so an allowed edit is not asked again
+        return None
+    state.setdefault("skill_asked", []).append(transcript)
+    save(root, state)
+    return ask("This edit changes a file before any skill framed the change. Allow to edit anyway; deny to have the "
+               "agent load the story skill first for a change a user would notice, or the chore skill for one no "
+               "user would notice.")
 
 
 def plan_gate(inp, ti, cwd):
@@ -513,7 +555,7 @@ def main():
     root = (git(cwd, "rev-parse", "--show-toplevel") or "").strip()
     out = None
     if event == "PreToolUse" and tool in ("Edit", "Write", "MultiEdit"):
-        out = pre_edit(tool, ti, cwd) or plan_gate(inp, ti, cwd)
+        out = pre_edit(tool, ti, cwd) or skill_gate(inp, ti, cwd) or plan_gate(inp, ti, cwd)
     elif not root:
         return
     elif event == "PreToolUse" and tool == "Bash":
@@ -639,6 +681,22 @@ def self_test():
     assert decision(gate(loaded + [msg("user", "ok"), use("Skill", skill="building")])) == "ask", "a new building load asks again"
     assert not plan_gate({"transcript_path": tr}, {"file_path": "/tmp/x.py"}, "/tmp"), "outside a repository passes"
     os.remove(tr)
+
+    # Skill gate
+    def sg(lines, name):
+        path = os.path.join(t, name + ".jsonl")
+        open(path, "w").write("\n".join(lines) + "\n")
+        return skill_gate({"transcript_path": path}, {"file_path": os.path.join(t, "notes.md")}, t)
+    bare = [msg("user", "Add a note to AGENTS.md that we merge straight to main.")]
+    assert decision(sg(bare, "s1")) == "ask", "an edit no skill framed asks"
+    assert not sg(bare, "s1"), "the same session is asked once"
+    assert not sg(bare + [use("Skill", skill="agentic-dev:chore")], "s2"), "an edit after the chore skill passes"
+    assert not sg(bare + [use("Skill", skill="explaining"), use("Skill", skill="story")], "s3"), "after the story skill passes"
+    assert decision(sg(bare + [use("Skill", skill="agentic-dev:explaining")], "s4")) == "ask", "explaining frames no change"
+    assert not skill_gate({"transcript_path": os.path.join(t, "s1.jsonl")}, {"file_path": "/tmp/x.md"}, "/tmp"), \
+        "outside a repository passes"
+    for n in ("s1", "s2", "s3", "s4"):
+        os.remove(os.path.join(t, n + ".jsonl"))
 
     # Retro reminder
     run("git", "checkout", "-qb", "feat/r")

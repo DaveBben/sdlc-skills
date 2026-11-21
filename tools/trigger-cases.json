@@ -42,12 +42,12 @@
  },
  {
   "prompt": "Install gitleaks",
-  "expected": "story",
+  "expected": "chore",
   "source": "mined"
  },
  {
   "prompt": "I merged into main. In the SPEC.md make a note that we do not need a PR workflow for this repo and can merge straight to main",
-  "expected": "story",
+  "expected": "chore",
   "source": "mined",
   "needs_context": true
  },
@@ -151,7 +151,7 @@
  },
  {
   "prompt": "file a chore for the pip-audit failures",
-  "expected": "story",
+  "expected": "chore",
   "source": "mined"
  },
  {
@@ -191,7 +191,7 @@
  },
  {
   "prompt": "Close this issue",
-  "expected": null,
+  "expected": "tracker",
   "source": "mined"
  },
  {
@@ -246,12 +246,12 @@
  },
  {
   "prompt": "rename total to order_total everywhere",
-  "expected": "story",
+  "expected": "chore",
   "source": "generated"
  },
  {
   "prompt": "bump the requests dependency",
-  "expected": "story",
+  "expected": "chore",
   "source": "generated"
  },
  {
@@ -276,7 +276,7 @@
  },
  {
   "prompt": "refactor pricing.py so the discount logic isnt inline",
-  "expected": "story",
+  "expected": "chore",
   "source": "generated"
  },
  {
@@ -296,7 +296,7 @@
  },
  {
   "prompt": "upgrade to python 3.13 and fix whatever breaks",
-  "expected": "story",
+  "expected": "chore",
   "source": "generated"
  },
  {
@@ -311,12 +311,12 @@
  },
  {
   "prompt": "remove the dead code in export.py",
-  "expected": "story",
+  "expected": "chore",
   "source": "generated"
  },
  {
   "prompt": "add type hints to pricing.py",
-  "expected": "story",
+  "expected": "chore",
   "source": "generated"
  },
  {
@@ -347,7 +347,8 @@
  {
   "prompt": "agreed, proceed with the implementation as framed",
   "expected": "building",
-  "source": "generated"
+  "source": "generated",
+  "needs_context": true
  },
  {
   "prompt": "Framing complete. Acceptance criteria are in the conversation above. Hand over to building and implement the change now.",
@@ -1032,7 +1033,7 @@
  },
  {
   "prompt": "format pricing.py with black",
-  "expected": null,
+  "expected": "chore",
   "source": "generated"
  },
  {

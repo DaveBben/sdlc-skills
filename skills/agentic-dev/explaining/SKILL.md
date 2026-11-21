@@ -3,7 +3,7 @@ name: explaining
 description: "Use before answering every question the person asks to understand something rather than to change it, however short or casual: any why, how or what question, a difference between two things, or what something means, about code, a file, a log, a result, an error, a concept, a tool or a design, such as 'why did this test fail?', 'how does this function decide what to keep?', 'what is this option for?', 'what's the tradeoff of A over B?', 'which is better here, and why?', 'what am I not thinking about?' or 'what do you think of my approach?'. Not for writing or changing code. How to explain so the idea sticks: bridge from what they know, one concrete case before the mechanism, and the source of every number."
 license: MIT
 metadata:
-  version: "6.2.0"
+  version: "7.0.0"
 ---
 # Explain
 

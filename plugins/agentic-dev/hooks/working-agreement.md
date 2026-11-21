@@ -8,6 +8,7 @@ A loaded skill's own rules win where they differ.
 
 ## Work
 
+* **Route a change:** load the story skill for a change a user would notice, and the chore skill for one no user would notice, such as a refactor, rename, dependency bump, formatting, CI or a dev tool.
 * Never ask the user for a fact a tool can reach.
 * **Delegate (context isolation):** a subagent takes work that is large to read but small to state: code exploration, logs, docs, a fresh-context review of finished work, or an independent side task, in its own worktree if it changes files here. Brief it with the objective, scope limits and a return shape (answer, file:line per claim, a "Not verified" list), on a smaller model such as Sonnet where the work is mechanical, and spot-check what returns. Do it yourself when it takes a handful of tool calls, is coupled to your edits or needs the context you hold. Work the user asks to run in parallel or in the background, and checking review findings, always go to a subagent.
 * **Pushback narrows the work:** answer "why this?" in one line and add no work.

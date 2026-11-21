@@ -3,7 +3,7 @@ name: tracker
 description: "Use for every read or write of an issue tracker or project board (GitHub, GitLab, Gitea, Jira): opening, closing, commenting on, listing, labelling or linking issues, putting written stories, spikes or bugs on the tracker, marking one issue as blocking another, or finding the next story to build, like 'close #12', 'mark the spike as blocking the export story', 'what is the next unblocked story?' or 'put these three stories in Gitea'. Not for writing a story, a bug report or a spike: those skills write it, then this one files it. Files one labelled issue per item in build order, blocks by the tracker's own relation, and reads every write back."
 license: MIT
 metadata:
-  version: "6.6.0"
+  version: "7.0.0"
 ---
 # Tracker
 
