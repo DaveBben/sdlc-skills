@@ -1,3 +1,3 @@
 # agentic-dev
 
-9 skills, 10 hooks and the house rules for coding with AI agents through a short loop: Frame, Explore, Build, Verify, Review. See the [repository README](../../README.md) for the loop, the skills and how to install.
+3 skills, 11 hooks and the house rules for coding with AI agents through a short loop: Frame, Explore, Build, Verify, Review. See the [repository README](../../README.md) for the loop, the skills and how to install.
