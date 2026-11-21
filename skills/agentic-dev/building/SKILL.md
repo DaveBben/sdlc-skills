@@ -14,7 +14,10 @@ metadata:
 * **Plan small steps** when the change does not fit one sentence: each a readable diff, risk rising down the list, a commit before each risky one.
 * **Have a fresh subagent review a large plan** once, on your strongest model, by [references/design-review.md](references/design-review.md).
 * **Build on a new branch in its own git worktree,** never in the person's checkout.
-* **Red first:** when the frame has acceptance criteria or a bug's reproduction, read [references/tests.md](references/tests.md) before writing code: one test per criterion example, each seen failing on its assertion, committed alone as `test(red): <title>`; after that commit a test changes only with the user's word. A change with no new rule keeps its `Done when:` line.
+* **Build in this order** when the frame has acceptance criteria or a bug's reproduction; a change with no new rule keeps its `Done when:` line:
+  1. **Interfaces with no implementation:** each new name's signature and a stub that returns an empty value, committed alone.
+  2. **Failing tests first,** by [references/tests.md](references/tests.md): one per criterion example, each seen failing on its assertion, committed alone as `test(red): <title>`. After that commit a test changes only with the person's word.
+  3. **Implement until those tests pass,** changing no test.
 * **Make the smallest complete change (KISS, YAGNI):** the whole task with every caller, test and fixture it breaks. Add error handling only for a trigger you can name. Never cut trust-boundary validation, data-loss handling or security. Name what you left out.
 * **Report done with a passing check:** its command, its result and what you did not check.
 * **On the second correction of the same mistake,** propose a check, hook or test that catches it.
