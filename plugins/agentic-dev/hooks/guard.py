@@ -15,7 +15,7 @@
   * Test-tamper gate: a commit that changes or removes a line of a test file the branch started with, or adds
                      a skip or expected-failure marker to a test, asks the person.
   * Retro reminder:  once per branch, after a pull request is opened from it or it is merged, tells the agent to
-                     run the retro skill when the branch changed more than RETRO_LINES lines of code.
+                     run the reflecting skill when the branch changed more than RETRO_LINES lines of code.
 """
 import hashlib, json, os, re, shlex, subprocess, sys, tempfile
 
@@ -258,7 +258,7 @@ def retro_due(command, root):
         return None
     state.setdefault("retro", []).append(branch)
     save(root, state)
-    return (f"This change touched {n} lines of code. Run the retro skill now, before you tell the person it is done; "
+    return (f"This change touched {n} lines of code. Run the reflecting skill now, before you tell the person it is done; "
             "if it is not finished, run it when it is.")
 
 
@@ -583,7 +583,7 @@ def self_test():
     run("git", "checkout", "-qb", "feat/u", "main"); put("u.py", "x = 1\n" * (RETRO_LINES + 5))
     run("git", "add", "u.py"); run("git", "commit", "-qm", "u"); run("git", "checkout", "-q", "main")
     run("git", "merge", "-q", "--no-ff", "-m", "m", "feat/u")
-    assert "retro skill" in post_bash("git merge --no-ff feat/u", t)["reason"], "a merge of a big branch reminds"
+    assert "reflecting skill" in post_bash("git merge --no-ff feat/u", t)["reason"], "a merge of a big branch reminds"
     run("git", "reset", "-q", "--hard", "HEAD~1")
     run("git", "branch", "-qD", "feat/r", "feat/s", "feat/u")
     for f in ("r.py", "r.json", "R.md"):
