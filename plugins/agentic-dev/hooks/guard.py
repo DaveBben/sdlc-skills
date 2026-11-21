@@ -24,7 +24,7 @@
   * Retro reminder:  once per branch, after a pull request is opened from it or it is merged, tells the agent to
                      run the reflecting skill when the branch changed more than RETRO_LINES lines of code.
 """
-import hashlib, json, os, re, shlex, subprocess, sys, tempfile
+import fnmatch, hashlib, json, os, re, shlex, subprocess, sys, tempfile
 
 MAX_LINES, MAX_BYTES = 100, 8 * 1024  # this plugin's choice, sized for a root file of commands, constraints and traps
 MAX_BLOCKS = 5  # this plugin's choice: failed checks in a row before the agent may stop anyway
@@ -64,8 +64,8 @@ TEST_FILE = re.compile(r"(?:^|/)(?:tests?|__tests__|spec)/|(?:^|/)test_[^/]*$|_t
 SKIP = re.compile(r"@pytest\.mark\.(?:skip|xfail)|\bpytest\.(?:skip|xfail)\(|@unittest\.(?:skip|expectedFailure)|\.skip\(|\bx(?:it|describe|test)\("
                   r"|\b(?:it|test)\.todo\(|\bt\.Skip(?:Now|f)?\(|#\[ignore\]|@(?:Disabled|Ignore)\b")
 # shortcut: one line at a time, so an expected value inside a multi-line literal or a parametrize row passes.
-ASSERTION = re.compile(r"\bassert|\bexpect\(|\.should\b|\braises\(|\bt\.(?:Error|Fatal|Fail)|\bdef test|\b(?:it|test|describe)\("
-                       r"|\bfunc Test|#\[test\]|@Test\b")
+TEST_DEF = re.compile(r"\bdef test|\b(?:it|test|describe)\(|\bfunc Test|#\[test\]|@Test\b")
+ASSERTION = re.compile(r"\bassert|\bexpect\(|\.should\b|\braises\(|\bt\.(?:Error|Fatal|Fail)|" + TEST_DEF.pattern)
 PROSE = (".md", ".txt", ".rst")
 CONFIG = (".json", ".toml", ".yaml", ".yml", ".ini", ".cfg", ".conf", ".env", ".lock")
 RETRO_LINES = 20  # this plugin's guess at "more than a couple of lines"; tune it
@@ -417,21 +417,24 @@ def removed_test_lines(root):
 def commit_paths(root, parts):
     """The changed paths the commit in these command parts takes in, or None for every one."""
     # shortcut: paths are matched from the repository root, so `cd sub && git add f` misses f; parse cwd if it bites.
-    words = []
-    for part in parts:
-        if COMMIT.match(part) or ADD.match(part):
-            try:
-                words += shlex.split(part)
-            except ValueError:
-                words += part.split()
-    adds_all = any(ADD.match(p) for p in parts) and {"-A", "--all", "-u", "--update", ".", "*"} & set(words)
-    if adds_all or any(w == "--all" or re.match(r"-[^-]*a", w) for w in words if w.startswith("-")):
+    def words(match):
+        out = []
+        for part in parts:
+            if match.match(part):
+                try:
+                    out += shlex.split(part)
+                except ValueError:
+                    out += part.split()
+        return out
+    added, committed = words(ADD), words(COMMIT)
+    if (any(w in ("--all", "--update", ".", "*") or w.startswith(":") or re.match(r"-[^-]*[Au]", w) for w in added)
+            or any(w == "--all" or re.match(r"-[^-]*a", w) for w in committed)):
         return None
-    names = [w.rstrip("/") for w in words if not w.startswith("-")]
+    names = [w.rstrip("/") for w in added + committed if not w.startswith("-")]
     changed = set((git(root, "diff", "HEAD", "--name-only") or "").splitlines() +
                   (git(root, "ls-files", "-o", "--exclude-standard") or "").splitlines())
     staged = set((git(root, "diff", "--cached", "--name-only") or "").splitlines())
-    return staged | {f for f in changed if any(f == n or f.startswith(n + "/") for n in names)}
+    return staged | {f for f in changed if any(f == n or f.startswith(n + "/") or fnmatch.fnmatch(f, n) for n in names)}
 
 
 def commit_gates(root, parts):
@@ -446,16 +449,22 @@ def commit_gates(root, parts):
     if quiet:
         reasons.append(f"This commit switches a checker off: {show(quiet)}. Fix the type or lint finding instead; "
                        "approve only when it cannot be fixed.")
-    tampered = [r for r in removed_test_lines(root) if (paths is None or r[0] in paths) and ASSERTION.search(r[2])]
-    tampered += [r for r in rows if TEST_FILE.search(r[0]) and SKIP.search(r[2])]
+    # Each line is keyed with the test it sits in, so two tests' identical `assert r.ok` lines stay apart.
+    head = lambda f: (git(root, "show", f"HEAD:{f}") or "").splitlines()
+    tree = lambda f: read(os.path.join(root, f)).splitlines()
+    test_of = lambda lines, n, up: next((l.strip() for l in (reversed(lines[:n]) if up else lines[n - 1:]) if TEST_DEF.search(l)), "")
+    tampered = [(r, test_of(head(r[0]), r[1], True)) for r in removed_test_lines(root)
+                if (paths is None or r[0] in paths) and ASSERTION.search(r[2])]
+    tampered += [(r, test_of(tree(r[0]), r[1], False)) for r in rows if TEST_FILE.search(r[0]) and SKIP.search(r[2])]
     # Ask about each line once per branch, so a retried or split commit does not ask again.
     branch, state = (git(root, "rev-parse", "--abbrev-ref", "HEAD") or "").strip(), load(root)
-    key = lambda r: hashlib.sha256(f"{branch}\0{r[0]}\0{r[2].strip()}".encode()).hexdigest()[:16]
+    key = lambda r, test: hashlib.sha256(f"{branch}\0{r[0]}\0{test}\0{r[2].strip()}".encode()).hexdigest()[:16]
     seen = set(state.get("tamper", []))
-    tampered = [r for r in tampered if key(r) not in seen]
+    tampered = [(r, test) for r, test in tampered if key(r, test) not in seen]
     if tampered:
-        state["tamper"] = sorted(seen | {key(r) for r in tampered})
+        state["tamper"] = sorted(seen | {key(r, test) for r, test in tampered})
         save(root, state)
+        tampered = [r for r, _ in tampered]
         reasons.append(f"This commit changes, removes or skips tests the branch started with: {show(tampered)}. Make the code "
                        "pass the test as it was; approve only when the test itself is wrong, with the reason in the commit message.")
     return reasons
@@ -553,7 +562,8 @@ def trees(root):
 
 
 def start(root):
-    save(root, {"retro": load(root).get("retro", []), "check": check_command(root), "trees": {p: {"baseline": fingerprint(p)} for p in trees(root)}})
+    old = load(root)
+    save(root, {"retro": old.get("retro", []), "tamper": old.get("tamper", []), "check": check_command(root), "trees": {p: {"baseline": fingerprint(p)} for p in trees(root)}})
 
 
 def new_turn(root):  # a tree only the person changed this turn runs no check
@@ -735,7 +745,7 @@ def self_test():
     assert "tests/test_a.py:9" in tamper(), "a second assertion with the same text asks"
     run("git", "reset", "-q", "--hard", "HEAD~2")
     for c in ("git add tests/*.py && git commit -qm t", "git add '*.py' && git commit -qm t", "git add -fA && git commit -qm t",
-              "git add :/ && git commit -qm t"):
+              "git add :/ && git commit -qm t", "git add -u && git commit -qm t"):
         save(t, {**load(t), "tamper": []})
         put("tests/test_a.py", TEST_A.replace("f(2) == 4", "f(2) == 9"))
         assert "tests/test_a.py:5" in tamper(c), f"{c} takes the test in"
