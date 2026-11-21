@@ -3,7 +3,7 @@ name: story
 description: "Use when a user story is to be written, reviewed, split, forecast or filed, not built: writing a story, a ticket or its acceptance criteria for later or for someone else, critiquing a story someone wrote, splitting an epic, a PRD or a large feature into stories, or forecasting when a set of stories will be finished, such as 'write a story for X', 'critique the story in docs/stories/x.md', 'are these criteria testable', 'break this PRD into stories', 'this is too big for one merge request, cut it down' or 'how many weeks for the remaining stories'. Not for building a story or changing code. Holds the story template (why, context, one acceptance criterion per business rule with a Given/When/Then example and a check, a UAT, out of scope), the checks a story is reviewed against, the splitting rules and the forecast format."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 # Story
 

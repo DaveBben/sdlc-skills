@@ -10,7 +10,7 @@
       "name": "agentic-dev",
       "source": "./plugins/agentic-dev",
       "description": "You drive a loose loop, Frame, Explore, Build, Verify, Review, and a machine decides when it is done: a building skill that is the single entry for any change to code, a story or a chore, and grills the request before any code for what you do not know or have not said (silent assumptions, the walking skeleton, each item's lifecycle, edge cases, integration points that fail, one-way doors, criteria nobody can test, the UAT), then builds test-first in its own worktree; a prototyping skill that answers one question with throwaway code (a spike or proof of concept) with no tests or clean code, then deletes it; a reviewing skill that has a fresh agent review a finished change and a second prove or drop each finding, then fixes the blocking ones test-first within 3 rounds; a reflecting skill that has a fresh agent read the session of a finished change and tells you what to do next time; plus hooks for a done check that runs every test and the linter, an AGENTS.md size cap, a dependency gate, a pull request size cap, gates on commits that leave in debugging leftovers, switch a checker off, or change, remove or skip a test the branch started with, a gate on the first edit the building or prototyping skill did not frame, a gate on the first edit after the building skill loads when you have not been asked anything, a gate on a pull request or merge no review preceded, and a reminder to run the reflecting skill once a branch is merged or opened as a pull request.",
-      "version": "8.1.0",
+      "version": "8.1.1",
       "license": "MIT",
       "skills": [
         "./skills/building",
@@ -26,7 +26,7 @@
       "name": "xp-templates",
       "source": "./plugins/xp-templates",
       "description": "Templates and review checks for XP artifacts, and nothing about implementation: a story skill (the story template, one acceptance criterion per business rule with a Given/When/Then example, a check and a UAT, the ways a story fails, splitting an epic into vertical slices, a throughput forecast), a spike skill (4 frame lines and the finding record), a bug skill (a report built on a reproduction that fails, with a severity and a decision, triage and escape analysis), and a tracker skill that files each as a labelled issue in GitHub, GitLab, Gitea or Jira with blockers linked.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "license": "MIT",
       "skills": [
         "./skills/story",

@@ -3,7 +3,7 @@ name: prototyping
 description: "Use first, before writing any code, when a question is to be answered by running throwaway code now: a spike to run, a prototype, a proof of concept, or a quick experiment to see whether something would work, how a library or API really behaves, or how hard a change would be, such as 'try the decimal module and see if it fixes the rounding', 'do a spike on async export', 'run the spike in docs/spikes/03.md', 'does the Gmail API return threads in date order? try it' or 'can pandas write this csv faster than the csv module, quick test'. Not for the real change, which is the building skill's, nor for writing a spike down for later. Writes disposable code that answers one question, with no tests, clean code or what-ifs beyond it, then reports the finding and deletes the code."
 license: MIT
 metadata:
-  version: "8.1.0"
+  version: "8.1.1"
 ---
 # Prototyping
 
