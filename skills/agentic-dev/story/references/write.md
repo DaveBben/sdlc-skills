@@ -48,6 +48,6 @@ Change nothing without its owner's yes. Report `<story>: <rule broken> — "<quo
 
 ## Where it lives, where it goes
 
-* **Lives** in the team's tracker when a tool here reaches it, by [tracker.md](tracker.md); else `docs/stories/<NN>-<slug>.md`, numbered in build order, a blocker named in `Dependencies`. File only what the person approved.
+* **Lives** in the team's tracker when a tool here reaches it, filed by the tracker skill; else `docs/stories/<NN>-<slug>.md`, numbered in build order, a blocker named in `Dependencies`. File only what the person approved.
 * **To build:** one story, one merge request. Its criteria are the build's done-check, each ticked by seeing its `Check:` run. They and its `Out of scope` go into the review's `story.md` in the story's words and numbering.
 * **After the merge** it is a record, never edited. A miss or a change of mind is a new story.

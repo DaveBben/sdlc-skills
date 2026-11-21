@@ -1129,5 +1129,55 @@
   "prompt": "How did the empty-order crash get past our tests and review?",
   "expected": "bug",
   "source": "confusion"
+ },
+ {
+  "prompt": "Close issue #12 in GitHub, it's fixed on main.",
+  "expected": "tracker",
+  "source": "generated"
+ },
+ {
+  "prompt": "Put the three order-history stories in docs/stories into Gitea as issues.",
+  "expected": "tracker",
+  "source": "generated"
+ },
+ {
+  "prompt": "Mark the Polars spike as blocking the export story in our tracker.",
+  "expected": "tracker",
+  "source": "generated"
+ },
+ {
+  "prompt": "What's the next unblocked story in the tracker?",
+  "expected": "tracker",
+  "source": "generated"
+ },
+ {
+  "prompt": "Comment on PROJ-41 that the migration is done and link the merge request.",
+  "expected": "tracker",
+  "source": "generated"
+ },
+ {
+  "prompt": "List the open issues labelled bug.",
+  "expected": "tracker",
+  "source": "generated"
+ },
+ {
+  "prompt": "Label #7 as a spike and add it to the board.",
+  "expected": "tracker",
+  "source": "generated"
+ },
+ {
+  "prompt": "Our GitLab backlog has two issues for the same thing, link them as duplicates.",
+  "expected": "tracker",
+  "source": "generated"
+ },
+ {
+  "prompt": "Which open tickets are waiting on something else?",
+  "expected": "tracker",
+  "source": "generated"
+ },
+ {
+  "prompt": "Take the stories we just split and get them onto the board in the right order, with the blockers wired up.",
+  "expected": "tracker",
+  "source": "generated"
  }
 ]
