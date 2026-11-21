@@ -7,9 +7,11 @@ metadata:
 ---
 # Build
 
-* **Read the code the change touches first:** the exact names, paths and the data's real shape.
+* **Read the code the change touches first:** the exact names, paths and the data's real shape, what to reuse and the patterns to follow.
 * **Ask the design decisions only the person can make,** after reading the code and its decision records: who reads or sees the result and the least they need; where it is stored and who owns it; what one run costs; what a failed or half-finished run leaves behind; what is out of scope. Ask at the level they know, never an implementation choice they would need the code to judge. Decide the rest as `Decided: X, because Y`, and mark which of your decisions are hard to reverse.
+* **Sketch the components and how they connect** when the change spans more than one; this is the design the pre-mortem attacks.
 * **Pre-mortem the design,** the person's or yours, before building on it: strongest objection first, each pinned to a file, caller or real input you checked. Skip style and cases nothing can produce. Ask about a one-way door; give any other objection one line, then build as asked.
+* **Plan small steps** when the change does not fit one sentence: each a readable diff, risk rising down the list, a commit before each risky one.
 * **Have a fresh subagent review a large plan** once, on your strongest model, by [references/design-review.md](references/design-review.md).
 * **Build on a new branch in its own git worktree,** never in the person's checkout.
 * **Red first:** when the frame has acceptance criteria or a bug's reproduction, read [references/tests.md](references/tests.md) before writing code: one test per criterion example, each seen failing on its assertion, committed alone as `test(red): <title>`; after that commit a test changes only with the user's word. A change with no new rule keeps its `Done when:` line.

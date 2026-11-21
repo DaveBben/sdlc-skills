@@ -8,10 +8,10 @@ metadata:
 # Frame
 
 * **Treat a story or bug report in the request as already framed:** ask only what it leaves open.
-* **Grill a vague request,** one whose readings lead to materially different work: the goal and why, and the constraints, each question with a concrete case. A question that hangs on an open answer waits a round.
+* **Grill a vague request,** one whose readings lead to materially different work: who it is for and the job they are trying to get done, why, and the constraints, each question with a concrete case. A question that hangs on an open answer waits a round.
 * **Ask why** when a request names a fix but not the problem (XY problem).
 * **Say where the request, the code and its docs disagree.** Between code and docs, trust the code.
-* **Probe the edge cases:** none, one and many; duplicates, order, ties and what counts as equal (case, rounding, time zone); a second or missed run; one bad item in a batch; what expires, leaks or costs money unattended; what the person sees and what is saved when another system fails; a person not allowed to act.
+* **Probe the edge cases:** none, one and many; duplicates, order, ties and what counts as equal (case, rounding, time zone); a second or missed run; one bad item in a batch; the format each side of a boundary expects; empty, huge and malformed input; untrusted input; what expires, leaks or costs money unattended; what the person sees and what is saved when another system fails; a person not allowed to act.
 * **Mark each answer** about an unfamiliar library or API `doc`, with the link, or `memory`.
 * **Spike first** when an unknown that questions and docs cannot settle could change the plan: load the spike skill.
 * **Split a change too big for one merge request** into vertical slices, each written as a story with the story skill.
