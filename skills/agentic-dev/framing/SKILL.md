@@ -3,12 +3,13 @@ name: framing
 description: "Use first, before editing any file, for every request that changes code, configuration, dependencies or tooling, however small, clear or casually phrased, even a one-line change or a quick tweak to a value, format or threshold: a feature, a bug or wrong output to fix, a refactor, deleting unused code, a new flag, adding a tool or bumping a dependency, a change to how something is computed, or implementing a story or a spec section, like 'add a CSV export', 'the export crashes on an empty order list, fix it', 'rename total to order_total everywhere' or 'bump the requests dependency'. Not for reviewing a finished change, an experiment, or a question about code. Agrees with the person what to build and how done is checked, grilling a vague request, then hands to the building skill to build it now, or to the story skill to write it down for later."
 license: MIT
 metadata:
-  version: "5.1.0"
+  version: "5.1.1"
 ---
 # Frame
 
 * **Treat a story or bug report in the request as already framed:** ask only what it leaves open.
 * **Grill a vague request,** one whose readings lead to materially different work: who it is for and the job they are trying to get done, why, and the constraints, each question with a concrete case. A question that hangs on an open answer waits a round.
+* **Pin each overloaded term to one meaning** (ubiquitous language), checked against the project's glossary and the code: does "account" mean the customer or the user; is "the table" a table, or a view with a row per item per night?
 * **Ask why** when a request names a fix but not the problem (XY problem).
 * **Say where the request, the code and its docs disagree.** Between code and docs, trust the code.
 * **Probe the edge cases:** none, one and many; duplicates, order, ties and what counts as equal (case, rounding, time zone); a second or missed run; one bad item in a batch; the format each side of a boundary expects; empty, huge and malformed input; untrusted input; what expires, leaks or costs money unattended; what the person sees and what is saved when another system fails; a person not allowed to act.
