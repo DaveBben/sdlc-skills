@@ -1,74 +1,74 @@
 [
  {
   "prompt": "I want to add an additional criteria to the pricing total. In order for a line to count, it needs to also have a quantity of at least 10",
-  "expected": "story",
+  "expected": "building",
   "source": "mined"
  },
  {
   "prompt": "I want to store a checksum of each order that enters orders.csv for the first time.",
-  "expected": "story",
+  "expected": "building",
   "source": "mined"
  },
  {
   "prompt": "In this repo I want to create a new python script for exporting the orders from export.py to a JSON file",
-  "expected": "story",
+  "expected": "building",
   "source": "mined"
  },
  {
   "prompt": "I actually want to lower the bar from 50% to 20% or greater in pricing.py. The reason being is the following order should have been discounted but wasn't",
-  "expected": "story",
+  "expected": "building",
   "source": "mined"
  },
  {
   "prompt": "Let’s actually remove the 25 row limit and export all the orders",
-  "expected": "story",
+  "expected": "building",
   "source": "mined"
  },
  {
   "prompt": "Fix that bug. Then commit all changes and merge branch into main.",
-  "expected": "story",
+  "expected": "building",
   "source": "mined",
   "needs_context": true
  },
  {
   "prompt": "Handle the following bug: the export_orders crashes on an empty order list",
-  "expected": "story",
+  "expected": "building",
   "source": "mined"
  },
  {
   "prompt": "Implement the following story: docs/stories/export.md",
-  "expected": "story",
+  "expected": "building",
   "source": "mined"
  },
  {
   "prompt": "Install gitleaks",
-  "expected": "chore",
+  "expected": "building",
   "source": "mined"
  },
  {
   "prompt": "I merged into main. In the SPEC.md make a note that we do not need a PR workflow for this repo and can merge straight to main",
-  "expected": "chore",
+  "expected": "building",
   "source": "mined",
   "needs_context": true
  },
  {
   "prompt": "Implement the remaining story",
-  "expected": "story",
+  "expected": "building",
   "source": "mined"
  },
  {
   "prompt": "build the export story",
-  "expected": "story",
+  "expected": "building",
   "source": "mined"
  },
  {
   "prompt": "Build this as a fix, but we still have 68% of the orders not being exported?",
-  "expected": "story",
+  "expected": "building",
   "source": "mined"
  },
  {
   "prompt": "No need to add the extra ceremony, just fix it now. Post the PR, I'll merge it.",
-  "expected": "story",
+  "expected": "building",
   "source": "mined",
   "needs_context": true
  },
@@ -90,93 +90,73 @@
  },
  {
   "prompt": "Explain to me what a rounding mode is and when I would use half-up?",
-  "expected": "explaining",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "Explain the dataflow of this whole export to me at a high level using a diagram",
-  "expected": "explaining",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "How is a line total currently calculated. Walk me through the data flow with an example scenario.",
-  "expected": "explaining",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "Question around best practices.\n\nExplain the purpose more of a design document. At one point is it built? How does it differ from a PRD and Architecture Document?",
-  "expected": "explaining",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "Why do I need the findings.md file when I could just put it in SPEC.md?",
-  "expected": "explaining",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "What are design things that I'm probably not thinking about which I should be",
-  "expected": "explaining",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "what does check actually do?",
-  "expected": "explaining",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "What's the tradeoff of running the linter through uvx?",
-  "expected": "explaining",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "I feel like the order in the export should be a 4. Why is it a three?",
-  "expected": "explaining",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "How is rounding adjacent to money handling?",
-  "expected": "explaining",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "What is the typical approach to solving this problem?",
-  "expected": "explaining",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "What steps of these do not require an LLM judgement?",
-  "expected": "explaining",
+  "expected": null,
   "source": "mined",
   "needs_context": true
  },
  {
-  "prompt": "file a chore for the pip-audit failures",
-  "expected": "chore",
-  "source": "mined"
- },
- {
-  "prompt": "So identify the cause of this bug: the export writes a blank file when there are no orders",
-  "expected": "bug",
-  "source": "mined"
- },
- {
-  "prompt": "Create me a new spike, addressing a question of whether export.py should write Parquet instead of CSV right now, but I don't really know if that's the right choice",
-  "expected": "spike",
-  "source": "mined"
- },
- {
   "prompt": "Let's launch a spike to test early results. Something we can get an early reading back within an hour",
-  "expected": "spike",
-  "source": "mined"
- },
- {
-  "prompt": "I think another spike I wanna create is determining whether or not orders will be validated before they're exported",
-  "expected": "spike",
+  "expected": "building",
   "source": "mined"
  },
  {
   "prompt": "Execute the following spike: docs/stories/export.md",
-  "expected": "spike",
+  "expected": "building",
   "source": "mined"
  },
  {
@@ -187,11 +167,6 @@
  {
   "prompt": "What directory are u in?",
   "expected": null,
-  "source": "mined"
- },
- {
-  "prompt": "Close this issue",
-  "expected": "tracker",
   "source": "mined"
  },
  {
@@ -236,102 +211,102 @@
  },
  {
   "prompt": "add a CSV export for refunds too",
-  "expected": "story",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "the export crashes on an empty order list",
-  "expected": "story",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "rename total to order_total everywhere",
-  "expected": "chore",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "bump the requests dependency",
-  "expected": "chore",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "implement the story in docs/stories/export.md",
-  "expected": "story",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "pricing.total gives the wrong answer when a line has quantity 0, sort it out",
-  "expected": "story",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "can you make export_orders skip cancelled orders",
-  "expected": "story",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "add a --dry-run flag to the export",
-  "expected": "story",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "refactor pricing.py so the discount logic isnt inline",
-  "expected": "chore",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "um so i want the export to also include the customer email column and maybe sort by date but only if its not too hard just go and do it",
-  "expected": "story",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "Please implement the changes described in SPEC.md section 3.",
-  "expected": "story",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "export.py shuld quote fields that contain commas",
-  "expected": "story",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "upgrade to python 3.13 and fix whatever breaks",
-  "expected": "chore",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "total() ignores tax, fix",
-  "expected": "story",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "We need VAT support in pricing. Make it so.",
-  "expected": "story",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "remove the dead code in export.py",
-  "expected": "chore",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "add type hints to pricing.py",
-  "expected": "chore",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "hey the csv has windows line endings, i need unix ones, can you change that",
-  "expected": "story",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "Task from orchestrator: implement ticket EXP-14 (export orders as UTF-8 with BOM). Start now.",
-  "expected": "story",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "make total() round to 2 decimals half-up instead of banker's rounding",
-  "expected": "story",
+  "expected": "building",
   "source": "generated"
  },
  {
@@ -583,402 +558,162 @@
  },
  {
   "prompt": "explain how total() in pricing.py works",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "why did the test in tests/test_pricing.py fail?",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "how does export_orders decide which rows to write",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "what do you think of my approach in docs/design.md",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "is it a good idea to store money as floats",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "I don't really get decorators, can you walk me through them",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "what does git rebase do?",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "why is the csv module better than joining strings with commas",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "explain the difference between a mock and a stub like im new to this",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "so basically how come my export is slow, like what is actually happening when it writes a file, i dont get it",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "Walk me through the design in docs/design.md.",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "what's the difference between SPEC.md and design.md supposedly",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "how does python decide which rounding to use in round()",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "is 40 percent test coverage bad? what does that number actually tell me",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "Can you give me feedback on findings.md? Is the reasoning sound?",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "why would total() return a float here",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "what is idempotency and does my export need it",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "explian what the log lines in the .log files mean",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "help me understand why the pricing tests are structured like that",
-  "expected": "explaining",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "which is better here, a dataclass or a dict, and why",
-  "expected": "explaining",
-  "source": "generated"
- },
- {
-  "prompt": "write a story for exporting orders to CSV",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "critique the story in docs/stories/export.md",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "break this PRD into stories",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "this is too big for one merge request, cut it down",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "how many weeks for the remaining stories",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "draft acceptance criteria for the refund feature, for the team to pick up next sprint",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "split the epic in SPEC.md into vertical slices",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "turn these notes into a ticket for someone else to build",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "is this story any good? it feels vague",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "Create user stories covering section 2 of SPEC.md, one per business rule.",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "we need a ticket for multi-currency pricing, dont build it now",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "how long will the 7 stories left in docs/stories take at our pace",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "write up the VAT work as something we can hand to Priya next week",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "storie for async export pls, with acceptance critera",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "Orchestrator task: decompose the export epic into stories sized for single MRs and output them to docs/stories/.",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "our PM gave me this big feature, help me chop it into mergeable pieces",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "add worked examples to the acceptance criteria in docs/stories/export.md",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "forecast delivery for the backlog given we merge about two a week",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "can you write this as a ticket: customers want order exports filtered by date",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "review my story, are the criteria testable",
-  "expected": "story",
-  "source": "generated"
- },
- {
-  "prompt": "file a bug: export drops the last row",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "write this up, don't fix it yet",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "can you reproduce what the customer saw with the empty export",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "triage the open bugs in findings.md",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "how did this get past the tests and the review",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "why do we keep getting bugs like this in pricing",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "customer says their totals are off by a cent. just reproduce it and tell me how bad it is",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "log a bug for the missing header row in the csv, i'll get to it later",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "Create a bug report for the unicode crash in export_orders with severity and repro steps.",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "can you confirm this is a real bug before I raise it with the team",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "we shipped a rounding error to prod last week, what check should have caught it",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "i found something odd, total() returns negative for a refund line. dont change anything, just write a repro test and report it",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "Orchestrator: reproduce the reported symptom (CSV missing quotes) with a failing check and file the report. Do not fix.",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "bugg report for the export timeout pls, no fixing",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "prioritise these three issues, which is the worst",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "is this a bug or expected behaviour? total() with an empty list returns 0",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "somebody reported that export.py overwrites the old file silently, can you verify and write it up",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "escaped defect analysis: how did the duplicate-orders issue reach users",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "what severity would you give the thing in findings.md item 4, and should we fix it this sprint",
-  "expected": "bug",
-  "source": "generated"
- },
- {
-  "prompt": "document the failing case so QA can track it",
-  "expected": "bug",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "do a spike on async export",
-  "expected": "spike",
-  "source": "generated"
- },
- {
-  "prompt": "how hard would it be to make the export async",
-  "expected": "spike",
-  "source": "generated"
- },
- {
-  "prompt": "would Postgres full-text search be fast enough",
-  "expected": "spike",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "try the decimal module and see if it fixes the rounding",
-  "expected": "spike",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "quick experiment: can pandas write this csv faster than the csv module",
-  "expected": "spike",
-  "source": "generated"
- },
- {
-  "prompt": "how much work to move pricing to use Decimal everywhere",
-  "expected": "spike",
-  "source": "generated"
- },
- {
-  "prompt": "what would adopting polars do to this codebase",
-  "expected": "spike",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "could we stream the export instead of building it in memory? try it and see",
-  "expected": "spike",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "prototype an export to parquet, throwaway is fine",
-  "expected": "spike",
-  "source": "generated"
- },
- {
-  "prompt": "is it feasible to generate the export as xlsx",
-  "expected": "spike",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "spike: does orjson speed up serialising 1M orders? timebox 30 min",
-  "expected": "spike",
-  "source": "generated"
- },
- {
-  "prompt": "i wonder if sqlite could replace the csv files, can you check if that would work",
-  "expected": "spike",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "Orchestrator: run a timeboxed spike on whether multiprocessing speeds up export_orders; delete the code after and report the finding.",
-  "expected": "spike",
-  "source": "generated"
- },
- {
-  "prompt": "how big a change would it be to support multiple currencies",
-  "expected": "spike",
-  "source": "generated"
- },
- {
-  "prompt": "will switching to attrs break our tests?",
-  "expected": "spike",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "hack together something to see if gzip on the fly works with export_orders",
-  "expected": "spike",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "rough estimate of effort to add i18n, try a bit of it first",
-  "expected": "spike",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "spik on moving the pricing rules to a yaml file, see if it works",
-  "expected": "spike",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "can we do this without a db, just test it quickly in a scratch dir",
-  "expected": "spike",
+  "expected": "building",
   "source": "generated"
  },
  {
   "prompt": "um so i was thinking maybe we could cache total() results and i want to know if that would actually help or just add complexity can you try something",
-  "expected": "spike",
+  "expected": "building",
   "source": "generated"
  },
  {
@@ -1033,7 +768,7 @@
  },
  {
   "prompt": "format pricing.py with black",
-  "expected": "chore",
+  "expected": "building",
   "source": "generated"
  },
  {
@@ -1082,23 +817,8 @@
   "source": "generated"
  },
  {
-  "prompt": "Write up the empty-export crash as a bug, don't fix it",
-  "expected": "bug",
-  "source": "confusion"
- },
- {
-  "prompt": "How hard would it be to make export async?",
-  "expected": "spike",
-  "source": "confusion"
- },
- {
   "prompt": "The empty-export crash: fix it",
-  "expected": "story",
-  "source": "confusion"
- },
- {
-  "prompt": "Write a story for the empty-export crash fix so Sam can pick it up next week",
-  "expected": "story",
+  "expected": "building",
   "source": "confusion"
  },
  {
@@ -1108,7 +828,7 @@
  },
  {
   "prompt": "Why does total() round that way? I want to understand it before I touch it.",
-  "expected": "explaining",
+  "expected": null,
   "source": "confusion"
  },
  {
@@ -1118,67 +838,12 @@
  },
  {
   "prompt": "Is it feasible to swap the csv module for pandas? Try it quick and tell me.",
-  "expected": "spike",
+  "expected": "building",
   "source": "confusion"
  },
  {
   "prompt": "The plan above is agreed, go ahead and build it",
   "expected": "building",
   "source": "confusion"
- },
- {
-  "prompt": "How did the empty-order crash get past our tests and review?",
-  "expected": "bug",
-  "source": "confusion"
- },
- {
-  "prompt": "Close issue #12 in GitHub, it's fixed on main.",
-  "expected": "tracker",
-  "source": "generated"
- },
- {
-  "prompt": "Put the three order-history stories in docs/stories into Gitea as issues.",
-  "expected": "tracker",
-  "source": "generated"
- },
- {
-  "prompt": "Mark the Polars spike as blocking the export story in our tracker.",
-  "expected": "tracker",
-  "source": "generated"
- },
- {
-  "prompt": "What's the next unblocked story in the tracker?",
-  "expected": "tracker",
-  "source": "generated"
- },
- {
-  "prompt": "Comment on PROJ-41 that the migration is done and link the merge request.",
-  "expected": "tracker",
-  "source": "generated"
- },
- {
-  "prompt": "List the open issues labelled bug.",
-  "expected": "tracker",
-  "source": "generated"
- },
- {
-  "prompt": "Label #7 as a spike and add it to the board.",
-  "expected": "tracker",
-  "source": "generated"
- },
- {
-  "prompt": "Our GitLab backlog has two issues for the same thing, link them as duplicates.",
-  "expected": "tracker",
-  "source": "generated"
- },
- {
-  "prompt": "Which open tickets are waiting on something else?",
-  "expected": "tracker",
-  "source": "generated"
- },
- {
-  "prompt": "Take the stories we just split and get them onto the board in the right order, with the blockers wired up.",
-  "expected": "tracker",
-  "source": "generated"
  }
 ]
