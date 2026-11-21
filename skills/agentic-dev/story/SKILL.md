@@ -3,7 +3,7 @@ name: story
 description: "Use first, before editing any file, for every request that changes code, configuration, dependencies or tooling, however small, clear or casually phrased, even a one-line change or a quick tweak to a value, format or threshold: a feature, a bug or wrong output to fix, a refactor, deleting unused code, a new flag, adding a tool or bumping a dependency, or implementing a story or a spec section, like 'add a CSV export', 'the export crashes on an empty order list, fix it', 'rename total to order_total everywhere' or 'implement docs/stories/export.md'. Also when work is to be written down for later or for others, critiqued, split or forecast, like 'write a story for X', 'critique the story in docs/stories/x.md', 'break this PRD into stories' or 'how many weeks for the remaining stories'. Not for reviewing a finished change, an experiment, or a question about code. Every change starts as a user story: who it is for, why, and acceptance criteria; then the building skill builds it now, or it is written down for later."
 license: MIT
 metadata:
-  version: "6.3.0"
+  version: "6.5.0"
 ---
 # Story
 
@@ -58,5 +58,6 @@ Check the request, and any story you are given or write, for these. Each one fou
 ## Play back and hand off
 
 * **Play back** the goal, the criteria and what this change will not do. End the play-back by asking whether to build it now or write it down for later. "I want to build X" says what the person wants, not when.
+* **More than one story:** write each down by [references/write.md](references/write.md), in build order, and build at most the first now. Each later story is built in a fresh session: several in one session run out of context.
 * **Built now:** offer up to 3 parts to explore, new to this codebase or to the person, each with the question that matters for this task. Then load the building skill; the story stays in the conversation, with no file.
 * **For later or for others:** name up to 3 unknowns that could change the build fundamentally, to explore, test or verify. File each as a spike with the spike skill, listed under the story's `Dependencies` as blocking it, then write the story down by [references/write.md](references/write.md).
