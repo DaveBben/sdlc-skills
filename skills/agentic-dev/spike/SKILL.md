@@ -3,7 +3,7 @@ name: spike
 description: "Use first, before answering or building, when the person asks whether something would work, how much work or how hard a change would be, whether it would break something, or what adopting a library or platform would do to the codebase, or wants a prototype, a quick test in a scratch directory, an experiment or a spike filed for later, such as 'do a spike on X', 'how hard would it be to make the export async', 'would Postgres full-text search be fast enough' or 'try the decimal module and see if it fixes the rounding'. Not for the real change: a request to build it is the building skill's. Frames a question that can fail and the decision it changes, runs throwaway code in a scratch directory inside a timebox, records the finding and deletes the code."
 license: MIT
 metadata:
-  version: "5.1.0"
+  version: "6.0.0"
 ---
 # Spike
 
@@ -45,7 +45,7 @@ Write each finding as it surfaces, in `docs/spikes/<question-slug>.md` or on the
 
 * **Stop when the timebox is spent:** mark it inconclusive and give your pick of extend by a stated amount, drop or defer.
 * **Delete the code** and its worktree, and commit the findings file alone. Kept code is an exception the `Code:` line names, never merged as it is.
-* **To build:** the real change starts from the finding in a fresh session, at the framing skill. `Quirks` and `Open questions` go into its frame; `Follow-ups` become stories by the `story` skill.
+* **To build:** the real change starts from the finding in a fresh session, at the story skill. `Quirks` and `Open questions` go into its frame; `Follow-ups` become stories by the `story` skill.
 
 ## File one for later
 

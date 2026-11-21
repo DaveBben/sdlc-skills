@@ -21,7 +21,7 @@ import argparse, concurrent.futures as cf, json, os, shutil, subprocess, sys, ti
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLUGIN, RUNS = os.path.join(REPO, "plugins", "agentic-dev"), os.path.expanduser("~/.sdlc-trigger-runs")
-SKILLS = {"bug", "building", "explaining", "framing", "reflecting", "reviewing", "spike", "story"}
+SKILLS = {"bug", "building", "explaining", "reflecting", "reviewing", "spike", "story"}
 AGENTS = set()  # the plugin ships no agents; reviewers are reference files its skills launch
 
 FIXTURE = {
@@ -65,25 +65,25 @@ CASES = [
     # Talk about review, with no finished change to review, gets none.
     ("What should a good code review checklist cover?", "explaining"),  # a question about review, not a change to review
     ("Summarise what my uncommitted change does, for a pull request description.", None),
-    ("Bump the requests dependency to the latest version.", "framing"),
+    ("Bump the requests dependency to the latest version.", "story"),
     # Held out.
-    ("Can you wire up a new endpoint that returns order totals as JSON?", "framing"),
-    ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "framing"),
+    ("Can you wire up a new endpoint that returns order totals as JSON?", "story"),
+    ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "story"),
     ("Why does total give 9.999999 instead of 10 for some carts? I want to understand it before anything changes.", "explaining"),
     ("How does the export decide which columns to write?", "explaining"),
     # Held out.
     ("I don't get what a merge base is. Walk me through it.", "explaining"),
     # A change about to start, or a trivial one, gets no retro.
-    ("Add a CSV export to the orders page.", "framing"),
-    ("The export crashes on an empty order list. Fix it.", "framing"),
-    ("Rename total to order_total everywhere.", "framing"),
+    ("Add a CSV export to the orders page.", "story"),
+    ("The export crashes on an empty order list. Fix it.", "story"),
+    ("Rename total to order_total everywhere.", "story"),
     ("Write a story for letting customers download their order history.", "story"),
     ("Break the order-history PRD in docs/prd/history.md into stories.", "story"),
     ("Critique the story in docs/stories/export.md before the team picks it up.", "story"),
     # Held out.
     ("Order history is far too much for one go. Carve it into pieces that each ship on their own, for the backlog.", "story"),
-    # Building a story, or a question about stories, is not the story skill's.
-    ("Implement the story in docs/stories/export.md.", "framing"),
+    # Implementing a story starts at the story skill; a question about stories is not the story skill's.
+    ("Implement the story in docs/stories/export.md.", "story"),
     ("Management wants a date: how many weeks will the remaining order-history stories take?", "story"),
     ("What makes a good acceptance criterion?", "explaining"),
     ("Do a spike on using Polars for the export.", "spike"),
@@ -92,7 +92,7 @@ CASES = [
     # Held out.
     ("Before we commit to sqlite, knock together something disposable to find out if it copes with our order volume.", "spike"),
     # The real change, or a question about spikes, is not the spike skill's.
-    ("Make the export async.", "framing"),
+    ("Make the export async.", "story"),
     ("What is a spike, and when is one worth running?", "explaining"),
     ("File a bug: the export writes a blank file when there are no orders. Don't fix it yet.", "bug"),
     ("Customers say the export sometimes drops the last order. Reproduce it and write it up; no fix for now.", "bug"),
@@ -100,7 +100,7 @@ CASES = [
     # Held out.
     ("The empty-cart crash went live last week although CI was green and two people approved it. What let it through?", "bug"),
     # A fix, or a question about bug reports, is not the bug skill's; so is 'The export crashes ... Fix it.' above.
-    ("total returns 9.99 for a 10.00 cart. Find the cause and patch it.", "framing"),
+    ("total returns 9.99 for a 10.00 cart. Find the cause and patch it.", "story"),
     ("What belongs in a good bug report?", "explaining"),
     ("I just bumped the export timeout in AGENTS.md from 30 to 60 seconds. Done.", None),
     ("What does pricing.py do?", "explaining"),

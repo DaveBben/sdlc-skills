@@ -1,68 +1,57 @@
 ---
 name: story
-description: "Use first when work is to be written down or cut up for later or for other people instead of built now: writing a user story, a chore or a ticket, or writing work up for someone else to pick up, or its acceptance criteria, reviewing or critiquing a story someone wrote, splitting an epic, a PRD or a large feature into stories, or forecasting when a set of stories will be finished, such as 'write a story for X', 'critique the story in docs/stories/x.md', 'break this PRD into stories', 'this is too big for one merge request, cut it down' or 'how many weeks for the remaining stories'. Not for building a story: that is the building skill's. A story is a short frame written ahead of the build for one vertical slice that fits one merge request: why, scope, and one acceptance criterion per business rule, each with a worked example and a check someone can run."
+description: "Use first, before editing any file, for every request that changes code, configuration, dependencies or tooling, however small, clear or casually phrased, even a one-line change or a quick tweak to a value, format or threshold: a feature, a bug or wrong output to fix, a refactor, deleting unused code, a new flag, adding a tool or bumping a dependency, or implementing a story or a spec section, like 'add a CSV export', 'the export crashes on an empty order list, fix it', 'rename total to order_total everywhere' or 'implement docs/stories/export.md'. Also when work is to be written down for later or for others, critiqued, split or forecast, like 'write a story for X', 'critique the story in docs/stories/x.md', 'break this PRD into stories' or 'how many weeks for the remaining stories'. Not for reviewing a finished change, an experiment, or a question about code. Every change starts as a user story: who it is for, why, and acceptance criteria; then the building skill builds it now, or it is written down for later."
 license: MIT
 metadata:
-  version: "5.1.0"
+  version: "6.0.0"
 ---
 # Story
 
-* **Write no story** for work that fits a sentence and one merge request and is built now: say so in one line.
-* **Send a defect** to the `bug` skill, and an unknown that blocks sizing to the `spike` skill.
+Every change starts as a user story: who it is for, why, and how done is checked. It goes to a file only when it is for later or for others.
 
-## Write one
+## Frame
 
-Frame it with the framing skill's grilling, edge cases and acceptance criteria, at the business level. Read the code only for what is already built or decided that shapes the story, and tell the person each in one line with `file:line`.
+* **Treat a story or bug report in the request as already framed:** ask only what it leaves open.
+* **Grill a vague request,** one whose readings lead to materially different work: who it is for and the job they are trying to get done, why, and the constraints, each question with a concrete case. A question that hangs on an open answer waits a round.
+* **Pin each overloaded term to one meaning** (ubiquitous language), checked against the project's glossary and the code: does "account" mean the customer or the user; is "the table" a table, or a view with a row per item per night?
+* **Say where the request, the code and its docs disagree.** Between code and docs, trust the code.
+* **Probe the edge cases:** none, one and many; duplicates, order, ties and what counts as equal (case, rounding, time zone); a second or missed run; one bad item in a batch; the format each side of a boundary expects; empty, huge and malformed input; untrusted input; what expires, leaks or costs money unattended; what the person sees and what is saved when another system fails; a person not allowed to act.
+* **Mark each answer** about an unfamiliar library or API `doc`, with the link, or `memory`.
+* **Spike first** when an unknown that questions and docs cannot settle could change the plan: load the spike skill.
 
-```markdown
-# <what a person can do once this merges: an outcome, not a task>
+## How a story fails
 
-Why: <who hits this, what they do today, why now; 1 or 2 sentences>
+Check the request, and any story you are given or write, for these. Each one found is a question for the person, or a gap you fill with its reason.
 
-## Context
-
-<2 or 3 sentences for a reader outside the team: this part of the product today, and related work or decisions>
+* **A solution, not a problem** (XY problem): "add a Redis cache" where the need is "exports show data more than 15 minutes old". Ask why.
+* **"As a user":** a role that hides who it is for and the job they are trying to get done.
+* **No "so that", or one you wrote:** the why is the person's.
+* **Several asks joined by "and":** each is its own vertical slice.
+* **A layer, not a vertical slice:** no page, route or command where a person or test meets the change.
+* **Vague words** such as fast, easy, robust or "handles errors": each needs a number or a stated result.
+* **The story sentence without rules:** the rules and their examples carry the build, not the sentence.
+* **A Given reachable several ways, or a Then that states part of the result:** tests built on it pass and miss the rule.
+* **Design in the story:** files, tables or layout before the rules are agreed. How is the build's job.
+* **Too big:** several features, more than about 400 changed lines or 5 criteria, or nobody can size it. Split it into vertical slices by [references/split.md](references/split.md).
+* **Conflicts:** a rule another story also states, or one main already meets.
 
 ## Acceptance criteria
 
-1. <one business rule>
-   Given a cart of 3 items at 10.00, added through the product page
-   When the shopper applies code SAVE10
-   Then the total shows 27.00 and the order summary lists SAVE10 −3.00
-   Check: <the command or test that will show it, or `by eye: <what to look at>`>
+The person writes the criteria. Critique them against these rules and fill the gaps.
 
-## Out of scope
+* **One per business rule,** in the product's words, measurable: not "is fast" but "under 200 ms at 1,000 rows".
+* **A Given/When/Then example in real values.** The Given says how its state came about, the When is one action, and the Then states every result the rule decides. A rule with several cases gets a table, one row per case.
+* **A check someone can run or watch.** When the change reads real data or calls another system, one check runs on real input, read-only or as a dry run.
+* **Follow the person's rule,** not what the code does today.
+* **Add a criterion with its reason,** why you think it is needed, and keep it only once the person agrees.
+* **Mark an open question `unknown`.**
+* **No new rule** (a rename, refactor, dependency bump or config value): no story and no criteria, one `Done when:` line, such as the existing tests unchanged and green. Before a refactor, add characterization tests where the tests miss the moved code.
 
-- <what a reader would expect here and this story will not do>
+## Play back and hand off
 
-## Dependencies
-
-- <who must review, sign off or supply data, and the wait; or the story this waits on>
-
-## Open questions
-
-- <one per line, with who can answer it>
-
-Reach: <the page, route or command where a person or test meets the new behaviour>
-Hint: <files or APIs to start from; optional, never a design>
-```
-
-* **Size it by INVEST,** where small means about 400 changed lines and a few days of work at most. More than about 5 criteria is usually two stories. Split a bigger story, or one nobody can size, by [references/split.md](references/split.md).
-
-## Review one
-
-Change nothing without its owner's yes. Report `<story>: <rule broken> — "<quoted text>" — <fix>` per finding, then `Ready: <stories with no finding>`. Check the framing skill's acceptance criteria rules, the size rule above, and these:
-
-* **Ready to build:** name each missing goal, why, scope or done-check.
-* **Reach:** a story with no entry point where a person or test meets the new behaviour is a layer, not a vertical slice.
-* **Dependencies:** name each other team it needs that no dependency line covers with who and how long.
-* **Duplicate rule:** a rule another story also states goes to one of them.
-* **Stale:** delete a criterion main already meets, naming the code or test; rewrite an example whose starting state main can no longer reach.
-* **In flight:** leave a story with an open or merged merge request alone; a change now is a question for that build.
-
-## Where it lives, where it goes
-
-* **Lives** in the team's tracker when a tool here reaches it, one issue per story; else `docs/stories/<slug>.md`. File only what the person approved.
-* **To build:** one story, one merge request. Its criteria are the build's done-check, each ticked by seeing its `Check:` run. They and its `Out of scope` go into the review's `story.md` in the story's words and numbering.
-* **After the merge** it is a record, never edited. A miss or a change of mind is a new story.
+* **Play back** the goal, the criteria and what this change will not do. End the play-back by asking whether to build it now or write it down for later. "I want to build X" says what the person wants, not when.
+* **Offer up to 3 parts to explore,** new to this codebase or to the person, each with the question that matters for this task. None when there is no new rule.
+* **Built now:** the story stays in the conversation, with no file. Load the building skill.
+* **For later or for others:** write it down by [references/write.md](references/write.md).
+* **Critique a story someone wrote** by [references/write.md](references/write.md).
 * **How long will it take:** [references/forecast.md](references/forecast.md).
