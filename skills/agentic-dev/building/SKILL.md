@@ -3,12 +3,12 @@ name: building
 description: "Use once the story skill has framed a change and the person chose to build it now, or when the person says a change framed or agreed earlier in this session should now be built, such as 'that's agreed, go ahead and build it'. Never the first step for a new change to code: that is the story skill's. How to change code here: attack the design with a pre-mortem, make the smallest complete change in its own worktree, and call it done only when a check passed, then hand a non-trivial change to the reviewing skill."
 license: MIT
 metadata:
-  version: "6.0.0"
+  version: "6.0.1"
 ---
 # Build
 
 * **Read the code the change touches first:** the exact names, paths and the data's real shape, what to reuse and the patterns to follow.
-* **Ask the design decisions only the person can make,** after reading the code and its decision records: who reads or sees the result and the least they need; where it is stored and who owns it; what one run costs; what a failed or half-finished run leaves behind; what is out of scope. Ask at the level they know, never an implementation choice they would need the code to judge. Decide the rest as `Decided: X, because Y`, and mark which of your decisions are hard to reverse.
+* **Ask the design decisions only the person can make,** after reading the code and its decision records: who reads or sees the result and the least they need; where it is stored and who owns it; what one run costs; what a failed or half-finished run leaves behind; what is out of scope. Ask each one-way door the criteria imply, implementation choices included, such as "the criteria need each verdict stored: in the warehouse, in a new schema, or in a local SQLite file?". Decide the two-way doors yourself as `Decided: X, because Y`.
 * **Sketch the components and how they connect** when the change spans more than one; this is the design the pre-mortem attacks.
 * **Pre-mortem the design,** the person's or yours, before building on it: strongest objection first, each pinned to a file, caller or real input you checked. Skip style and cases nothing can produce. Ask about a one-way door; give any other objection one line, then build as asked.
 * **Plan small steps** when the change does not fit one sentence: each a readable diff, risk rising down the list, a commit before each risky one.
