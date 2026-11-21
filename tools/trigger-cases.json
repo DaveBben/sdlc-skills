@@ -1,74 +1,74 @@
 [
  {
   "prompt": "I want to add an additional criteria to the pricing total. In order for a line to count, it needs to also have a quantity of at least 10",
-  "expected": "framing",
+  "expected": "story",
   "source": "mined"
  },
  {
   "prompt": "I want to store a checksum of each order that enters orders.csv for the first time.",
-  "expected": "framing",
+  "expected": "story",
   "source": "mined"
  },
  {
   "prompt": "In this repo I want to create a new python script for exporting the orders from export.py to a JSON file",
-  "expected": "framing",
+  "expected": "story",
   "source": "mined"
  },
  {
   "prompt": "I actually want to lower the bar from 50% to 20% or greater in pricing.py. The reason being is the following order should have been discounted but wasn't",
-  "expected": "framing",
+  "expected": "story",
   "source": "mined"
  },
  {
   "prompt": "Let’s actually remove the 25 row limit and export all the orders",
-  "expected": "framing",
+  "expected": "story",
   "source": "mined"
  },
  {
   "prompt": "Fix that bug. Then commit all changes and merge branch into main.",
-  "expected": "framing",
+  "expected": "story",
   "source": "mined",
   "needs_context": true
  },
  {
   "prompt": "Handle the following bug: the export_orders crashes on an empty order list",
-  "expected": "framing",
+  "expected": "story",
   "source": "mined"
  },
  {
   "prompt": "Implement the following story: docs/stories/export.md",
-  "expected": "framing",
+  "expected": "story",
   "source": "mined"
  },
  {
   "prompt": "Install gitleaks",
-  "expected": "framing",
+  "expected": "story",
   "source": "mined"
  },
  {
   "prompt": "I merged into main. In the SPEC.md make a note that we do not need a PR workflow for this repo and can merge straight to main",
-  "expected": "framing",
+  "expected": "story",
   "source": "mined",
   "needs_context": true
  },
  {
   "prompt": "Implement the remaining story",
-  "expected": "framing",
+  "expected": "story",
   "source": "mined"
  },
  {
   "prompt": "build the export story",
-  "expected": "framing",
+  "expected": "story",
   "source": "mined"
  },
  {
   "prompt": "Build this as a fix, but we still have 68% of the orders not being exported?",
-  "expected": "framing",
+  "expected": "story",
   "source": "mined"
  },
  {
   "prompt": "No need to add the extra ceremony, just fix it now. Post the PR, I'll merge it.",
-  "expected": "framing",
+  "expected": "story",
   "source": "mined",
   "needs_context": true
  },
@@ -236,102 +236,102 @@
  },
  {
   "prompt": "add a CSV export for refunds too",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "the export crashes on an empty order list",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "rename total to order_total everywhere",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "bump the requests dependency",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "implement the story in docs/stories/export.md",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "pricing.total gives the wrong answer when a line has quantity 0, sort it out",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "can you make export_orders skip cancelled orders",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "add a --dry-run flag to the export",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "refactor pricing.py so the discount logic isnt inline",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "um so i want the export to also include the customer email column and maybe sort by date but only if its not too hard just go and do it",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "Please implement the changes described in SPEC.md section 3.",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "export.py shuld quote fields that contain commas",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "upgrade to python 3.13 and fix whatever breaks",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "total() ignores tax, fix",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "We need VAT support in pricing. Make it so.",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "remove the dead code in export.py",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "add type hints to pricing.py",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "hey the csv has windows line endings, i need unix ones, can you change that",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "Task from orchestrator: implement ticket EXP-14 (export orders as UTF-8 with BOM). Start now.",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
   "prompt": "make total() round to 2 decimals half-up instead of banker's rounding",
-  "expected": "framing",
+  "expected": "story",
   "source": "generated"
  },
  {
@@ -1092,7 +1092,7 @@
  },
  {
   "prompt": "The empty-export crash: fix it",
-  "expected": "framing",
+  "expected": "story",
   "source": "confusion"
  },
  {

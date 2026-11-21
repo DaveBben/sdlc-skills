@@ -15,8 +15,8 @@ Then start a new session, or run `/reload-plugins`. If you had the old `sdlc` pl
 
 | Step | Why it matters | Here |
 |---|---|---|
-| **1. Frame** | Agents rarely ask the question that matters, and a vague request gets built as a guess. Agree the goal, the why and a done-check you can watch run before any code. | The `framing` skill loads first for any change to code: it grills a vague request, writes one acceptance criterion per business rule with a Given/When/Then example, and looks where gaps hide (none, one and many; duplicates; a second run). |
-| **2. Explore** | Code built on an unchecked answer about an unfamiliar library fails late. Settle unknowns before you plan. | `framing` marks each answer `doc` or `memory` and names the parts that may be new to you. An unknown that questions cannot settle goes to the `spike` skill: a timeboxed throwaway experiment. |
+| **1. Frame** | Agents rarely ask the question that matters, and a vague request gets built as a guess. Agree the goal, the why and a done-check you can watch run before any code. | The `story` skill loads first for any change to code: every change starts as a user story, written to a file only when it is for later; it grills a vague request, writes one acceptance criterion per business rule with a Given/When/Then example, and looks where gaps hide (none, one and many; duplicates; a second run). |
+| **2. Explore** | Code built on an unchecked answer about an unfamiliar library fails late. Settle unknowns before you plan. | `story` marks each answer `doc` or `memory` and names the parts that may be new to you. An unknown that questions cannot settle goes to the `spike` skill: a timeboxed throwaway experiment. |
 | **3. Build** | Small steps give diffs you can read; the smallest complete change gives less to get wrong. | The `building` skill: a pre-mortem on your design, the smallest change that fully does the task, its own git worktree. |
 | **4. Verify** | "Done" on the agent's word is not done. | A hook runs your tests and linter every time the agent stops, and sends it back on failure. A commit that edits, deletes or skips an existing test asks you first. |
 | **5. Review** | An author misses their own mistakes, and an unchecked review is mostly noise. | The `reviewing` skill: one fresh reviewer, a second agent that proves or drops each finding, and test-first fixes of the blocking ones, within 3 rounds. |
@@ -26,7 +26,7 @@ After a non-trivial change, the `reflecting` skill reads the session and tells y
 ## At work
 
 * **`story`** writes, reviews or splits user stories for later or for others, and forecasts how long they will take. A story is a Frame written down for a reader outside the chat; work you build now needs none.
-* **`bug`** reproduces, reports and triages a bug without fixing it; fixing starts at `framing`.
+* **`bug`** reproduces, reports and triages a bug without fixing it; fixing starts at `story`.
 * **`spike`** frames a question that can fail, builds throwaway code and records what it found.
 * **`explaining`** loads when you want to understand something: one concrete case first, then the mechanism.
 

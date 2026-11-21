@@ -3,7 +3,7 @@ name: bug
 description: "Use first when a bug is to be reported, reproduced, confirmed, triaged or explained instead of fixed now: writing one up, checking whether behaviour is a bug or expected, confirming it is real before raising it, finding its cause to report it, judging severity or which of several issues matters most, such as 'file a bug: Y', 'write this up, don't fix it yet', 'can you reproduce what the customer saw', 'triage the open bugs', 'how did this get past the tests and the review' or 'why do we keep getting bugs like this'. Not for fixing one: a request to fix misbehaving code is the building skill's, even when it starts from a bug report. Reproduces the bug with a check that fails for the reported symptom, files a short report with a severity and a decision, and for a bug that reached users names the check that should have caught it."
 license: MIT
 metadata:
-  version: "5.1.0"
+  version: "6.0.0"
 ---
 # Bug
 
