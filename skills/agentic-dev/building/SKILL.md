@@ -3,7 +3,7 @@ name: building
 description: "Use first, before editing any file, for every request that changes code, configuration, dependencies or tooling, however small, clear or casually phrased: a feature, a bug or wrong output to fix, a new flag, a changed limit or format, a refactor, a rename, a dependency bump, CI or dev-tool setup, or implementing a story, ticket or spec section, like 'add a CSV export', 'the export crashes on an empty order list, fix it', 'rename total to order_total everywhere', 'implement docs/stories/export.md'. Not for reviewing a finished change, a question about code, or a throwaway experiment or spike, which is the prototyping skill's. Grills the request before any code for what the person does not know or has not said (silent assumptions, the walking skeleton, lifecycles, edge cases, failing integration points, one-way doors, untestable criteria), then builds test-first in its own worktree, done only when a check passed."
 license: MIT
 metadata:
-  version: "8.1.1"
+  version: "8.1.3"
 ---
 # Building
 
