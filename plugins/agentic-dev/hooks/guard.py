@@ -14,7 +14,11 @@
   * Silencer gate:   a commit that adds a line switching a type checker or linter off asks the person.
   * Test-tamper gate: a commit that changes or removes an assertion or a test in a test file the branch started
                      with, or adds a skip or expected-failure marker to a test, asks the person, once per line per branch.
-                     It and the leftovers and silencer gates read only the files the commit takes in.
+                     It and the leftovers, silencer and weak-assertion gates read only the files the commit takes in.
+  * Weak-assertion gate: a commit that adds a test checking no exact value, only that a result exists, is truthy,
+                     matches a snapshot or that a mock was called, asks the person.
+  * Already-passing gate: a `test(red)` commit adding a pytest test that already passes asks the person, unless the
+                     commit message names it with `already passing`.
   * Skill gate:      the first file edit in a repository in a session that loaded none of the building, prototyping
                      and reviewing skills, nor an xp-templates skill, asks the person, once per session.
   * Review gate:     opening a pull request, or merging a branch into the default branch, with more than RETRO_LINES
@@ -64,6 +68,12 @@ SKIP = re.compile(r"@pytest\.mark\.(?:skip|xfail)|\bpytest\.(?:skip|xfail)\(|@un
 # shortcut: one line at a time, so an expected value inside a multi-line literal or a parametrize row passes.
 TEST_DEF = re.compile(r"\bdef test|\b(?:it|test|describe)\(|\bfunc Test|#\[test\]|@Test\b")
 ASSERTION = re.compile(r"\bassert|\bexpect\(|\.should\b|\braises\(|\bt\.(?:Error|Fatal|Fail)|" + TEST_DEF.pattern)
+# An assertion of an exact value or an error; existence, truthiness, a snapshot or a mock call is not one.
+# shortcut: by pattern per line, so a helper that asserts for the test reads as weak; the gate asks, it does not refuse.
+EXACT = re.compile(r"\b(?:assert|expect|should|t\.Error|t\.Fatal)\w*\b.*(?:==|!=|<=|>=|\s[<>]\s|\bin\s|\bis\s+(?!not\b))"
+                   r"|\braises\(|Raises\(|\.to(?:Equal|StrictEqual|Be|HaveLength|Contain|Throw|MatchObject)\("
+                   r"|\.(?:equal|eql|equals)\(|\bassert(?:Equals?|In|Is|Raises|Throws)\b|\bassert_(?:eq|ne)!|\bif\b.*(?:!=|==)")
+PY_TEST = re.compile(r"^\s*(?:async\s+)?def (test\w*)")
 PROSE = (".md", ".txt", ".rst")
 CONFIG = (".json", ".toml", ".yaml", ".yml", ".ini", ".cfg", ".conf", ".env", ".lock")
 RETRO_LINES = 20  # this plugin's guess at "more than a couple of lines"; tune it
@@ -384,6 +394,40 @@ def commit_paths(root, parts):
     return staged | {f for f in changed if any(f == n or f.startswith(n + "/") or fnmatch.fnmatch(f, n) for n in names)}
 
 
+def weak_tests(rows):
+    """The (path, line, text) of each test the added rows define, body included, whose added lines assert no exact value."""
+    tests = []  # [def row, asserts an exact value, last line, body lines]
+    for path, n, text in rows:
+        if not TEST_FILE.search(path):
+            continue
+        if TEST_DEF.search(text):
+            tests.append([(path, n, text), "describe(" in text or bool(EXACT.search(text)), n, 0])
+        elif tests and tests[-1][0][0] == path and tests[-1][2] == n - 1:
+            tests[-1][1] = tests[-1][1] or bool(EXACT.search(text))
+            tests[-1][2], tests[-1][3] = n, tests[-1][3] + bool(text.strip())
+    return [t[0] for t in tests if not t[1] and t[3]]
+
+
+def already_passing(root, rows, message):
+    """Node ids of the pytest tests the added rows define that pass on the tree as it is, less those the message names."""
+    # shortcut: pytest only, whose `-rA` lists each passing test; add another runner when a repository needs it.
+    cmd, names = test_command(root) or "", {}
+    for path, _, text in rows:
+        m = PY_TEST.search(text)
+        if m and path.endswith(".py") and TEST_FILE.search(path):
+            names.setdefault(path, set()).add(m.group(1))
+    if not names or not cmd.endswith("pytest"):
+        return []
+    try:
+        r = subprocess.run(f"{cmd} -q -rA -p no:cacheprovider " + " ".join(map(shlex.quote, sorted(names))), shell=True,
+                           cwd=root, capture_output=True, text=True, errors="replace", timeout=CHECK_SECONDS)
+    except subprocess.TimeoutExpired:
+        return []
+    named = lambda name: name in message and "already passing" in message
+    return [i for i in re.findall(r"^PASSED (\S+)", r.stdout, re.M)
+            for name in [re.sub(r"\[.*", "", i).rsplit("::", 1)[-1]] if name in names.get(i.split("::")[0], ()) and not named(name)]
+
+
 def commit_gates(root, parts):
     paths = commit_paths(root, parts)
     rows = [r for r in added_lines(root) if paths is None or r[0] in paths]
@@ -396,6 +440,17 @@ def commit_gates(root, parts):
     if quiet:
         reasons.append(f"This commit switches a checker off: {show(quiet)}. Fix the type or lint finding instead; "
                        "approve only when it cannot be fixed.")
+    weak = weak_tests(rows)
+    if weak:
+        reasons.append(f"This commit adds tests that check no exact value: {show(weak)}. Assert the value the criterion's "
+                       "Then gives, not only that a result exists, is truthy, matches a snapshot or that a mock was called; "
+                       "approve only when a helper asserts it.")
+    message = " ".join(parts)
+    passing = already_passing(root, rows, message) if "test(red)" in message else []
+    if passing:
+        reasons.append(f"These red tests already pass: {', '.join(passing[:5])}. Make each fail on its assertion against the "
+                       "code as it is, or name it in the commit message as `already passing` with the behaviour it guards; "
+                       "code not in this commit that makes it pass belongs after the red commit.")
     # Each line is keyed with the test it sits in, so two tests' identical `assert r.ok` lines stay apart.
     head = lambda f: (git(root, "show", f"HEAD:{f}") or "").splitlines()
     tree = lambda f: read(os.path.join(root, f)).splitlines()
@@ -706,6 +761,49 @@ def self_test():
     assert "changes, removes or skips" not in tamper(), "adding to a test file passes"
     assert SKIP.search("  xit('x', () => {})") and SKIP.search("    t.Skip(\"later\")") and not SKIP.search("def skip_rows():")
     run("git", "checkout", "-q", "--", "tests/test_a.py")
+
+    # Weak-assertion gate
+    rows = lambda path, src: [(path, i, l) for i, l in enumerate(src.splitlines(), 1)]
+    py = ("def test_none():\n    assert r is not None\n\ndef test_truthy():\n    assert r\n\ndef test_mock():\n"
+          "    m.assert_called_once()\n\ndef test_bare():\n    f(1)\n\ndef test_eq():\n    assert f(2) == 4\n\n"
+          "def test_raises():\n    with pytest.raises(ValueError):\n        f(-1)\n\ndef test_is():\n    assert f(0) is None\n")
+    assert [n for _, n, _ in weak_tests(rows("tests/test_w.py", py))] == [1, 4, 7, 10], "existence, truthiness, a mock call, nothing"
+    js = ("describe('f', () => {\n  beforeEach(() => { r = 1 })\n  it('truthy', () => {\n    expect(f(1)).toBeTruthy()\n  })\n  it('snap', () => {\n"
+          "    expect(f(1)).toMatchSnapshot()\n  })\n  it('eq', () => {\n    expect(f(1)).toEqual(3)\n  })\n})\n")
+    assert [n for _, n, _ in weak_tests(rows("src/f.test.js", js))] == [3, 6], "a describe block is not a test"
+    assert not weak_tests(rows("f_test.go", "func TestF(t *testing.T) {\n\tif got := f(1); got != 3 {\n\t\tt.Errorf(\"%d\", got)\n\t}\n}\n"))
+    assert not weak_tests(rows("tests/f.rs", "#[test]\nfn f_is_3() {\n    assert_eq!(f(1), 3);\n}\n"))
+    assert not weak_tests(rows("src/app.py", "def test_helper():\n    assert r\n")), "only test files"
+    assert not weak_tests([("tests/test_w.py", 3, "def test_a():"), ("tests/test_w.py", 9, "    assert r")]), \
+        "a line the test does not hold is not its assertion"
+    put("tests/test_w.py", "def test_none():\n    assert r is not None\n")
+    assert "tests/test_w.py:1" in tamper("git add tests/test_w.py && git commit -qm w"), "a commit adding a weak test asks"
+    os.remove(os.path.join(t, "tests/test_w.py"))
+
+    # Already-passing gate, with a stand-in for pytest that prints `-rA` lines and records its arguments
+    d2 = os.path.realpath(tempfile.mkdtemp())
+    put2 = lambda name, text: (os.makedirs(os.path.dirname(os.path.join(d2, name)) or d2, exist_ok=True),
+                               open(os.path.join(d2, name), "w").write(text))
+    for c in (("init", "-q"), ("config", "user.email", "t@t"), ("config", "user.name", "t")):
+        subprocess.run(("git",) + c, cwd=d2, check=True)
+    put2(".gitignore", ".venv/\n"); put2("conftest.py", ""); put2("tests/test_n.py", "def test_old():\n    assert f(0) == 0\n")
+    put2(".venv/bin/python", "#!/bin/sh\necho \"$@\" > .venv/args\ncat .venv/passed\n")
+    os.chmod(os.path.join(d2, ".venv/bin/python"), 0o755)
+    subprocess.run(("git", "add", "-A"), cwd=d2, check=True); subprocess.run(("git", "commit", "-qm", "base"), cwd=d2, check=True)
+    put2("tests/test_n.py", "def test_old():\n    assert f(0) == 0\n\n\ndef test_x():\n    assert f(1) == 1\n\n\n"
+         "def test_y():\n    assert f(1) == 2\n\n\nclass TestC:\n    def test_z(self):\n        assert f(1) == 1\n")
+    put2(".venv/passed", "PASSED tests/test_n.py::test_old\nPASSED tests/test_n.py::test_x[1]\n"
+         "PASSED tests/test_n.py::TestC::test_z\nFAILED tests/test_n.py::test_y - assert 1 == 2\n")
+    red = lambda c: (pre_bash(c, d2) or {}).get("hookSpecificOutput", {}).get("permissionDecisionReason", "")
+    r = red('git add -A && git commit -m "test(red): f"')
+    assert "tests/test_n.py::test_x[1]" in r and "TestC::test_z" in r, "a red test that passes asks"
+    assert "test_y" not in r and "test_old" not in r, "a failing test and one the branch had pass"
+    assert "-rA" in read(os.path.join(d2, ".venv/args")) and "tests/test_n.py" in read(os.path.join(d2, ".venv/args"))
+    r = red('git add -A && git commit -m "test(red): f" -m "already passing: test_x and test_z guard f(1)"')
+    assert "already pass" not in r, "a test the message names as already passing passes"
+    os.remove(os.path.join(d2, ".venv/args"))
+    assert "already pass" not in red('git add -A && git commit -m "feat: f"') and not os.path.exists(os.path.join(d2, ".venv/args")), \
+        "only a red commit runs tests"
 
     msg = lambda kind, content, **kw: json.dumps({"type": kind, "message": {"content": content}, **kw})
     use = lambda name, **i: msg("assistant", [{"type": "tool_use", "name": name, "input": i}])

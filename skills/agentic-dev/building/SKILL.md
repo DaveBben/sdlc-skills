@@ -3,7 +3,7 @@ name: building
 description: "Use first, before editing any file, for every request that changes code, configuration, dependencies or tooling, however small, clear or casually phrased: a feature, a bug or wrong output to fix, a new flag, a changed limit or format, a refactor, a rename, a dependency bump, CI or dev-tool setup, or implementing a story, ticket or spec section, like 'add a CSV export', 'the export crashes on an empty order list, fix it', 'rename total to order_total everywhere', 'implement docs/stories/export.md'. Not for reviewing a finished change, a question about code, or a throwaway experiment or spike, which is the prototyping skill's. Plans the change, attacks the plan with a pre-mortem and a fresh review where it is risky, then builds test-first in its own worktree, with failing tests that fail for the right reason, done only when a check passed and the person accepted the UAT."
 license: MIT
 metadata:
-  version: "9.0.0"
+  version: "9.1.0"
 ---
 # Building
 
@@ -24,7 +24,7 @@ metadata:
 * **Build a change in behaviour in this order;** a refactor, rename, dependency bump or other chore keeps the existing tests unchanged and green:
   1. **Interfaces:** each new name's signature and a stub that returns an empty value, committed alone.
   2. **Red:** failing tests by [references/tests.md](references/tests.md), one per criterion example, each seen failing on its assertion, committed alone as `test(red): <title>`. After that commit a test changes only with the person's word.
-  3. **Green:** implement until those tests pass, changing no test.
+  3. **Green:** implement until those tests pass, changing no test, in code a reviewer merges by [references/code.md](references/code.md).
 * **Make the smallest complete change (KISS, YAGNI):** the whole task with every caller, test and fixture it breaks. Add error handling only for a trigger you can name. Never cut trust-boundary validation, data-loss handling or security. Name what you left out.
 
 ## Finish
