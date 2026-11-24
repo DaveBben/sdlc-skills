@@ -57,7 +57,8 @@ Why: <who hits this, what they do today, what changes once it ships, and why now
    Then the request succeeds and the response says 0 remain
    Check: <the command or test that will show it, or `by eye: <what to look at>`>
 
-UAT: <how the person sees the story work on the live system: the credentials, services and data it uses, and read-only, dry run or a write they approve>
+## UAT
+<how the person sees the story work on the live system: the credentials, services and data it uses, and read-only, dry run or a write they approve>
 
 ## Out of scope
 
