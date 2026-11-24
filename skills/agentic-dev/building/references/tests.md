@@ -21,6 +21,16 @@ A property test is worth its cost when a criterion's rule says any, every, alway
 * **The wrong implementations a property lets through are degenerate:** one that returns its input, an empty result or a constant. Tighten it until each fails.
 * **A counterexample** is pinned as an example test with its shrunk values. One that shows behaviour no criterion decides is a question for the person, not a bug to fix.
 
+## A rule with no single right answer
+
+A threshold criterion, a metric over a labelled sample, becomes an eval: a test that scores the output against that sample and fails below the criterion's threshold.
+
+* **Commit the labelled sample** as a fixture, with who labelled it. Choose settings on other data: a setting tuned on the sample the test scores has passed an exam it already saw.
+* **Take the threshold from the criterion,** never from a run: one set just below today's score blesses today's output.
+* **Pin the seed and the model or library version.** Where output changes by seed, score the runs against each other by the criterion's stability bar.
+* **Pair the metric with a check a degenerate output fails,** such as a size range for groups: every item alone or everything in one group scores well on some metrics. The criterion's `by eye:` read stays with the person.
+* **Run a slow or paid eval outside the default suite,** named in the definition of done with when it runs.
+
 ## Where a wrong answer is expensive
 
 Mutation testing is worth its run time for money, permissions, parsing and rules with boundaries, once the tests are green, on the lines this change touched and no wider. Use the repository's tool where it has one, such as mutmut, Stryker, PIT or cargo-mutants. Without one, do it by hand on the lines that hold the rule: flip the comparison, drop the branch or change the constant, see a test fail, and restore the line.

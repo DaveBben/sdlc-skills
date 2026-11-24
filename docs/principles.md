@@ -46,7 +46,7 @@ Whoever made it, someone else attacks it, and a machine decides when it's done. 
 | Principle | Enforced by |
 |---|---|
 | 1, 2 | The `building` skill's pre-mortem and fresh design review of a large plan |
-| 5 | The `building` skill's Grill and Criteria sections, and the grill gate hook |
+| 5 | The `discovery` skill's interview and the `story` skill's acceptance criteria rules; the `building` skill asks for criteria when none were brought |
 | 3 | The `reviewing` skill: a fresh reviewer and a fresh verifier, and the review gate hook |
 | 6 | Done-check hook at every stop |
 | 8 | The `reviewing` skill's reviewer, and the test-tamper gate hook |

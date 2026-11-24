@@ -15,8 +15,6 @@
   * Test-tamper gate: a commit that changes or removes an assertion or a test in a test file the branch started
                      with, or adds a skip or expected-failure marker to a test, asks the person, once per line per branch.
                      It and the leftovers and silencer gates read only the files the commit takes in.
-  * Grill gate:      the first file edit after the building skill loads asks the person when nothing since that load
-                     asked them anything (no question tool call, no message from them): its grilling comes first.
   * Skill gate:      the first file edit in a repository in a session that loaded none of the building, prototyping
                      and reviewing skills, nor an xp-templates skill, asks the person, once per session.
   * Review gate:     opening a pull request, or merging a branch into the default branch, with more than RETRO_LINES
@@ -196,41 +194,8 @@ def pre_edit(tool, inp, cwd):
     return None
 
 
-# Text a person did not type, though it arrives as a user message.
-NOT_THE_PERSON = ("<task-notification", "<system-reminder", "[Request interrupted", "Another Claude session")
-
-
-def building_unasked(transcript):
-    """The transcript line of the last building-skill load, when nothing since it asked the person anything."""
-    try:
-        lines = open(transcript).read().splitlines()
-    except (OSError, TypeError):
-        return None
-    load, asked = None, False
-    for n, line in enumerate(lines):
-        try:
-            d = json.loads(line)
-        except ValueError:
-            continue
-        content = (d.get("message") or {}).get("content") if isinstance(d, dict) else None
-        blocks = content if isinstance(content, list) else [{"type": "text", "text": content}] if isinstance(content, str) else []
-        blocks = [b for b in blocks if isinstance(b, dict)]
-        if d.get("type") == "assistant":
-            for b in blocks:
-                if b.get("type") != "tool_use":
-                    continue
-                if b.get("name") == "Skill" and str((b.get("input") or {}).get("skill", "")).split(":")[-1] == "building":
-                    load, asked = n, False
-                elif b.get("name") == "AskUserQuestion" and load is not None:
-                    asked = True
-        elif d.get("type") == "user" and load is not None and not d.get("isMeta"):
-            if any(b.get("type") == "text" and not str(b.get("text", "")).lstrip().startswith(NOT_THE_PERSON) for b in blocks):
-                asked = True
-    return load if load is not None and not asked else None
-
-
 FRAMING_SKILLS = {"building", "prototyping", "reviewing",  # frame a change, run a throwaway experiment, fix findings
-                  "story", "spike", "bug", "tracker"}  # xp-templates: write an artifact
+                  "story", "spike", "bug", "tracker", "design", "prd", "discovery"}  # xp-templates: write an artifact
 
 
 def skills_loaded(transcript):
@@ -267,24 +232,6 @@ def skill_gate(inp, ti, cwd):
     save(root, state)
     return ask("This edit changes a file before the building skill framed the change. Allow to edit anyway, as for a "
                "written artifact such as a story or a bug report; deny to have the agent load the building skill first.")
-
-
-def plan_gate(inp, ti, cwd):
-    path = os.path.join(cwd, ti.get("file_path", ""))
-    where = os.path.dirname(path) if os.path.isdir(os.path.dirname(path)) else cwd
-    root = (git(where, "rev-parse", "--show-toplevel") or "").strip()
-    transcript = inp.get("transcript_path")
-    line = building_unasked(transcript) if root else None
-    if line is None:
-        return None
-    state, key = load(root), f"{transcript}:{line}"
-    if key in state.get("plan_asked", []):  # once per building load, so an allowed edit is not asked again
-        return None
-    state.setdefault("plan_asked", []).append(key)
-    save(root, state)
-    return ask("The building skill is about to edit a file without having asked you anything since it loaded. Its "
-               "grilling comes first: what the request leaves open, and the one-way doors only you can decide. Allow "
-               "to let it edit anyway; deny to have it ask you first.")
 
 
 def state_path(root):
@@ -625,7 +572,7 @@ def main():
     root = (git(cwd, "rev-parse", "--show-toplevel") or "").strip()
     out = None
     if event == "PreToolUse" and tool in ("Edit", "Write", "MultiEdit"):
-        out = pre_edit(tool, ti, cwd) or skill_gate(inp, ti, cwd) or plan_gate(inp, ti, cwd)
+        out = pre_edit(tool, ti, cwd) or skill_gate(inp, ti, cwd)
     elif not root:
         return
     elif event == "PreToolUse" and tool == "Bash":
@@ -760,24 +707,8 @@ def self_test():
     assert SKIP.search("  xit('x', () => {})") and SKIP.search("    t.Skip(\"later\")") and not SKIP.search("def skip_rows():")
     run("git", "checkout", "-q", "--", "tests/test_a.py")
 
-    # Grill gate
-    tr = os.path.join(t, "transcript.jsonl")
     msg = lambda kind, content, **kw: json.dumps({"type": kind, "message": {"content": content}, **kw})
     use = lambda name, **i: msg("assistant", [{"type": "tool_use", "name": name, "input": i}])
-    gate = lambda lines: (open(tr, "w").write("\n".join(lines) + "\n"),
-                          plan_gate({"transcript_path": tr}, {"file_path": os.path.join(t, "src.py")}, t))[1]
-    begin = [msg("user", "Add a CSV export."), use("Skill", skill="agentic-dev:reflecting")]
-    loaded = begin + [use("Skill", skill="agentic-dev:building"),
-                      msg("user", [{"type": "text", "text": "Base directory for this skill: x"}], isMeta=True),
-                      msg("user", "<task-notification>done</task-notification>")]
-    assert not gate(begin), "no building load passes"
-    assert decision(gate(loaded)) == "ask", "an edit before any question asks"
-    assert not gate(loaded), "the same building load is asked once"
-    assert not gate(loaded + [use("AskUserQuestion", questions=[])]), "a question tool call passes"
-    assert not gate(loaded + [msg("user", "Store it in the warehouse.")]), "a message from the person passes"
-    assert decision(gate(loaded + [msg("user", "ok"), use("Skill", skill="building")])) == "ask", "a new building load asks again"
-    assert not plan_gate({"transcript_path": tr}, {"file_path": "/tmp/x.py"}, "/tmp"), "outside a repository passes"
-    os.remove(tr)
 
     # Skill gate
     def sg(lines, name):
@@ -793,9 +724,12 @@ def self_test():
     assert decision(sg(bare + [use("Skill", skill="agentic-dev:reflecting")], "s4")) == "ask", "reflecting frames no change"
     assert decision(sg(bare + [use("Skill", skill="other-plugin:deploy")], "s5")) == "ask", "another plugin's skill frames no change"
     assert not sg(bare + [use("Skill", skill="xp-templates:story")], "s7"), "an edit after an xp-templates skill passes"
+    assert not sg(bare + [use("Skill", skill="xp-templates:design")], "s8"), "an edit after the design skill passes"
+    assert not sg(bare + [use("Skill", skill="xp-templates:prd")], "s9"), "an edit after the prd skill passes"
+    assert not sg(bare + [use("Skill", skill="xp-templates:discovery")], "s10"), "an edit after the discovery skill passes"
     assert not skill_gate({"transcript_path": os.path.join(t, "s1.jsonl")}, {"file_path": "/tmp/x.md"}, "/tmp"), \
         "outside a repository passes"
-    for n in ("s1", "s2", "s3", "s4", "s5", "s6", "s7"):
+    for n in ("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10"):
         os.remove(os.path.join(t, n + ".jsonl"))
 
     # Retro reminder

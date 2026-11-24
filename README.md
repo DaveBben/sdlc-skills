@@ -16,21 +16,24 @@ Then start a new session, or run `/reload-plugins`. If you had the old `sdlc` pl
 
 | Step | Why it matters | Here |
 |---|---|---|
-| **1. Frame** | Agents rarely ask the question that matters, and a vague request gets built as a guess. Most of the gain is hearing what you do not know, are missing, or do not know that you do not know. | The `building` skill loads first for any change to code, a story or a chore, and grills it before any code: silent assumptions, the walking skeleton, each item's lifecycle, edge cases, integration points that fail once and every time, one-way doors, and acceptance criteria that are vague or untestable. A story or bug report you bring is its frame. |
-| **2. Explore** | Code built on an unchecked answer about an unfamiliar library fails late. Settle unknowns before you plan. | `building` marks each answer `doc` or `memory`, names up to 3 unknown unknowns, and hands an unknown that questions cannot settle to `prototyping`: a timeboxed experiment with no tests or clean code, deleted once you are done with it. |
-| **3. Build** | Small steps give diffs you can read; the smallest complete change gives less to get wrong. | `building`: a pre-mortem on the plan, red tests from the criteria committed alone, the smallest change that fully does the task, its own git worktree. |
+| **1. Frame** | Agents rarely ask the question that matters, and a vague request gets built as a guess. Most of the gain is hearing what you do not know, are missing, or do not know that you do not know. | xp-templates' `discovery` interviews you into a story or a PRD, and `design` talks your design options through against the code and the data. The `building` skill takes its criteria and UAT from the story or bug report you bring, and asks for them when there is none. |
+| **2. Explore** | Code built on an unchecked answer about an unfamiliar library fails late. Settle unknowns before you plan. | `prototyping` settles an unknown that questions cannot: a timeboxed experiment with no tests or clean code, deleted once you are done with it. |
+| **3. Build** | Small steps give diffs you can read; the smallest complete change gives less to get wrong. | `building`: a pre-mortem on the plan and a fresh review of a risky one, red tests from the criteria committed alone that fail for the right reason, the smallest change that fully does the task, its own git worktree. |
 | **4. Verify** | "Done" on the agent's word is not done. | A hook runs your tests and linter every time the agent stops, and sends it back on failure. A commit that edits, deletes or skips an existing test asks you first. |
 | **5. Review** | An author misses their own mistakes, and an unchecked review is mostly noise. | The `reviewing` skill: one fresh reviewer, a second agent that proves or drops each finding, and test-first fixes of the blocking ones, within 3 rounds. A hook asks you before a pull request or merge no review preceded. |
 
 After a non-trivial change, the `reflecting` skill reads the session and tells you what to do next time to get better output; a hook reminds the agent when a branch is merged or opened as a pull request.
 
-## Stories, spikes and bugs
+## Stories, spikes, bugs, designs and PRDs
 
 The `xp-templates` plugin writes, reviews and files XP artifacts, and builds nothing. `building` takes a story from there or from anywhere as its input, and needs neither.
 
-* **`story`** writes a user story for one vertical slice, reviews one, splits an epic or PRD into stories, and forecasts a set from throughput.
+* **`discovery`** interviews you and writes what the scope calls for: a user story for one vertical slice, or a PRD and its story map for several features or a product.
+* **`story`** holds the story template, reviews one, splits an epic or PRD into stories, and forecasts a set from throughput.
 * **`spike`** frames a question that can fail in 4 lines, reviews one, and records what the experiment found. `prototyping` runs it.
 * **`bug`** reproduces a bug, reports it with a severity and a decision, triages a backlog, and names the check a bug escaped.
+* **`design`** talks a design through with you: you bring the options and decide; it draws each out by seven questions, holds it against the code and a real sample of the data, and raises the unknowns you have not. It then writes the design doc or ADR (under 200 lines, the decision first, readable from outside the team), and reviews one.
+* **`prd`** holds the PRD template, including who runs, maintains and pays for it after launch, and reviews a PRD you were handed for what it leaves out.
 * **`tracker`** files each as a labelled issue in GitHub, GitLab, Gitea or Jira, with blockers linked by the tracker's own relation.
 
 ## Hooks
@@ -44,7 +47,6 @@ All in [`plugins/agentic-dev/hooks/guard.py`](plugins/agentic-dev/hooks/guard.py
 * **Leftovers and silencer gates:** a commit that adds a debugger call, a TODO, commented-out code or a switched-off checker asks you.
 * **Size cap:** `AGENTS.md` and `CLAUDE.md` stay under 100 lines.
 * **Skill gate:** the first file edit in a session that loaded none of the building, prototyping and reviewing skills, nor an xp-templates skill, asks you.
-* **Grill gate:** the first file edit after the building skill loads asks you when the agent has asked you nothing since.
 * **Review gate:** a pull request, or a merge into the default branch, of more than a few lines of code that the reviewing skill has not seen in the session asks you.
 * **Retro reminder:** once per branch, after a merge or pull request of more than a few lines of code.
 
