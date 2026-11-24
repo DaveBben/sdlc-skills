@@ -8,4 +8,4 @@
 * **Check each vertical slice:** after it merges, where does a person or test meet it? Fold a data or rules slice with no entry point of its own into the slice that exposes it. A workflow-step split that turns out to be a layer split fails.
 * **Dependencies:** block a story only on what it truly waits for, with the reason. A slice that needs another team's review, sign-off or data goes early.
 * **Coverage:** map each requirement in the source to a story, a criterion, an `Out of scope` line or an open question, and show what is left over.
-* **Show the tree and stop:** titles, outcome lines, order and dependencies. File nothing before the person approves it. The first story then gets its criteria; each later one gets them when it is picked.
+* **Show the tree and stop:** titles, outcome lines, order and dependencies. File nothing before the person approves it. The first story is then created by [create.md](create.md); each later one when it is picked.

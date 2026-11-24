@@ -16,7 +16,7 @@ Then start a new session, or run `/reload-plugins`. If you had the old `sdlc` pl
 
 | Step | Why it matters | Here |
 |---|---|---|
-| **1. Frame** | Agents rarely ask the question that matters, and a vague request gets built as a guess. Most of the gain is hearing what you do not know, are missing, or do not know that you do not know. | The `building` skill loads first for any change to code, a story or a chore, and grills it before any code: silent assumptions, the walking skeleton, each item's lifecycle, edge cases, integration points that fail once and every time, one-way doors, and acceptance criteria that are vague or untestable. A story or bug report you bring is its frame. |
+| **1. Frame** | Agents rarely ask the question that matters, and a vague request gets built as a guess. Most of the gain is hearing what you do not know, are missing, or do not know that you do not know. | The `building` skill loads first for any change to code, a story or a chore, and grills it before any code: silent assumptions, the walking skeleton, each item's lifecycle, edge cases, integration points that fail once and every time, and one-way doors. A story or bug report you bring is its frame. |
 | **2. Explore** | Code built on an unchecked answer about an unfamiliar library fails late. Settle unknowns before you plan. | `building` marks each answer `doc` or `memory`, names up to 3 unknown unknowns, and hands an unknown that questions cannot settle to `prototyping`: a timeboxed experiment with no tests or clean code, deleted once you are done with it. |
 | **3. Build** | Small steps give diffs you can read; the smallest complete change gives less to get wrong. | `building`: a pre-mortem on the plan, red tests from the criteria committed alone, the smallest change that fully does the task, its own git worktree. |
 | **4. Verify** | "Done" on the agent's word is not done. | A hook runs your tests and linter every time the agent stops, and sends it back on failure. A commit that edits, deletes or skips an existing test asks you first. |
@@ -28,7 +28,7 @@ After a non-trivial change, the `reflecting` skill reads the session and tells y
 
 The `xp-templates` plugin writes, reviews and files XP artifacts, and builds nothing. `building` takes a story from there or from anywhere as its input, and needs neither.
 
-* **`story`** writes a user story for one vertical slice, reviews one, splits an epic or PRD into stories, and forecasts a set from throughput.
+* **`story`** interviews you and writes a user story for one vertical slice from your answers, reviews one, splits an epic or PRD into stories, and forecasts a set from throughput.
 * **`spike`** frames a question that can fail in 4 lines, reviews one, and records what the experiment found. `prototyping` runs it.
 * **`bug`** reproduces a bug, reports it with a severity and a decision, triages a backlog, and names the check a bug escaped.
 * **`tracker`** files each as a labelled issue in GitHub, GitLab, Gitea or Jira, with blockers linked by the tracker's own relation.
