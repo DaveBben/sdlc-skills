@@ -8,12 +8,13 @@ metadata:
 # Building
 
 * **Take the criteria and the UAT from what the person brought:** a story, ticket, spec section or bug report, whose reproduction is the first red test. When nothing states them, ask for them before any code.
+* **Follow a design doc or ADR the change falls under,** linked from what the person brought or in `docs/design/` or `docs/adr/`: its decision and one-way doors are settled, so plan within them. Put each place the code as it stands contradicts it to the person; a changed decision is a new ADR, never an edit to the old one.
 
 ## Plan
 
 * **Write a plan** only when you cannot state the diff in one sentence: the components and how they connect, then small steps, each a readable diff, risk rising down the list.
-* **Run a pre-mortem on it:** the bug reports it would get, each pinned to a file, caller, doc or real input you checked. Look for them in each item's lifecycle across runs, each integration point failing once and failing every time, and the edge cases: none, one and many, duplicates and ties, empty, huge, malformed and untrusted input. Add the defence against each to the steps. Skip cases nothing can produce.
-* **Have a fresh subagent review the plan,** on your strongest model, by [references/design-review.md](references/design-review.md), when it touches security (auth, permissions, secrets, a trust boundary), stored data (a schema change or migration) or concurrency (shared state, retries, ordering), or is over about 400 changed lines.
+* **Run a pre-mortem on it,** starting from the design's risks and the chosen option's failure modes where there is one: the bug reports it would get, each pinned to a file, caller, doc or real input you checked. Look for them in each item's lifecycle across runs, each integration point failing once and failing every time, and the edge cases: none, one and many, duplicates and ties, empty, huge, malformed and untrusted input. Add the defence against each to the steps. Skip cases nothing can produce.
+* **Have a fresh subagent review the plan,** on your strongest model, by [references/design-review.md](references/design-review.md), with the design doc where there is one, when it touches security (auth, permissions, secrets, a trust boundary), stored data (a schema change or migration) or concurrency (shared state, retries, ordering), or is over about 400 changed lines.
 * **Present it in chat,** in plain English, as intent, not code, ending with the one-way doors for the person to decide.
 
 ## Build
@@ -29,5 +30,5 @@ metadata:
 ## Finish
 
 * **Check each claim about a library or API you made from memory** against its doc or a real call, and name each still unverified.
-* **Report done with a passing check:** its command, its result and what you did not check. Done is every test green and the UAT run on the live system, with the person accepting its result.
+* **Report done with a passing check:** its command, its result, what you did not check and each departure from the design doc. Done is every test green and the UAT run on the live system, with the person accepting its result.
 * **Hand a change** beyond a one- or two-line edit to the reviewing skill.
