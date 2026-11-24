@@ -793,9 +793,11 @@ def self_test():
     assert decision(sg(bare + [use("Skill", skill="agentic-dev:reflecting")], "s4")) == "ask", "reflecting frames no change"
     assert decision(sg(bare + [use("Skill", skill="other-plugin:deploy")], "s5")) == "ask", "another plugin's skill frames no change"
     assert not sg(bare + [use("Skill", skill="xp-templates:story")], "s7"), "an edit after an xp-templates skill passes"
+    assert not sg(bare + [use("Skill", skill="xp-templates:design")], "s8"), "an edit after the design skill passes"
+    assert not sg(bare + [use("Skill", skill="xp-templates:prd")], "s9"), "an edit after the prd skill passes"
     assert not skill_gate({"transcript_path": os.path.join(t, "s1.jsonl")}, {"file_path": "/tmp/x.md"}, "/tmp"), \
         "outside a repository passes"
-    for n in ("s1", "s2", "s3", "s4", "s5", "s6", "s7"):
+    for n in ("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9"):
         os.remove(os.path.join(t, n + ".jsonl"))
 
     # Retro reminder
