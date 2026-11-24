@@ -230,7 +230,7 @@ def building_unasked(transcript):
 
 
 FRAMING_SKILLS = {"building", "prototyping", "reviewing",  # frame a change, run a throwaway experiment, fix findings
-                  "story", "spike", "bug", "tracker", "design", "prd"}  # xp-templates: write an artifact
+                  "story", "spike", "bug", "tracker", "design", "prd", "discovery"}  # xp-templates: write an artifact
 
 
 def skills_loaded(transcript):

@@ -11,4 +11,4 @@ Check it against SKILL.md's acceptance criteria rules and "How a story fails", a
 
 * **Change nothing without its owner's yes.**
 * **Report each finding** as `<story>: <rule broken> — "<quoted text>" — <fix>`, then `Ready: <stories with no finding>`.
-* **Interview the owner on the gaps,** by [create.md](create.md), when they are here and want them closed.
+* **Interview the owner on the gaps,** by the discovery skill, when they are here and want them closed.

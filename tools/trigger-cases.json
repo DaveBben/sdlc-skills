@@ -880,5 +880,10 @@
   "prompt": "What is missing from the PRD in docs/prd/themes.md?",
   "expected": null,
   "source": "confusion"
+ },
+ {
+  "prompt": "I have a rough idea for letting customers pre-order cakes, help me pin it down as a story",
+  "expected": null,
+  "source": "confusion"
  }
 ]

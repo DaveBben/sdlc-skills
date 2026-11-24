@@ -1,6 +1,6 @@
 ---
 name: prd
-description: "Use when a product requirements document is to be written, reviewed or filed: interviewing the person to turn a product idea into a PRD, writing a PRD for a team or stakeholders, or critiquing a PRD someone handed over for what it leaves out, such as 'interview me for a PRD for the bakery website', 'write a PRD for the support-ticket themes report', 'what is missing from this PRD' or 'review the PRD in docs/prd.md before we plan'. Not for breaking a PRD into stories, which is the story skill's, nor for the technical design, which is the design skill's. Interviews at the product level (problem, users, goals and non-goals, success measures, constraints, life after launch) and holds the PRD template and the checks a PRD is reviewed against."
+description: "Use when a product requirements document that exists is to be reviewed or filed, or its template is needed: critiquing a PRD someone handed over for what it leaves out, checking a draft before stakeholders see it, or filing an approved one, such as 'what is missing from this PRD', 'is this PRD ready for planning' or 'review the PRD in docs/prd.md before we plan'. Not for interviewing the person to write a new PRD, which is the discovery skill's, nor for breaking one into stories, which is the story skill's, nor for the technical design, which is the design skill's. Holds the PRD template (problem, users, goals and non-goals, success measures, constraints, life after launch) and the checks a PRD is reviewed against."
 license: MIT
 metadata:
   version: "1.0.0"
@@ -16,18 +16,9 @@ A PRD says what problem a product solves, for whom, and how everyone will know i
 * **Define each term, acronym and internal name** at first use, or link it.
 * **The outsider test:** before review, give the PRD alone to a fresh subagent and have it state the problem, who it is for, how success is measured and what is out of scope. Each one it gets wrong or cannot state is a gap.
 
-## Create one
+## Template
 
-You interview and the person answers, then you write it.
-
-* **Look up facts yourself,** in the code, the docs, the tracker or the web. Ask the person only what only they know: who it is for, why, the rules and the constraints.
-* **Ask in rounds:** every question whose prerequisites are settled, numbered, with a question tool where there is one. Recommend an answer for a rule, worded so "yes" accepts it; ask the who and the why open.
-* **Start from the problem and the last real time it happened** (The Mom Test), not a hypothetical. Ask why again when an answer names a solution.
-* **Ask what decision an output feeds** when the product makes a report, a grouping or a score. It decides whether to build it at all: sorting items into categories the team already has is classification, not clustering.
-* **Ask about life after launch,** which PRDs skip most: who changes the content and how often, who runs and maintains it, who pays for hosting and services, and what happens when the builder leaves.
-* **Make each success measure a number** with a baseline, a target and a date, or a check a person runs.
-* **Stop when "what didn't I ask that I should have?" turns up nothing,** each open gap marked `unknown` with who can answer it.
-* **Play back** the problem, the goals and non-goals and each assumption, and write it once the person agrees:
+Create one by the discovery skill's interview, in this template.
 
 ```markdown
 # <product or feature>: <the outcome in one line>
@@ -65,7 +56,7 @@ Owner: <who> · Status: draft | in review | approved · Date: <date>
 
 ## Review one
 
-Report `<prd>: <rule broken> — "<quoted text>" — <fix>`, then `Ready: yes | no`. Change nothing without its owner's yes; interview the owner on the gaps when they are here and want them closed.
+Report `<prd>: <rule broken> — "<quoted text>" — <fix>`, then `Ready: yes | no`. Change nothing without its owner's yes; interview the owner on the gaps, by the discovery skill, when they are here and want them closed.
 
 * **Over 200 lines,** or unreadable from outside the team: an undefined term, acronym or internal name, or a point the outsider test could not restate.
 * **A solution, not a problem,** or a problem with no real case behind it.

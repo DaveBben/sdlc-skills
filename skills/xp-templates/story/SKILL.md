@@ -1,15 +1,15 @@
 ---
 name: story
-description: "Use when a user story is to be created, reviewed, split, forecast or filed, not built: interviewing the person to turn an idea into a story, writing a story or ticket for later or for someone else, critiquing a story someone wrote, splitting an epic, a PRD or a large feature into stories, or forecasting when a set of stories will be finished, such as 'interview me for a story about X', 'write a story for X', 'critique the story in docs/stories/x.md', 'are these criteria testable', 'break this PRD into stories', 'this is too big for one merge request, cut it down' or 'how many weeks for the remaining stories'. Not for building a story or changing code. Interviews the person at the business level and writes the story from their answers (why, context, one acceptance criterion per business rule with a Given/When/Then example and a check, a UAT, out of scope); holds the checks a story is reviewed against, the splitting rules and the forecast format."
+description: "Use when a user story that exists, or a set of them, is to be reviewed, split, forecast or filed, not built: critiquing a story someone wrote, splitting an epic, a PRD or a large feature into stories, or forecasting when a set of stories will be finished, such as 'critique the story in docs/stories/x.md', 'are these criteria testable', 'break this PRD into stories', 'this is too big for one merge request, cut it down' or 'how many weeks for the remaining stories'. Not for interviewing the person to write a new story, which is the discovery skill's, nor for building one or changing code. Holds the story template (why, context, one acceptance criterion per business rule with a Given/When/Then example and a check, a UAT, out of scope), the checks a story is reviewed against, the splitting rules and the forecast format."
 license: MIT
 metadata:
   version: "2.0.0"
 ---
 # Story
 
-A story is one vertical slice that fits one merge request, written at the business level for a reader outside the conversation. It has the 3 C's: the card is the story you write, the conversation is your interview of the person, and the confirmation is its acceptance criteria and UAT.
+A story is one vertical slice that fits one merge request, written at the business level for a reader outside the conversation. It has the 3 C's: the card is the story you write, the conversation is the interview, by the discovery skill, and the confirmation is its acceptance criteria and UAT.
 
-* **Create one** by interviewing the person: [references/create.md](references/create.md).
+* **Create one** by the discovery skill's interview, in the template below.
 * **Review one** by [references/review.md](references/review.md).
 * **Split** an epic, a PRD or a story that is too big by [references/split.md](references/split.md).
 * **Forecast** a set of stories by [references/forecast.md](references/forecast.md).
@@ -47,3 +47,42 @@ Each one is a gap to close in the interview, or a finding in a review.
 * **Design in the story:** files, tables or layout before the rules are agreed.
 * **Conflicts:** a rule another story also states, or one main already meets.
 * **An unknown that could change the story fundamentally:** name up to 3, and write each as a spike, by the spike skill, listed under `Dependencies` as blocking it.
+
+## Template
+
+```markdown
+# <what a person can do once this merges: an outcome, not a task>
+
+Why: <who hits this, what they do today, what changes once it ships, and why now; 1 or 2 sentences>
+
+## Context
+
+<2 or 3 sentences for a reader outside the team: this part of the product today, and related work or decisions>
+
+## Acceptance criteria
+
+1. <one business rule>
+   Given a key that made 99 requests in the last minute, through the public API
+   When it makes one more
+   Then the request succeeds and the response says 0 remain
+   Check: <the command or test that will show it, or `by eye: <what to look at>`>
+
+## UAT
+<how the person sees the story work on the live system: the credentials, services and data it uses, and read-only, dry run or a write they approve>
+
+## Out of scope
+
+- <what a reader would expect here and this story will not do>
+
+## Dependencies
+
+- <who must review, sign off or supply data, and the wait; the story this waits on; or a spike that blocks it>
+
+## Open questions
+
+- <one per line, with who can answer it>
+
+Reach: <the page, route or command where a person or test meets the new behaviour>
+Hint: <files or APIs to start from; optional, never a design>
+```
+
