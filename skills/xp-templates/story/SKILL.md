@@ -23,6 +23,7 @@ You write the criteria from the person's answers. The rules in them are the pers
 * **One per business rule,** in the product's words, measurable: not "is fast" but "under 200 ms at 1,000 rows".
 * **A Given/When/Then example in real values.** The Given says how its state came about, the When is one action, and the Then states every result the rule decides. A rule with several cases gets a table, one row per case.
 * **A check someone can run** for each criterion.
+* **A rule with no single right answer,** such as a grouping, a ranking, a match or generated text, as a threshold over a labelled sample: the metric, the threshold, the sample and who labelled it, plus a `by eye:` read of real output. For example: "themes agree with 200 tickets the support lead grouped by hand at ARI ≥ 0.6, and stay at ≥ 0.8 between runs with different seeds".
 * **A user acceptance test (UAT)** for the story: how the person will see it work on the live system, with real credentials and services, read-only or as a dry run where it writes.
 * **Follow the person's rule,** not what the code does today.
 * **Mark an open question `unknown`,** with who can answer it.

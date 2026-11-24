@@ -24,13 +24,15 @@ Then start a new session, or run `/reload-plugins`. If you had the old `sdlc` pl
 
 After a non-trivial change, the `reflecting` skill reads the session and tells you what to do next time to get better output; a hook reminds the agent when a branch is merged or opened as a pull request.
 
-## Stories, spikes and bugs
+## Stories, spikes, bugs, designs and PRDs
 
 The `xp-templates` plugin writes, reviews and files XP artifacts, and builds nothing. `building` takes a story from there or from anywhere as its input, and needs neither.
 
 * **`story`** interviews you and writes a user story for one vertical slice from your answers, reviews one, splits an epic or PRD into stories, and forecasts a set from throughput.
 * **`spike`** frames a question that can fail in 4 lines, reviews one, and records what the experiment found. `prototyping` runs it.
 * **`bug`** reproduces a bug, reports it with a severity and a decision, triages a backlog, and names the check a bug escaped.
+* **`design`** writes a design doc or an ADR for others to review: under 200 lines, the pick first, readable by someone outside the team, each option weighed by seven questions. It also reviews one.
+* **`prd`** interviews you at the product level and writes a PRD, including who runs, maintains and pays for it after launch, or reviews a PRD you were handed for what it leaves out.
 * **`tracker`** files each as a labelled issue in GitHub, GitLab, Gitea or Jira, with blockers linked by the tracker's own relation.
 
 ## Hooks

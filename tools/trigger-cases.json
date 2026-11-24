@@ -860,5 +860,25 @@
   "prompt": "write a spike ticket for whether we can stream the export, don't run it",
   "expected": null,
   "source": "confusion"
+ },
+ {
+  "prompt": "Write a design doc for the ticket-clustering pipeline so the team can review it",
+  "expected": null,
+  "source": "confusion"
+ },
+ {
+  "prompt": "Draft an ADR for moving our sessions store from Redis to Postgres",
+  "expected": null,
+  "source": "confusion"
+ },
+ {
+  "prompt": "Interview me for a PRD for the bakery website",
+  "expected": null,
+  "source": "confusion"
+ },
+ {
+  "prompt": "What is missing from the PRD in docs/prd/themes.md?",
+  "expected": null,
+  "source": "confusion"
  }
 ]

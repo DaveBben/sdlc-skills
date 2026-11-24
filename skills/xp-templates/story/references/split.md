@@ -1,5 +1,6 @@
 # Split work into stories
 
+* **A PRD's gaps first:** check it by the prd skill's review, and raise what it leaves out, above all life after launch, as open questions before mapping.
 * **Story map first:** read the source and everything it links, then lay it out as a user story map, each story a title and an outcome line. A gap or contradiction in the source is an open question.
 * **First story:** a walking skeleton, deploy included.
 * **Too big:** try Richard Lawrence's story-splitting patterns in his order and take the first whose slices pass the check below. Between two splits that work, take the one that lets a low-value slice be dropped.
