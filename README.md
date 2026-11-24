@@ -32,7 +32,7 @@ The `xp-templates` plugin writes, reviews and files XP artifacts, and builds not
 * **`story`** holds the story template, reviews one, splits an epic or PRD into stories, and forecasts a set from throughput.
 * **`spike`** frames a question that can fail in 4 lines, reviews one, and records what the experiment found. `prototyping` runs it.
 * **`bug`** reproduces a bug, reports it with a severity and a decision, triages a backlog, and names the check a bug escaped.
-* **`design`** writes a design doc or an ADR for others to review: under 200 lines, the pick first, readable by someone outside the team, each option weighed by seven questions. It also reviews one.
+* **`design`** talks a design through with you: you bring the options and decide; it draws each out by seven questions, holds it against the code and a real sample of the data, and raises the unknowns you have not. It then writes the design doc or ADR (under 200 lines, the decision first, readable from outside the team), and reviews one.
 * **`prd`** holds the PRD template, including who runs, maintains and pays for it after launch, and reviews a PRD you were handed for what it leaves out.
 * **`tracker`** files each as a labelled issue in GitHub, GitLab, Gitea or Jira, with blockers linked by the tracker's own relation.
 
