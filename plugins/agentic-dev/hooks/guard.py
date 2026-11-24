@@ -795,9 +795,10 @@ def self_test():
     assert not sg(bare + [use("Skill", skill="xp-templates:story")], "s7"), "an edit after an xp-templates skill passes"
     assert not sg(bare + [use("Skill", skill="xp-templates:design")], "s8"), "an edit after the design skill passes"
     assert not sg(bare + [use("Skill", skill="xp-templates:prd")], "s9"), "an edit after the prd skill passes"
+    assert not sg(bare + [use("Skill", skill="xp-templates:discovery")], "s10"), "an edit after the discovery skill passes"
     assert not skill_gate({"transcript_path": os.path.join(t, "s1.jsonl")}, {"file_path": "/tmp/x.md"}, "/tmp"), \
         "outside a repository passes"
-    for n in ("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9"):
+    for n in ("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10"):
         os.remove(os.path.join(t, n + ".jsonl"))
 
     # Retro reminder
