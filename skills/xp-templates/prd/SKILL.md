@@ -3,7 +3,7 @@ name: prd
 description: "Use when a product requirements document that exists is to be reviewed or filed, or its template is needed: critiquing a PRD someone handed over for what it leaves out, checking a draft before stakeholders see it, or filing an approved one, such as 'what is missing from this PRD', 'is this PRD ready for planning' or 'review the PRD in docs/prd.md before we plan'. Not for interviewing the person to write a new PRD, which is the discovery skill's, nor for breaking one into stories, which is the story skill's, nor for the technical design, which is the design skill's. Holds the PRD template (problem, users, goals and non-goals, success measures, constraints, life after launch) and the checks a PRD is reviewed against."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 # PRD
 
@@ -47,6 +47,9 @@ Owner: <who> · Status: draft | in review | approved · Date: <date>
 ## Life after launch
 <who updates the content and how often; who runs, monitors and maintains it; running costs and who pays; what is handed over>
 
+## Who must agree
+- <who signs off or reviews, who supplies data, and the wait>
+
 ## Risks and assumptions
 - <assumption> — <how we will find out it is wrong>
 
@@ -64,6 +67,7 @@ Report `<prd>: <rule broken> — "<quoted text>" — <fix>`, then `Ready: yes | 
 * **A success measure with no number,** baseline or way to measure it.
 * **Vague words,** such as fast, easy, intuitive or scalable, with no number.
 * **No non-goals.**
+* **Nobody named to sign off,** or a review or data another team supplies with no wait stated.
 * **Life after launch missing:** nobody named to run, maintain, update or pay for it.
 * **A constraint the PRD never states** that the code, the data or the person reveals, such as data that may not leave or a fixed date.
 * **Design in the PRD:** a framework, table or architecture chosen before the problem is agreed. Move it to a design doc.

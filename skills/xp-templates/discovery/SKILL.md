@@ -3,7 +3,7 @@ name: discovery
 description: "Use when the person wants an idea, problem or request turned into written requirements for later or for someone else, by being interviewed, not built now: 'interview me for a story about X', 'write a story for X', 'help me write a PRD for the bakery website', 'turn this idea into requirements', 'I have a rough idea for a feature, help me pin it down' or 'write a ticket for X for the team'. Not for reviewing, splitting, forecasting or filing a story or PRD that already exists, which are the story and prd skills', nor for building one. Interviews at the business level, sizes what it finds, and writes one story for a single vertical slice, or a PRD and its story map for several features or a product."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 # Discovery
 
@@ -37,12 +37,16 @@ Size it from the first answers, again whenever an answer changes it, and say so 
 
 * **Start from the problem:** who hits it, what they do today, what changes for them once it ships, and why now.
 * **Ask about the last real time,** not a hypothetical (The Mom Test): "walk me through the last time a customer split a bill", not "would people want split bills?"
-* **Ask for a specific example** when an answer is an opinion, and why again when an answer names a solution.
+* **Ask what they would use without it:** an existing tool, a workaround, or nothing (build vs buy).
+* **Ask for a specific example** when an answer is an opinion.
+* **Ask why again** when an answer names a solution.
+* **Pin each term that could mean two things** to one meaning (ubiquitous language): does "order" mean the cake or the invoice?
 * **Ask what decision an output feeds** when it is a report, a grouping or a score. It decides whether to build it at all: sorting items into categories the team already has is classification, not clustering.
 * **Ask about life after launch** whenever it creates something someone must run: who changes the content and how often, who runs and maintains it, who pays for hosting and services, and what happens when the builder leaves.
+* **Ask what the first version must do,** and what can wait for later.
 * **Make each success measure a number** with a baseline, a target and a date, or a check a person runs.
 * **Propose a concrete example for each rule** for the person to correct (specification by example): "Given 3 friends on a $90 bill, one leaves before paying. Do the other two owe $45 each?"
-* **Probe each rule's edge cases** in the product's terms: none, one and many; a tie; a repeat or an undo; someone not allowed to act.
+* **Probe each rule's edge cases** in the product's terms: none, one and many; a tie; a repeat or an undo; a step that fails partway, such as a declined payment; someone not allowed to act.
 * **Name each contradiction,** between two answers or between an answer and what the product does, and ask which is right.
 * **Stop asking what talk cannot settle,** such as how a screen should look or feel. Offer a sketch or a spike for the person to react to.
 
