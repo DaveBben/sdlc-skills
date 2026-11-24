@@ -42,6 +42,8 @@ All in [`plugins/agentic-dev/hooks/guard.py`](plugins/agentic-dev/hooks/guard.py
 
 * **Done check:** your `Definition of done:` command from `AGENTS.md`, else the repository's own test and lint commands, at every stop.
 * **Test-tamper gate:** a commit that changes or removes an assertion or a test the branch started with, or skips a test, asks you once per line.
+* **Weak-assertion gate:** a commit that adds a test checking no exact value, only that a result exists, is truthy, matches a snapshot or that a mock was called, asks you.
+* **Already-passing gate:** a `test(red)` commit adding a pytest test that already passes asks you, unless the message names it as `already passing`.
 * **Dependency gate:** a package no manifest or lockfile holds asks you.
 * **Pull request cap:** a branch over 400 changed lines asks you.
 * **Leftovers and silencer gates:** a commit that adds a debugger call, a TODO, commented-out code or a switched-off checker asks you.
