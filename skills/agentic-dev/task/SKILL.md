@@ -11,7 +11,7 @@ A task is a change whose done one deterministic check proves. The check is a hel
 
 ## Clarify
 
-* **Ask at most one question,** only when the request reads two ways and the answer changes the code, such as a fixed retry or exponential backoff. Skip it when the request, the code or the conversation already answers it. Never ask why.
+* **Ask at most one question,** only when the request reads two ways and the answer changes the code, such as a fixed retry or exponential backoff. Skip it when the request, the code or the conversation already answers it.
 * **Ask for the done check** when the person gave none: a check, or a set of them, that deterministically proves the task is done. Offer the one you would pick.
 * **Write the task down instead of building it** when the person asks: the goal, the answer to the question and the done check, in the file or issue they name.
 
