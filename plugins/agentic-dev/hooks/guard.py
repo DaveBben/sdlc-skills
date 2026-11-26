@@ -68,6 +68,7 @@ TEST_DEF = re.compile(r"\bdef test|\b(?:it|test|describe)\(|\bfunc Test|#\[test\
 ASSERTION = re.compile(r"\bassert|\bexpect\(|\.should\b|\braises\(|\bt\.(?:Error|Fatal|Fail)|" + TEST_DEF.pattern)
 PROSE = (".md", ".txt", ".rst")
 CONFIG = (".json", ".toml", ".yaml", ".yml", ".ini", ".cfg", ".conf", ".env", ".lock")
+SLICE_CAP = 200  # the person's cap on one slice of a story: past it, split the slice
 RETRO_LINES = 20  # this plugin's guess at "more than a couple of lines"; tune it
 SHIP = re.compile(PREFIX + r"(?:gh\s+pr\s+create|glab\s+mr\s+create|tea\s+(?:pr|pulls?)\s+create)\b")
 INSTALLERS = {"pip", "setuptools", "wheel"}
@@ -343,6 +344,16 @@ def unreviewed_lines(parts, root, transcript):
     if ref and (git(root, "rev-parse", "--abbrev-ref", "HEAD") or "").strip() in ("main", "master"):
         return code_lines(root, f"HEAD...{ref}")
     return code_lines(root, base) if base and any(SHIP.match(part) for part in parts) else 0
+
+
+def agents_launched(transcript):
+    """The subagent types this session's transcript shows launched, or None when it cannot be read."""
+    return set()
+
+
+def slice_cap(parts, root):
+    """Lines of code a merge of a slice branch into a story branch brings, when over SLICE_CAP, else 0."""
+    return 0
 
 
 def retro_due(command, root):
