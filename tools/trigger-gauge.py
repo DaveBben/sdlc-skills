@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Measure whether each agentic-dev skill and agent fires on the requests meant for it, and stays quiet otherwise.
+"""Measure whether each agentic-xp skill and agent fires on the requests meant for it, and stays quiet otherwise.
 
 Each case is a first message to a fresh `claude -p` session in a small fixture repository, with this working
-copy's plugin loaded and the user's own settings and plugins left out. The run stops at the first agentic-dev skill
+copy's plugin loaded and the user's own settings and plugins left out. The run stops at the first agentic-xp skill
 or agent it reaches, so no agent's work runs:
 
-  * a skill case passes when the first agentic-dev skill or agent is that skill;
+  * a skill case passes when the first agentic-xp skill or agent is that skill;
   * an agent case passes when the first agent launched is that agent, whatever skill loaded before it;
-  * a negative case passes when no agentic-dev skill or agent fires. Built-in agents such as Explore are allowed.
+  * a negative case passes when no agentic-xp skill or agent fires. Built-in agents such as Explore are allowed.
 
 Target: 9 hits in 10 per skill and agent. Runs go under ~/.sdlc-trigger-runs, outside this repository and
 outside the system temp directory, where skills do not load. Each run is a short headless session and costs
@@ -20,7 +20,7 @@ API money. Usage:
 import argparse, concurrent.futures as cf, json, os, shutil, subprocess, sys, time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PLUGIN, RUNS = os.path.join(REPO, "plugins", "agentic-dev"), os.path.expanduser("~/.sdlc-trigger-runs")
+PLUGIN, RUNS = os.path.join(REPO, "plugins", "agentic-xp"), os.path.expanduser("~/.sdlc-trigger-runs")
 SKILLS = {"task", "story", "spike", "pair-program"}
 AGENTS = {"reviewer", "verifier"}
 
@@ -138,7 +138,7 @@ def setup(work):
 
 
 def fires(event):
-    """The agentic-dev skills and every agent one stream-json event launches from the main session, in order."""
+    """The agentic-xp skills and every agent one stream-json event launches from the main session, in order."""
     if event.get("type") != "assistant" or event.get("parent_tool_use_id"):
         return []
     out = []
@@ -200,12 +200,12 @@ def self_test():
     ev = lambda *blocks, parent=None: {"type": "assistant", "parent_tool_use_id": parent, "message": {"content": list(blocks)}}
     skill = lambda s: {"type": "tool_use", "name": "Skill", "input": {"skill": s}}
     agent = lambda a: {"type": "tool_use", "name": "Agent", "input": {"subagent_type": a}}
-    assert fires(ev(skill("agentic-dev:story"), agent("agentic-dev:reviewer"))) == ["skill:story", "agent:reviewer"]
-    assert fires(ev(skill("agentic-dev:story"), parent="x")) == [], "a subagent's own calls are not counted"
+    assert fires(ev(skill("agentic-xp:story"), agent("agentic-xp:reviewer"))) == ["skill:story", "agent:reviewer"]
+    assert fires(ev(skill("agentic-xp:story"), parent="x")) == [], "a subagent's own calls are not counted"
     assert passed(["skill:story", "agent:reviewer"], "agent:reviewer") and not passed(["agent:Explore"], "agent:delegator")
     assert passed(["agent:Explore"], None) and passed(["agent:general-purpose"], None), "a general subagent is not ours"
     assert passed(["skill:story"], "story") and not passed(["skill:task", "skill:story"], "story")
-    assert not passed(["skill:story"], None) and passed(["skill:other"], None), "only agentic-dev skills count"
+    assert not passed(["skill:story"], None) and passed(["skill:other"], None), "only agentic-xp skills count"
     assert done(["skill:story"], "story") and not done(["skill:story"], "agent:reviewer") and done(["agent:Explore"], "agent:x")
     print("self-test passed")
 

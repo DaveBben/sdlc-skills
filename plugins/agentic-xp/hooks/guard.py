@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The agentic-dev plugin's hooks. Reads one hook event as JSON on stdin; `--self-test` runs its tests.
+"""The agentic-xp plugin's hooks. Reads one hook event as JSON on stdin; `--self-test` runs its tests.
 
   * Done check:      at Stop, unless pair-program is the last skill loaded, runs the definition of done, as it was when the
                      session began: the backticked `Definition of done:` (or `Check:`) command of the root AGENTS.md,
@@ -589,12 +589,12 @@ def stop_tree(path, state, t):
         if fp == t.get("failed"):
             return None
         t["failed"] = fp
-        return {"systemMessage": f"agentic-dev: the definition of done{where} is `{cmd}`, not `{state['check']}` as when the "
+        return {"systemMessage": f"agentic-xp: the definition of done{where} is `{cmd}`, not `{state['check']}` as when the "
                 "session began, so the done check did not run there. A new session uses the new line."}
     if not cmd:
         return None
     if fp == t.get("failed"):
-        return {"systemMessage": f"agentic-dev: `{cmd}` still fails{where}, and nothing changed since it last ran."}
+        return {"systemMessage": f"agentic-xp: `{cmd}` still fails{where}, and nothing changed since it last ran."}
     try:
         r = subprocess.run(cmd, shell=True, cwd=path, capture_output=True, text=True, errors="replace", timeout=CHECK_SECONDS)
         ok, out = r.returncode == 0, (r.stdout + r.stderr)
@@ -606,7 +606,7 @@ def stop_tree(path, state, t):
         return None
     t.update(failed=fp, blocks=t.get("blocks", 0) + 1)
     if t["blocks"] >= MAX_BLOCKS:
-        return {"systemMessage": f"agentic-dev: `{cmd}` failed {t['blocks']} times in a row{where}. The work is not done."}
+        return {"systemMessage": f"agentic-xp: `{cmd}` failed {t['blocks']} times in a row{where}. The work is not done."}
     return {"decision": "block", "reason":
             f"The work is not done: `{cmd}` fails{where}.\n" + "\n".join(out.splitlines()[-40:]) +
             "\nFix the cause in the code. To stop instead, for a question or because the failure is in the person's "
@@ -765,14 +765,14 @@ def self_test():
     bare = [msg("user", "Add a note to AGENTS.md that we merge straight to main.")]
     assert decision(sg(bare, "s1")) == "ask", "an edit no skill framed asks"
     assert not sg(bare, "s1"), "the same session is asked once"
-    assert not sg(bare + [use("Skill", skill="agentic-dev:task")], "s2"), "an edit after the task skill passes"
+    assert not sg(bare + [use("Skill", skill="agentic-xp:task")], "s2"), "an edit after the task skill passes"
     assert decision(sg(bare + [use("Skill", skill="reviewing")], "s3")) == "ask", "the old reviewing skill frames no change"
-    assert decision(sg(bare + [use("Skill", skill="agentic-dev:prototyping")], "s6")) == "ask", "the prototyping skill is gone"
-    assert decision(sg(bare + [use("Skill", skill="agentic-dev:reflecting")], "s4")) == "ask", "reflecting frames no change"
+    assert decision(sg(bare + [use("Skill", skill="agentic-xp:prototyping")], "s6")) == "ask", "the prototyping skill is gone"
+    assert decision(sg(bare + [use("Skill", skill="agentic-xp:reflecting")], "s4")) == "ask", "reflecting frames no change"
     assert decision(sg(bare + [use("Skill", skill="other-plugin:deploy")], "s5")) == "ask", "another plugin's skill frames no change"
-    assert not sg(bare + [use("Skill", skill="agentic-dev:story")], "s7"), "an edit after the story skill passes"
-    assert not sg(bare + [use("Skill", skill="agentic-dev:spike")], "s11"), "an edit after the spike skill passes"
-    assert not sg(bare + [use("Skill", skill="agentic-dev:pair-program")], "s12"), "an edit after the pair-program skill passes"
+    assert not sg(bare + [use("Skill", skill="agentic-xp:story")], "s7"), "an edit after the story skill passes"
+    assert not sg(bare + [use("Skill", skill="agentic-xp:spike")], "s11"), "an edit after the spike skill passes"
+    assert not sg(bare + [use("Skill", skill="agentic-xp:pair-program")], "s12"), "an edit after the pair-program skill passes"
     assert decision(sg(bare + [use("Skill", skill="xp-templates:design")], "s8")) == "ask", "the design skill is gone"
     assert decision(sg(bare + [use("Skill", skill="xp-templates:prd")], "s9")) == "ask", "the prd skill is gone"
     assert decision(sg(bare + [use("Skill", skill="xp-templates:discovery")], "s10")) == "ask", "the discovery skill is gone"
@@ -806,14 +806,14 @@ def self_test():
     run("git", "add", "r.py", "r.json", "R.md"); run("git", "commit", "-qm", "r")
     rv = os.path.join(tempfile.mkdtemp(), "review.jsonl")
     ship = lambda cmd, *lines: (open(rv, "w").write("\n".join(lines) + "\n"), pre_bash(cmd, t, rv))[1]
-    built = use("Skill", skill="agentic-dev:story")
-    reviewed = use("Agent", subagent_type="agentic-dev:reviewer", prompt="Review the diff in /tmp/r")
+    built = use("Skill", skill="agentic-xp:story")
+    reviewed = use("Agent", subagent_type="agentic-xp:reviewer", prompt="Review the diff in /tmp/r")
     assert "not reviewed" in ship("gh pr create --fill", built)["hookSpecificOutput"]["permissionDecisionReason"], \
         "a pull request no review preceded asks"
     assert not ship("gh pr create --fill", built, reviewed), "after the reviewer agent it passes"
     assert decision(ship("gh pr create --fill", built, use("Agent", subagent_type="Explore", prompt="x"))) == "ask", \
         "another agent is not a review"
-    assert decision(ship("gh pr create --fill", built, use("Skill", skill="agentic-dev:reviewing"))) == "ask", \
+    assert decision(ship("gh pr create --fill", built, use("Skill", skill="agentic-xp:reviewing"))) == "ask", \
         "the old reviewing skill is not a review"
     assert not ship("git push", built), "a push ships nothing"
     assert not ship("git merge main", built), "merging the default branch into a feature branch passes"
@@ -859,10 +859,10 @@ def self_test():
     assert stop(t) is None, "an unchanged tree runs no check"
     put("flag", "no")
     pair = os.path.join(tempfile.mkdtemp(), "pair.jsonl")
-    open(pair, "w").write(use("Skill", skill="agentic-dev:pair-program") + "\n")
+    open(pair, "w").write(use("Skill", skill="agentic-xp:pair-program") + "\n")
     assert stop(t, pair) is None, "a pairing session runs no check: the person's code is unfinished"
     handed = os.path.join(tempfile.mkdtemp(), "handed.jsonl")
-    open(handed, "w").write(use("Skill", skill="agentic-dev:pair-program") + "\n" + use("Skill", skill="agentic-dev:task") + "\n")
+    open(handed, "w").write(use("Skill", skill="agentic-xp:pair-program") + "\n" + use("Skill", skill="agentic-xp:task") + "\n")
     assert stop(t, handed)["decision"] == "block", "once the person hands the work to a task, the check runs again"
     put("flag", "ok"); start(t); put("flag", "no")  # a fresh baseline, so the next stop is a first failure again
     assert stop(t)["decision"] == "block", "a failing check blocks the stop"

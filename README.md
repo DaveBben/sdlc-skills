@@ -1,12 +1,12 @@
 # sdlc-skills
 
-One Claude Code plugin. `agentic-dev` is for coding with AI agents: you drive a short loop, the plugin keeps you in it, and a machine decides when work is done.
+One Claude Code plugin. `agentic-xp` is for coding with AI agents: you drive a short loop, the plugin keeps you in it, and a machine decides when work is done.
 
 ## Install
 
 ```bash
 claude plugin marketplace add DaveBben/sdlc-skills
-claude plugin install agentic-dev@sdlc-skills
+claude plugin install agentic-xp@sdlc-skills
 ```
 
 Then start a new session, or run `/reload-plugins`. If you had the old `sdlc` plugin: `claude plugin uninstall sdlc@sdlc-skills`.
@@ -27,7 +27,7 @@ To write the code yourself, ask to pair. `pair-program` makes the agent your nav
 
 ## Hooks
 
-All in [`plugins/agentic-dev/hooks/guard.py`](plugins/agentic-dev/hooks/guard.py):
+All in [`plugins/agentic-xp/hooks/guard.py`](plugins/agentic-xp/hooks/guard.py):
 
 * **Done check:** your `Definition of done:` command from `AGENTS.md`, else the repository's own test and lint commands, at every stop, except while you pair.
 * **Test-tamper gate:** a commit that changes or removes an assertion or a test the branch started with, or skips a test, asks you once per line.
@@ -39,6 +39,6 @@ All in [`plugins/agentic-dev/hooks/guard.py`](plugins/agentic-dev/hooks/guard.py
 * **Skill gate:** the first file edit in a session that loaded none of the task, story, spike and pair-program skills asks you.
 * **Review gate:** a pull request, or a merge into the default branch, of more than a few lines of code that no reviewer agent saw in the session asks you.
 
-House rules for how the agent talks, explains and asks you questions print at session start: [`working-agreement.md`](plugins/agentic-dev/hooks/working-agreement.md).
+House rules for how the agent talks, explains and asks you questions print at session start: [`working-agreement.md`](plugins/agentic-xp/hooks/working-agreement.md).
 
 MIT license.

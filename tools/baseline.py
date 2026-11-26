@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare the agentic-dev plugin against a plain prompt on the same tasks, by outcome.
+"""Compare the agentic-xp plugin against a plain prompt on the same tasks, by outcome.
 
 Each task is a directory under tools/tasks/:
 
@@ -9,7 +9,7 @@ Each task is a directory under tools/tasks/:
   hidden/     files copied over the tree after the agent stops, such as held-out tests
 
 Each arm runs `claude -p` on a fresh copy of the tree: `plain` with the task's prompt alone,
-`prompted` with one sentence of the plugin's rule added, and `agentic-dev` with this working copy's
+`prompted` with one sentence of the plugin's rule added, and `agentic-xp` with this working copy's
 plugin. The plugin has to beat `prompted`, the cheapest rival. Scored per run:
 
   * defects:  matches of "defect" in the check's output once the hidden files are in, or 1
@@ -33,7 +33,7 @@ import argparse, json, os, re, shutil, subprocess, sys
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TASKS, RUNS = os.path.join(REPO, "tools", "tasks"), os.path.expanduser("~/.sdlc-baseline-runs")
 RULE = " Write the tests first, and have a fresh subagent that did not write the code review the diff before you finish."
-ARMS = {"plain": ("", []), "prompted": (RULE, []), "agentic-dev": ("", ["--plugin-dir", os.path.join(REPO, "plugins", "agentic-dev")])}
+ARMS = {"plain": ("", []), "prompted": (RULE, []), "agentic-xp": ("", ["--plugin-dir", os.path.join(REPO, "plugins", "agentic-xp")])}
 # Project settings only, so neither arm loads the user's installed plugins or instructions.
 # shortcut: commands run unsandboxed with edits and Bash approved; run only tasks you trust.
 CLAUDE = ["--setting-sources", "project", "--permission-mode", "acceptEdits", "--allowedTools", "Bash",
