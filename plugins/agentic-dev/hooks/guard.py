@@ -769,6 +769,7 @@ def self_test():
     assert cg("Glob", pattern="**/task-checks/**") == "deny", "listing the checks is denied"
     assert cg("Write", file_path=os.path.join(checks, "run"), content="exit 0\n") == "deny", "rewriting the check is denied"
     assert not cg("Bash", command="git status"), "git commands pass"
+    assert not cg("Read", file_path=os.path.join(t, ".github", "workflows", "ci.yml")), ".github is not the git directory"
     assert not check_gate(sub, "Read", {"file_path": "/tmp/x"}, tempfile.mkdtemp()), "outside a repository passes"
 
     # Review gate
@@ -809,15 +810,21 @@ def self_test():
     branch("slice/x-1", "story/x", **{"a.py": "x = 1\n" * (SLICE_CAP + 1)})
     branch("slice/x-2", "story/x", **{"b.py": "x = 1\n" * SLICE_CAP, "b.md": "y\n" * 500})
     branch("feat/big", "story/x", **{"c.py": "x = 1\n" * 500})
+    branch("slice/x-3", "story/x", **{"App.xcodeproj/project.pbxproj": "a = b;\n" * 400, "Main.unity": "--- !u!1\n" * 400,
+                                      "api_pb2.py": "x = 1\n" * 400, ".gitattributes": "api_pb2.py linguist-generated=true\n",
+                                      "d.py": "x = 1\n" * 50})
+    branch("slice/x-4", "story/x", **{"deploy.yaml": "kind: Service\n" * (SLICE_CAP + 1)})
     run("git", "checkout", "-q", "story/x")
     assert decision(pre_bash("git merge --no-ff slice/x-1", t)) == "deny", "a slice over the cap is denied"
     assert SLICE_CAP + 1 == int(re.search(r"\d+", pre_bash("git merge slice/x-1", t)["hookSpecificOutput"]["permissionDecisionReason"]).group())
     assert decision(pre_bash('git merge --no-ff -m "S1 slice 1" slice/x-1', t)) == "deny", "a message flag is not the branch"
     assert not pre_bash("git merge --no-ff slice/x-2", t), "a slice at the cap passes, its prose left out"
     assert not pre_bash("git merge feat/big", t), "a branch that is not a slice passes"
+    assert not pre_bash("git merge slice/x-3", t), "project files, scenes and files marked generated do not count"
+    assert decision(pre_bash("git merge slice/x-4", t)) == "deny", "a manifest in YAML counts"
     run("git", "checkout", "-q", "main")
     assert not pre_bash("git merge --no-ff story/x", t), "a story into the default branch is not a slice"
-    run("git", "branch", "-qD", "story/x", "slice/x-1", "slice/x-2", "feat/big")
+    run("git", "branch", "-qD", "story/x", "slice/x-1", "slice/x-2", "slice/x-3", "slice/x-4", "feat/big")
 
     # Done check
     start(t)
@@ -826,6 +833,10 @@ def self_test():
     pair = os.path.join(tempfile.mkdtemp(), "pair.jsonl")
     open(pair, "w").write(use("Skill", skill="agentic-dev:pair-program") + "\n")
     assert stop(t, pair) is None, "a pairing session runs no check: the person's code is unfinished"
+    handed = os.path.join(tempfile.mkdtemp(), "handed.jsonl")
+    open(handed, "w").write(use("Skill", skill="agentic-dev:pair-program") + "\n" + use("Skill", skill="agentic-dev:task") + "\n")
+    assert stop(t, handed)["decision"] == "block", "once the person hands the work to a task, the check runs again"
+    start(t); put("flag", "no")
     assert stop(t)["decision"] == "block", "a failing check blocks the stop"
     assert "systemMessage" in stop(t), "stopping again with nothing changed is allowed, and the person is told"
     put("flag", "ok"); put("fix.py", "x = 1\n")
