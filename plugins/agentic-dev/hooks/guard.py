@@ -16,8 +16,8 @@
                      It and the leftovers and silencer gates read only the files the commit takes in.
   * Check gate:      denies a subagent any tool call that reaches a task's held-out check under the git directory's
                      task-checks/, except running its run command alone.
-  * Skill gate:      the first file edit in a repository in a session that loaded none of the task, story, prototyping
-                     and spike skills asks the person, once per session.
+  * Skill gate:      the first file edit in a repository in a session that loaded none of the task, story and spike
+                     skills asks the person, once per session.
   * Review gate:     opening a pull request, or merging a branch into the default branch, with more than REVIEW_LINES
                      lines of code and no reviewer agent launched in the session asks the person.
 """
@@ -193,7 +193,7 @@ def pre_edit(tool, inp, cwd):
     return None
 
 
-FRAMING_SKILLS = {"task", "story", "prototyping", "spike"}
+FRAMING_SKILLS = {"task", "story", "spike"}
 
 
 def tool_uses(transcript):

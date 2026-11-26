@@ -22,7 +22,7 @@ Fact (quote, URL, date read) | Question for the business | Owner | Answer | Prov
 
 ## The thin path
 
-The finish line is an end-to-end spike through the real sandbox: connect and refresh a token, write one record, receive one vendor-side change by webhook and by poll, and measure the delay. Say up front whether it is a tracer bullet (kept and grown) or a prototype (deleted), and list what it leaves out.
+The finish line is an end-to-end spike through the real sandbox: connect and refresh a token, write one record, receive one vendor-side change by webhook and by poll, and measure the delay. List what it leaves out. Its code is thrown away like any spike's; a path meant to be kept and grown is a story's walking skeleton. Timebox in attempts.
 
 Record each row that could change the plan in the findings file:
 

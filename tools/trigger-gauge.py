@@ -21,7 +21,7 @@ import argparse, concurrent.futures as cf, json, os, shutil, subprocess, sys, ti
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLUGIN, RUNS = os.path.join(REPO, "plugins", "agentic-dev"), os.path.expanduser("~/.sdlc-trigger-runs")
-SKILLS = {"task", "story", "prototyping"}
+SKILLS = {"task", "story", "spike"}
 AGENTS = {"reviewer", "verifier"}
 
 FIXTURE = {
@@ -57,11 +57,11 @@ CASES = [
     # Held out: phrased unlike any description, to catch wording tuned to the cases above.
     ("That refactor of pricing.py is done. Any lessons for how I prompt you?", None),
     ("The new JSON endpoint shipped. Where did we lose time, and what should I do differently?", None),
-    ("The empty-cart change to pricing.py is finished. Review it and fix what really matters before I open the pull request.", "agent:reviewer"),
-    ("Take my uncommitted change through review: verify what the reviewer finds and fix the blocking findings.", "agent:reviewer"),
-    ("Get my working-tree change reviewed and ready to merge.", "agent:reviewer"),
+    ("The empty-cart change to pricing.py is finished. Review it and fix what really matters before I open the pull request.", None),
+    ("Take my uncommitted change through review: verify what the reviewer finds and fix the blocking findings.", None),
+    ("Get my working-tree change reviewed and ready to merge.", None),
     # Held out.
-    ("I think the pricing edit is good to go. Have it checked properly and sort out anything serious first.", "agent:reviewer"),
+    ("I think the pricing edit is good to go. Have it checked properly and sort out anything serious first.", None),
     # Talk about review, with no finished change to review, gets none.
     ("What should a good code review checklist cover?", None),
     ("Summarise what my uncommitted change does, for a pull request description.", None),
@@ -73,11 +73,11 @@ CASES = [
     ("Implement the story in docs/stories/export.md.", "story"),
     ("Make the export async.", "task"),
     ("total returns 9.99 for a 10.00 cart. Find the cause and patch it.", "task"),
-    ("Would streaming the export keep memory flat at a million orders? Try it and see.", "prototyping"),
+    ("Would streaming the export keep memory flat at a million orders? Try it and see.", "spike"),
     # Held out.
     ("Can you wire up a new endpoint that returns order totals as JSON?", "story"),
     ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "task"),
-    ("Before we commit to sqlite, knock together something disposable to find out if it copes with our order volume.", "prototyping"),
+    ("Before we commit to sqlite, knock together something disposable to find out if it copes with our order volume.", "spike"),
     # A question gets no skill: the working agreement's Explain lines cover it.
     ("Why does total give 9.999999 instead of 10 for some carts? I want to understand it before anything changes.", None),
     ("How does the export decide which columns to write?", None),
@@ -91,7 +91,7 @@ CASES = [
     ("Commit this.", None),
 ]
 
-# Requests to review a change, which the reviewer agent takes; the last 6 are held out, phrased unlike any description.
+# Requests to review a change; the last 6 are held out, phrased unlike any description.
 AGENT_CASES = {
     "reviewer": [
         "Review my changes.",
@@ -116,7 +116,8 @@ AGENT_CASES = {
         "Would you approve this if it were a merge request?",
     ],
 }
-CASES += [(p, "agent:" + a) for a, ps in AGENT_CASES.items() for p in ps]
+# An ad-hoc review goes to Claude Code's own code review; the reviewer agent is for the story skill to launch.
+CASES += [(p, None) for ps in AGENT_CASES.values() for p in ps]
 
 
 def git(work, *args):

@@ -1,9 +1,0 @@
-{
-  "name": "xp-templates",
-  "version": "3.0.0",
-  "description": "A spike skill: the 4 frame lines (decision, falsifiable question, finish line, timebox), the checks a spike is reviewed against, and the finding record. Stories, PRDs and the interview moved into agentic-dev's story skill.",
-  "license": "MIT",
-  "author": {
-    "name": "DaveBben"
-  }
-}

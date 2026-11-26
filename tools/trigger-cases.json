@@ -74,7 +74,7 @@
  },
  {
   "prompt": "Launch a subagent to review",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "mined"
  },
  {
@@ -151,12 +151,12 @@
  },
  {
   "prompt": "Let's launch a spike to test early results. Something we can get an early reading back within an hour",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "mined"
  },
  {
   "prompt": "Execute the following spike: docs/stories/export.md",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "mined"
  },
  {
@@ -364,102 +364,102 @@
  },
  {
   "prompt": "review my changes",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "find the bugs in my working-tree diff",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "check my diff for bugs before I push",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "get this branch ready to merge",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "can you look over what I just did to export.py before I open a PR",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "second pair of eyes on my uncommitted changes pls",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "Review branch feature/vat against main.",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "is this commit ok? HEAD, give it a proper review",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "i think im done with the pricing change, anything wrong with it before i merge",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "Run a code review on the last 3 commits.",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "look at the diff and tell me if anything will break in prod",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "pre-merge review of the export changes please",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "do a review of my pr",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "revew my chnages in pricing.py and tests/test_pricing.py",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "Orchestrator request: independent review of the diff in the working tree; report blocking findings only.",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "so ive finished the refund export, can you go through the diff for problems then fix anything serious, tests first",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "audit this branch for regressions before it goes out",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "does my staged change look right?",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "critique the patch I just wrote",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "I'm about to open a pull request for this, check it over first",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "generated"
  },
  {
@@ -664,62 +664,62 @@
  },
  {
   "prompt": "do a spike on async export",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "generated"
  },
  {
   "prompt": "try the decimal module and see if it fixes the rounding",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "generated"
  },
  {
   "prompt": "quick experiment: can pandas write this csv faster than the csv module",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "generated"
  },
  {
   "prompt": "could we stream the export instead of building it in memory? try it and see",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "generated"
  },
  {
   "prompt": "prototype an export to parquet, throwaway is fine",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "generated"
  },
  {
   "prompt": "spike: does orjson speed up serialising 1M orders? timebox 30 min",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "generated"
  },
  {
   "prompt": "Orchestrator: run a timeboxed spike on whether multiprocessing speeds up export_orders; delete the code after and report the finding.",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "generated"
  },
  {
   "prompt": "hack together something to see if gzip on the fly works with export_orders",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "generated"
  },
  {
   "prompt": "rough estimate of effort to add i18n, try a bit of it first",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "generated"
  },
  {
   "prompt": "spik on moving the pricing rules to a yaml file, see if it works",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "generated"
  },
  {
   "prompt": "can we do this without a db, just test it quickly in a scratch dir",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "generated"
  },
  {
   "prompt": "um so i was thinking maybe we could cache total() results and i want to know if that would actually help or just add complexity can you try something",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "generated"
  },
  {
@@ -829,7 +829,7 @@
  },
  {
   "prompt": "Review the diff on this branch before I merge",
-  "expected": "agent:reviewer",
+  "expected": null,
   "source": "confusion"
  },
  {
@@ -844,7 +844,7 @@
  },
  {
   "prompt": "Is it feasible to swap the csv module for pandas? Try it quick and tell me.",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "confusion"
  },
  {
@@ -860,12 +860,12 @@
  },
  {
   "prompt": "does the stripe client retry on a 429 by itself? check by actually calling it against the test key",
-  "expected": "prototyping",
+  "expected": "spike",
   "source": "confusion"
  },
  {
   "prompt": "write a spike ticket for whether we can stream the export, don't run it",
-  "expected": null,
+  "expected": "spike",
   "source": "confusion"
  },
  {
