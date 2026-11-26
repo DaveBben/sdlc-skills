@@ -540,7 +540,8 @@ def new_turn(root):  # a tree only the person changed this turn runs no check
     save(root, state)
 
 
-def stop(root):
+def stop(root, transcript=None):
+    """Not implemented: a pairing session is not yet told apart."""
     state = load(root)
     outs = [o for p in trees(root) for o in [stop_tree(p, state, state.setdefault("trees", {}).setdefault(p, {}))] if o]
     save(root, state)
@@ -741,12 +742,13 @@ def self_test():
     assert decision(sg(bare + [use("Skill", skill="other-plugin:deploy")], "s5")) == "ask", "another plugin's skill frames no change"
     assert not sg(bare + [use("Skill", skill="agentic-dev:story")], "s7"), "an edit after the story skill passes"
     assert not sg(bare + [use("Skill", skill="agentic-dev:spike")], "s11"), "an edit after the spike skill passes"
+    assert not sg(bare + [use("Skill", skill="agentic-dev:pair-program")], "s12"), "an edit after the pair-program skill passes"
     assert decision(sg(bare + [use("Skill", skill="xp-templates:design")], "s8")) == "ask", "the design skill is gone"
     assert decision(sg(bare + [use("Skill", skill="xp-templates:prd")], "s9")) == "ask", "the prd skill is gone"
     assert decision(sg(bare + [use("Skill", skill="xp-templates:discovery")], "s10")) == "ask", "the discovery skill is gone"
     assert not skill_gate({"transcript_path": os.path.join(t, "s1.jsonl")}, {"file_path": "/tmp/x.md"}, "/tmp"), \
         "outside a repository passes"
-    for n in ("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11"):
+    for n in ("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "s12"):
         os.remove(os.path.join(t, n + ".jsonl"))
 
     # Check gate
@@ -819,6 +821,9 @@ def self_test():
     start(t)
     assert stop(t) is None, "an unchanged tree runs no check"
     put("flag", "no")
+    pair = os.path.join(tempfile.mkdtemp(), "pair.jsonl")
+    open(pair, "w").write(use("Skill", skill="agentic-dev:pair-program") + "\n")
+    assert stop(t, pair) is None, "a pairing session runs no check: the person's code is unfinished"
     assert stop(t)["decision"] == "block", "a failing check blocks the stop"
     assert "systemMessage" in stop(t), "stopping again with nothing changed is allowed, and the person is told"
     put("flag", "ok"); put("fix.py", "x = 1\n")
