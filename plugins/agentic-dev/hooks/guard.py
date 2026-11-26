@@ -8,8 +8,7 @@
   * Size cap:        refuses an edit that leaves AGENTS.md or CLAUDE.md over 100 lines or 8 KB.
   * Dependency gate: an install command or manifest edit naming a package that no manifest or
                      lockfile in the repository holds asks the person (slopsquatting).
-  * Pull request cap: opening a pull request or pushing a branch whose diff from the default branch
-                     changes more than 400 lines asks the person.
+  * Slice cap:       denies merging a slice branch (`slice/...`) that brings more than SLICE_CAP lines of code.
   * Leftovers gate:  a commit that adds a debugger call, a TODO or commented-out code asks the person.
   * Silencer gate:   a commit that adds a line switching a type checker or linter off asks the person.
   * Test-tamper gate: a commit that changes or removes an assertion or a test in a test file the branch started
@@ -17,19 +16,16 @@
                      It and the leftovers and silencer gates read only the files the commit takes in.
   * Check gate:      denies a subagent any tool call that reaches a task's held-out check under the git directory's
                      task-checks/, except running its run command alone.
-  * Skill gate:      the first file edit in a repository in a session that loaded none of the task, prototyping
-                     and reviewing skills, nor an xp-templates skill, asks the person, once per session.
+  * Skill gate:      the first file edit in a repository in a session that loaded none of the task, story, prototyping
+                     and spike skills asks the person, once per session.
   * Review gate:     opening a pull request, or merging a branch into the default branch, with more than REVIEW_LINES
-                     lines of code and no reviewing skill loaded in the session asks the person.
-  * Retro reminder:  once per branch, after a pull request is opened from it or it is merged, tells the agent to
-                     run the reflecting skill when the branch changed more than REVIEW_LINES lines of code.
+                     lines of code and no reviewer agent launched in the session asks the person.
 """
 import fnmatch, hashlib, json, os, re, shlex, subprocess, sys, tempfile
 
 MAX_LINES, MAX_BYTES = 100, 8 * 1024  # this plugin's choice, sized for a root file of commands, constraints and traps
 MAX_BLOCKS = 5  # this plugin's choice: failed checks in a row before the agent may stop anyway
 CHECK_SECONDS = 300
-DIFF_CAP = 400  # this plugin's choice: past about 400 changed lines a reviewer reads less of each line
 INSTRUCTIONS = {"AGENTS.md", "CLAUDE.md"}
 CHECK = re.compile(r"^\s*(?:[-*]\s+)?(?:\*\*)?(?:Definition of done|Check):(?:\*\*)?\s*`([^`\n]+)`", re.M | re.I)
 # Each manifest's pattern captures a dependency's name from one added line.
@@ -49,7 +45,6 @@ INSTALL = re.compile(PREFIX + r"(?:(?:python[\d.]*\s+-m\s+|uv\s+)?pip[\d.]*\s+in
                      r"|(?:npm|pnpm|bun)\s+(?:install|i|add)|go\s+get|gem\s+install|uv\s+tool\s+install|pipx\s+install)\s+(.*)$")
 # A runner fetches and executes its first argument at once.
 RUNNER = re.compile(PREFIX + r"(?:npx|uvx|bunx|pipx\s+run|pnpm\s+dlx|npm\s+exec|uv\s+tool\s+run)\s+(.*)$")
-PR = re.compile(PREFIX + r"(?:gh\s+pr\s+create|glab\s+mr\s+create|tea\s+(?:pr|pulls?)\s+create|git\s+push)\b")
 MERGE = re.compile(PREFIX + r"git\s+(?:-C\s+\S+\s+)?merge\s+(.*)$")
 COMMIT = re.compile(PREFIX + r"git\s+(?:-\S+\s+\S+\s+)*commit\b")
 ADD = re.compile(PREFIX + r"git\s+(?:-\S+\s+\S+\s+)*add\b")
@@ -197,17 +192,16 @@ def pre_edit(tool, inp, cwd):
     return None
 
 
-FRAMING_SKILLS = {"task", "prototyping", "reviewing",  # build a task, run a throwaway experiment, fix findings
-                  "story", "spike", "bug", "tracker", "design", "prd", "discovery"}  # xp-templates: write an artifact
+FRAMING_SKILLS = {"task", "story", "prototyping", "spike"}
 
 
-def skills_loaded(transcript):
-    """The plugin skills this session's transcript shows loaded, or None when it cannot be read."""
+def tool_uses(transcript):
+    """(tool name, input) for each tool call in this session's transcript, or None when it cannot be read."""
     try:
         lines = open(transcript).read().splitlines()
     except (OSError, TypeError):
         return None
-    names = set()
+    calls = []
     for line in lines:
         try:
             d = json.loads(line)
@@ -215,9 +209,15 @@ def skills_loaded(transcript):
             continue
         content = (d.get("message") or {}).get("content") if isinstance(d, dict) and d.get("type") == "assistant" else None
         for b in content if isinstance(content, list) else []:
-            if isinstance(b, dict) and b.get("type") == "tool_use" and b.get("name") == "Skill":
-                names.add(str((b.get("input") or {}).get("skill", "")).split(":")[-1])
-    return names
+            if isinstance(b, dict) and b.get("type") == "tool_use":
+                calls.append((b.get("name"), b.get("input") or {}))
+    return calls
+
+
+def skills_loaded(transcript):
+    """The plugin skills this session's transcript shows loaded, or None when it cannot be read."""
+    calls = tool_uses(transcript)
+    return None if calls is None else {str(i.get("skill", "")).split(":")[-1] for n, i in calls if n == "Skill"}
 
 
 def skill_gate(inp, ti, cwd):
@@ -307,17 +307,6 @@ def merge_base(root):
     return None
 
 
-def changed_lines(root):
-    """Lines added plus removed in the tree since the branch left the default branch, lockfiles left out."""
-    base = merge_base(root)
-    if not base:
-        return 0
-    rows = (l.split("\t") for l in (git(root, "diff", "--numstat", base, "--") or "").splitlines())
-    new = [f for f in (git(root, "ls-files", "-o", "--exclude-standard") or "").splitlines() if os.path.basename(f) not in LOCKFILES]
-    return sum(int(r[0]) + int(r[1]) for r in rows if len(r) == 3 and r[0].isdigit() and r[1].isdigit()
-               and os.path.basename(r[2]) not in LOCKFILES) + sum(read(os.path.join(root, f)).count("\n") for f in new)
-
-
 def code_lines(root, spec):
     """Lines added plus removed by `git diff spec`, prose, config and lockfiles left out."""
     rows = (l.split("\t") for l in (git(root, "diff", "--numstat", spec, "--") or "").splitlines())
@@ -335,9 +324,9 @@ def merge_ref(parts):
 
 
 def unreviewed_lines(parts, root, transcript):
-    """Lines of code the command ships when the session loaded no reviewing skill, else 0."""
-    loaded = skills_loaded(transcript)
-    if loaded is None or "reviewing" in loaded:
+    """Lines of code the command ships when the session launched no reviewer agent, else 0."""
+    launched = agents_launched(transcript)
+    if launched is None or "reviewer" in launched:
         return 0
     ref, base = merge_ref(parts), merge_base(root)
     # A merge of the default branch into a feature branch ships nothing, so only a merge into it counts.
@@ -348,31 +337,15 @@ def unreviewed_lines(parts, root, transcript):
 
 def agents_launched(transcript):
     """The subagent types this session's transcript shows launched, or None when it cannot be read."""
-    return set()
+    calls = tool_uses(transcript)
+    return None if calls is None else {str(i.get("subagent_type", "")).split(":")[-1] for n, i in calls if n in ("Agent", "Task")}
 
 
 def slice_cap(parts, root):
     """Lines of code a merge of a slice branch into a story branch brings, when over SLICE_CAP, else 0."""
-    return 0
-
-
-def retro_due(command, root):
-    """Once per branch: after a pull request from it or a merge of it, the change it holds is finished."""
-    parts = [part.strip() for part in re.split(r"&&|\|\||[;|\n]", command)]
     ref = merge_ref(parts)
-    if ref:  # the merge has run, so ORIG_HEAD is where it started
-        branch, n = ref, code_lines(root, f"ORIG_HEAD...{ref}")
-    elif any(SHIP.match(part) for part in parts) and merge_base(root):
-        branch, n = (git(root, "rev-parse", "--abbrev-ref", "HEAD") or "").strip(), code_lines(root, merge_base(root))
-    else:
-        return None
-    state = load(root)
-    if n <= REVIEW_LINES or branch in state.get("retro", []):
-        return None
-    state.setdefault("retro", []).append(branch)
-    save(root, state)
-    return (f"This change touched {n} lines of code. Run the reflecting skill now, before you tell the person it is done; "
-            "if it is not finished, run it when it is.")
+    n = code_lines(root, f"HEAD...{ref}") if ref and ref.startswith("slice/") else 0
+    return n if n > SLICE_CAP else 0
 
 
 def added_lines(root):
@@ -470,15 +443,14 @@ def pre_bash(command, root, transcript=None):
     parts = [part.strip() for part in re.split(r"&&|\|\||[;|\n]", command)]
     if any(COMMIT.match(part) for part in parts):
         reasons += commit_gates(root, parts)
-    if any(PR.match(part) for part in parts):
-        n = changed_lines(root)
-        if n > DIFF_CAP:
-            reasons.append(f"This branch changes {n} lines, over the {DIFF_CAP}-line cap for one pull request. "
-                           "Approve only when it cannot be split.")
+    n = slice_cap(parts, root)
+    if n:
+        return deny(f"This slice brings {n} lines of code, over the {SLICE_CAP}-line cap for one slice. Split it into "
+                    "smaller slices, each a part of the story's tests made green, and merge each on its own.")
     n = unreviewed_lines(parts, root, transcript)
     if n > REVIEW_LINES:
-        reasons.append(f"This ships {n} lines of code that the reviewing skill has not reviewed in this session. "
-                       "Approve only when it was reviewed elsewhere; deny to have the agent load the reviewing skill first.")
+        reasons.append(f"This ships {n} lines of code that the reviewer agent has not reviewed in this session. "
+                       "Approve only when it was reviewed elsewhere; deny to have the agent launch the reviewer agent first.")
     return ask(" ".join(reasons)) if reasons else None
 
 
@@ -487,8 +459,7 @@ def post_bash(command, root):
     if big:
         return {"decision": "block", "reason": f"{', '.join(big)} is now over {MAX_LINES} lines or {MAX_BYTES // 1024} KB. "
                 "Rewrite it shorter: delete lines a check enforces or the repository already shows."}
-    due = retro_due(command, root)
-    return {"decision": "block", "reason": due} if due else None
+    return None
 
 
 def check_command(root):
@@ -554,7 +525,7 @@ def trees(root):
 
 def start(root):
     old = load(root)
-    save(root, {"retro": old.get("retro", []), "tamper": old.get("tamper", []), "check": check_command(root), "trees": {p: {"baseline": fingerprint(p)} for p in trees(root)}})
+    save(root, {"tamper": old.get("tamper", []), "check": check_command(root), "trees": {p: {"baseline": fingerprint(p)} for p in trees(root)}})
 
 
 def new_turn(root):  # a tree only the person changed this turn runs no check

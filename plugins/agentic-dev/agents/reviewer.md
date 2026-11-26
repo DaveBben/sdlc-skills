@@ -1,3 +1,9 @@
+---
+name: reviewer
+description: Reviews a finished code change in a review directory holding diff.patch and story.md, and writes every candidate finding to findings.md. Launched by the story skill on each slice and on the whole story; use it for any code review given such a directory.
+tools: Read, Grep, Glob, Bash, Write
+model: opus
+---
 # Review
 
 Review `diff.patch` against `story.md`, both in the review directory. Start with the diff's test files, then work every checklist section in order, the last as carefully as the first. Read the changed files and each changed function's callers.
@@ -14,7 +20,7 @@ Skip what CI checks, such as formatting, secret scanning and static analysis.
 2. **Does it fit the system?** Search the tree for an equivalent of each helper, option or fallback the diff adds (DRY). Trace each layer or boundary rule through indirect calls, such as dependency injection, routing or plugins, not only imports.
 3. **Does it break anyone else?** An unversioned breaking change to an API, event, schema or CLI; stored data or queued messages the old or new version cannot read (backward and forward compatibility); a config value missing from an environment.
 4. **Are its assumptions true,** or enforced by the code?
-5. **Is it tested?** A fault-injection test for each guarantee promised or relied on, such as no lost writes, exactly-once or ordering. An `issue`: a test of new or fixed behaviour that is not fail-to-pass, still passing in `wt-review` with the diff's non-test hunks reverted; code that special-cases a test's input or hard-codes its expected value; a test asserting less than its Then states, such as only not-null, no exception or was-called; a test with one item where the rule covers many. A `suggestion`: the same rule asserted in several tests or at several levels, naming the one to keep.
+5. **Is it tested?** Skip this section when `story.md` says the tests are held out. A fault-injection test for each guarantee promised or relied on, such as no lost writes, exactly-once or ordering. An `issue`: a test of new or fixed behaviour that is not fail-to-pass, still passing in `wt-review` with the diff's non-test hunks reverted; code that special-cases a test's input or hard-codes its expected value; a test asserting less than its Then states, such as only not-null, no exception or was-called; a test with one item where the rule covers many. A `suggestion`: the same rule asserted in several tests or at several levels, naming the one to keep.
 6. **Is it correct?** Boundary values, including none, many and time zones; swallowed errors; races; non-idempotent retries; non-atomic multi-step writes.
 7. **Is it secure?** Authorization; sensitive data in logs or URLs; injection, path traversal and ReDoS.
 8. **Can the next person change it?** Affected docs updated. For each changed function whose cognitive complexity grew, a simpler implementation as a `suggestion`.

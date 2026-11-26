@@ -9,6 +9,8 @@ metadata:
 
 A task is a change whose done one deterministic check proves. The check is a held-out test: the subagent that writes the code never sees it, so it cannot pass by special-casing the check or editing it.
 
+When the check already exists, such as a story's hidden tests for one slice, start at Hand off.
+
 ## Clarify
 
 * **Ask at most one question,** only when the request reads two ways and the answer changes the code, such as a fixed retry or exponential backoff. Skip it when the request, the code or the conversation already answers it.

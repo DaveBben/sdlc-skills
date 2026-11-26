@@ -1,3 +1,3 @@
 # xp-templates
 
-7 skills that write, review and file user stories, spikes, bug reports, design docs, ADRs and PRDs. See the [repository README](../../README.md).
+1 skill that writes, reviews and records spikes. Stories moved into agentic-dev's `story` skill. See the [repository README](../../README.md).

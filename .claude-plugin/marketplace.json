@@ -4,19 +4,18 @@
   "owner": {
     "name": "DaveBben"
   },
-  "description": "Two plugins for coding agents: agentic-dev attacks a change's plan and builds it test-first, keeps you on a loose loop to a reviewed merge, with hooks that decide when it is done and house rules for how the agent works with you; xp-templates writes, reviews, splits, forecasts and files user stories, spikes, bug reports, design docs, ADRs and PRDs.",
+  "description": "Two plugins for coding agents: agentic-dev writes stories by interviewing you and builds them, or a smaller task, against checks the agent writing the code never sees, with hooks that decide when it is done and house rules for how the agent works with you; xp-templates writes and reviews spikes.",
   "plugins": [
     {
       "name": "agentic-dev",
       "source": "./plugins/agentic-dev",
-      "description": "You drive a loose loop, Frame, Explore, Build, Verify, Review, and a machine decides when it is done: a task skill for a change whose done one check proves: it asks at most one clarifying question and for the done check, writes the check where the agent doing the work cannot see it, sees it fail, and has a subagent make it pass from the simplest solution up in its own worktree; a prototyping skill that answers one question with throwaway code (a spike or proof of concept) with no tests or clean code, then deletes it; a reviewing skill that has a fresh agent review a finished change and a second prove or drop each finding, then fixes the blocking ones test-first within 3 rounds; a reflecting skill that has a fresh agent read the session of a finished change and tells you what to do next time; plus hooks for a done check that runs every test and the linter, an AGENTS.md size cap, a dependency gate, a pull request size cap, gates on commits that leave in debugging leftovers, switch a checker off, or change, remove or skip a test the branch started with, a gate that hides a task's check from the subagent, a gate on the first edit the task or prototyping skill did not frame, a gate on a pull request or merge no review preceded, and a reminder to run the reflecting skill once a branch is merged or opened as a pull request.",
+      "description": "Two skills that take any change from a request to a merge, against checks the agent writing the code never sees: a task skill for a change one check proves done, which asks at most one clarifying question and for the check, hides the check, and has a subagent make it pass from the simplest solution up in its own worktree; and a story skill for a feature or a whole product, which interviews you until nothing is ambiguous, confirms the acceptance criteria in plain language, splits them into vertical-slice stories with a walking skeleton first and files them, then builds one story at a time: a reviewed plan, design choices settled with you, hidden failing tests, slices of at most 200 lines each built as a task and reviewed, a final review and verification, a merge request watched to merge, and the UAT. Plus a prototyping skill for throwaway experiments, reviewer and verifier agents, and hooks for a done check that runs every test and the linter, an AGENTS.md size cap, a dependency gate, gates on commits that leave in debugging leftovers, switch a checker off, or change, remove or skip a test the branch started with, a gate that hides a check from the agent writing the code, a slice cap, a gate on the first edit no skill framed, and a gate on a pull request or merge no reviewer preceded.",
       "version": "10.0.0",
       "license": "MIT",
       "skills": [
         "./skills/task",
-        "./skills/prototyping",
-        "./skills/reviewing",
-        "./skills/reflecting"
+        "./skills/story",
+        "./skills/prototyping"
       ],
       "author": {
         "name": "DaveBben"
@@ -25,17 +24,11 @@
     {
       "name": "xp-templates",
       "source": "./plugins/xp-templates",
-      "description": "Templates and review checks for XP artifacts, and nothing about implementation: a discovery skill (an interview that draws the requirements out of you and writes a story or, when the scope is several features or a product, a PRD and its story map), a story skill (the story template, one acceptance criterion per business rule with a Given/When/Then example, a check and a UAT, the ways a story fails, splitting an epic into vertical slices, a throughput forecast), a spike skill (4 frame lines and the finding record), a bug skill (a report built on a reproduction that fails, with a severity and a decision, triage and escape analysis), a design skill (a dialog where you bring the design options and decide, and the agent draws each out by seven questions, holds it against the code and a real sample of the data, and surfaces the unknowns; then a design doc and an ADR under 200 lines an outsider can follow, and review checks), a prd skill (the PRD template with life after launch, and review checks for a PRD you were handed), and a tracker skill that files each as a labelled issue in GitHub, GitLab, Gitea or Jira with blockers linked.",
-      "version": "2.1.1",
+      "description": "A spike skill: the 4 frame lines (decision, falsifiable question, finish line, timebox), the checks a spike is reviewed against, and the finding record. Stories, PRDs and the interview moved into agentic-dev's story skill.",
+      "version": "3.0.0",
       "license": "MIT",
       "skills": [
-        "./skills/story",
-        "./skills/spike",
-        "./skills/bug",
-        "./skills/tracker",
-        "./skills/design",
-        "./skills/prd",
-        "./skills/discovery"
+        "./skills/spike"
       ],
       "author": {
         "name": "DaveBben"

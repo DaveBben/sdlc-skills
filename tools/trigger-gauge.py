@@ -21,8 +21,8 @@ import argparse, concurrent.futures as cf, json, os, shutil, subprocess, sys, ti
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLUGIN, RUNS = os.path.join(REPO, "plugins", "agentic-dev"), os.path.expanduser("~/.sdlc-trigger-runs")
-SKILLS = {"task", "prototyping", "reflecting", "reviewing"}
-AGENTS = set()  # the plugin ships no agents; reviewers are reference files its skills launch
+SKILLS = {"task", "story", "prototyping"}
+AGENTS = {"reviewer", "verifier"}
 
 FIXTURE = {
     "AGENTS.md": "Check: `python3 -m unittest discover -q -s tests -t .`\n",
@@ -50,32 +50,32 @@ DIRTY = {"pricing.py": FIXTURE["pricing.py"].replace("    return", "    if not l
 
 # (prompt, expected): a skill name, "agent:<name>", or None.
 CASES = [
-    ("Run a retro on the export change we just finished.", "reflecting"),
-    ("The bulk discount is merged. What could I do better next time when working with you?", "reflecting"),
-    ("Look back over the change we just made to pricing.py and tell me how to get better output from you.", "reflecting"),
-    ("We gave up on the async export. Review how we worked on it.", "reflecting"),
+    ("Run a retro on the export change we just finished.", None),
+    ("The bulk discount is merged. What could I do better next time when working with you?", None),
+    ("Look back over the change we just made to pricing.py and tell me how to get better output from you.", None),
+    ("We gave up on the async export. Review how we worked on it.", None),
     # Held out: phrased unlike any description, to catch wording tuned to the cases above.
-    ("That refactor of pricing.py is done. Any lessons for how I prompt you?", "reflecting"),
-    ("The new JSON endpoint shipped. Where did we lose time, and what should I do differently?", "reflecting"),
-    ("The empty-cart change to pricing.py is finished. Review it and fix what really matters before I open the pull request.", "reviewing"),
-    ("Take my uncommitted change through review: verify what the reviewer finds and fix the blocking findings.", "reviewing"),
-    ("Get my working-tree change reviewed and ready to merge.", "reviewing"),
+    ("That refactor of pricing.py is done. Any lessons for how I prompt you?", None),
+    ("The new JSON endpoint shipped. Where did we lose time, and what should I do differently?", None),
+    ("The empty-cart change to pricing.py is finished. Review it and fix what really matters before I open the pull request.", "agent:reviewer"),
+    ("Take my uncommitted change through review: verify what the reviewer finds and fix the blocking findings.", "agent:reviewer"),
+    ("Get my working-tree change reviewed and ready to merge.", "agent:reviewer"),
     # Held out.
-    ("I think the pricing edit is good to go. Have it checked properly and sort out anything serious first.", "reviewing"),
+    ("I think the pricing edit is good to go. Have it checked properly and sort out anything serious first.", "agent:reviewer"),
     # Talk about review, with no finished change to review, gets none.
     ("What should a good code review checklist cover?", None),
     ("Summarise what my uncommitted change does, for a pull request description.", None),
-    # A change whose done one check proves starts at the task skill; a feature that needs a spec has no build skill yet.
+    # A change whose done one check proves starts at the task skill; a feature starts at the story skill.
     ("Bump the requests dependency to the latest version.", "task"),
-    ("Add a CSV export to the orders page.", None),
+    ("Add a CSV export to the orders page.", "story"),
     ("The export crashes on an empty order list. Fix it.", "task"),
     ("Rename total to order_total everywhere.", "task"),
-    ("Implement the story in docs/stories/export.md.", None),
+    ("Implement the story in docs/stories/export.md.", "story"),
     ("Make the export async.", "task"),
     ("total returns 9.99 for a 10.00 cart. Find the cause and patch it.", "task"),
     ("Would streaming the export keep memory flat at a million orders? Try it and see.", "prototyping"),
     # Held out.
-    ("Can you wire up a new endpoint that returns order totals as JSON?", None),
+    ("Can you wire up a new endpoint that returns order totals as JSON?", "story"),
     ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "task"),
     ("Before we commit to sqlite, knock together something disposable to find out if it copes with our order volume.", "prototyping"),
     # A question gets no skill: the working agreement's Explain lines cover it.
@@ -91,9 +91,9 @@ CASES = [
     ("Commit this.", None),
 ]
 
-# Requests to review a change, which the reviewing skill takes; the last 6 are held out, phrased unlike any description.
+# Requests to review a change, which the reviewer agent takes; the last 6 are held out, phrased unlike any description.
 AGENT_CASES = {
-    "code-reviewer": [
+    "reviewer": [
         "Review my changes.",
         "Give me a second-opinion review of my uncommitted changes before I commit.",
         "Find the bugs in my working-tree diff.",
@@ -116,8 +116,7 @@ AGENT_CASES = {
         "Would you approve this if it were a merge request?",
     ],
 }
-# A request to review a change goes through the reviewing skill, which launches the code-reviewer itself.
-CASES += [(p, "reviewing" if a == "code-reviewer" else "agent:" + a) for a, ps in AGENT_CASES.items() for p in ps]
+CASES += [(p, "agent:" + a) for a, ps in AGENT_CASES.items() for p in ps]
 
 
 def git(work, *args):
@@ -200,13 +199,13 @@ def self_test():
     ev = lambda *blocks, parent=None: {"type": "assistant", "parent_tool_use_id": parent, "message": {"content": list(blocks)}}
     skill = lambda s: {"type": "tool_use", "name": "Skill", "input": {"skill": s}}
     agent = lambda a: {"type": "tool_use", "name": "Agent", "input": {"subagent_type": a}}
-    assert fires(ev(skill("agentic-dev:reflecting"), agent("agentic-dev:code-reviewer"))) == ["skill:reflecting", "agent:code-reviewer"]
-    assert fires(ev(skill("agentic-dev:reflecting"), parent="x")) == [], "a subagent's own calls are not counted"
-    assert passed(["skill:reflecting", "agent:code-reviewer"], "agent:code-reviewer") and not passed(["agent:Explore"], "agent:delegator")
+    assert fires(ev(skill("agentic-dev:story"), agent("agentic-dev:reviewer"))) == ["skill:story", "agent:reviewer"]
+    assert fires(ev(skill("agentic-dev:story"), parent="x")) == [], "a subagent's own calls are not counted"
+    assert passed(["skill:story", "agent:reviewer"], "agent:reviewer") and not passed(["agent:Explore"], "agent:delegator")
     assert passed(["agent:Explore"], None) and passed(["agent:general-purpose"], None), "a general subagent is not ours"
-    assert passed(["skill:reflecting"], "reflecting") and not passed(["skill:reviewing", "skill:reflecting"], "reflecting")
-    assert not passed(["skill:reflecting"], None) and passed(["skill:other"], None), "only agentic-dev skills count"
-    assert done(["skill:reflecting"], "reflecting") and not done(["skill:reflecting"], "agent:code-reviewer") and done(["agent:Explore"], "agent:x")
+    assert passed(["skill:story"], "story") and not passed(["skill:task", "skill:story"], "story")
+    assert not passed(["skill:story"], None) and passed(["skill:other"], None), "only agentic-dev skills count"
+    assert done(["skill:story"], "story") and not done(["skill:story"], "agent:reviewer") and done(["agent:Explore"], "agent:x")
     print("self-test passed")
 
 

@@ -45,16 +45,15 @@ Whoever made it, someone else attacks it, and a machine decides when it's done. 
 
 | Principle | Enforced by |
 |---|---|
-| 5 | The `discovery` skill's interview and the `story` skill's acceptance criteria rules; the `task` skill asks for a done check when none was brought |
-| 9, in part | The `task` skill's held-out check, and the check gate hook |
-| 3 | The `reviewing` skill: a fresh reviewer and a fresh verifier, and the review gate hook |
+| 5 | The `story` skill's interview, its plain-language confirmation of the criteria and its verifier; the `task` skill asks for a done check when none was brought |
+| 1, 2 | The `story` skill's design choices with you and its fresh plan review |
+| 9, in part | The held-out checks of `task` and `story`, and the check gate hook |
+| 3 | The `reviewer` and `verifier` agents the `story` skill launches, and the review gate hook |
 | 6 | Done-check hook at every stop |
-| 8 | The `reviewing` skill's reviewer, and the test-tamper gate hook |
-| 18, in part | The `reflecting` skill and its reminder hook: findings from the session after each non-trivial change |
+| 8 | The check gate hook, which hides the tests from the agent writing the code, and the test-tamper gate hook |
 | 10 | Leftovers and silencer gate hooks |
 | 11 | You |
 | 12 | Dependency-gate hook |
 | 13 | Size-cap hook, 100 lines or 8 KB |
-| 16 | Pull request cap hook, 400 changed lines |
 | 17 | `tools/baseline.py` |
-| 1, 2, 4, 7, 9, 14, 15, 18 | You |
+| 4, 7, 14, 15, 16, 18 | You |

@@ -11,7 +11,7 @@
  },
  {
   "prompt": "In this repo I want to create a new python script for exporting the orders from export.py to a JSON file",
-  "expected": null,
+  "expected": "story",
   "source": "mined"
  },
  {
@@ -37,7 +37,7 @@
  },
  {
   "prompt": "Implement the following story: docs/stories/export.md",
-  "expected": null,
+  "expected": "story",
   "source": "mined"
  },
  {
@@ -53,12 +53,12 @@
  },
  {
   "prompt": "Implement the remaining story",
-  "expected": null,
+  "expected": "story",
   "source": "mined"
  },
  {
   "prompt": "build the export story",
-  "expected": null,
+  "expected": "story",
   "source": "mined"
  },
  {
@@ -74,17 +74,17 @@
  },
  {
   "prompt": "Launch a subagent to review",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "mined"
  },
  {
   "prompt": "Okay I think I finally understand how all of this is working. I want your honest feedback. What went wrong before? Why did I lose control of what was happening?",
-  "expected": "reflecting",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "For all of those 6 areas that went wrong, I want you to create a list, restate what went wrong and how to avoid it so in future projects I will not run into this issue again",
-  "expected": "reflecting",
+  "expected": null,
   "source": "mined",
   "needs_context": true
  },
@@ -211,7 +211,7 @@
  },
  {
   "prompt": "add a CSV export for refunds too",
-  "expected": null,
+  "expected": "story",
   "source": "generated"
  },
  {
@@ -231,7 +231,7 @@
  },
  {
   "prompt": "implement the story in docs/stories/export.md",
-  "expected": null,
+  "expected": "story",
   "source": "generated"
  },
  {
@@ -261,7 +261,7 @@
  },
  {
   "prompt": "Please implement the changes described in SPEC.md section 3.",
-  "expected": null,
+  "expected": "story",
   "source": "generated"
  },
  {
@@ -281,7 +281,7 @@
  },
  {
   "prompt": "We need VAT support in pricing. Make it so.",
-  "expected": null,
+  "expected": "story",
   "source": "generated"
  },
  {
@@ -364,202 +364,202 @@
  },
  {
   "prompt": "review my changes",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "find the bugs in my working-tree diff",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "check my diff for bugs before I push",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "get this branch ready to merge",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "can you look over what I just did to export.py before I open a PR",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "second pair of eyes on my uncommitted changes pls",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "Review branch feature/vat against main.",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "is this commit ok? HEAD, give it a proper review",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "i think im done with the pricing change, anything wrong with it before i merge",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "Run a code review on the last 3 commits.",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "look at the diff and tell me if anything will break in prod",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "pre-merge review of the export changes please",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "do a review of my pr",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "revew my chnages in pricing.py and tests/test_pricing.py",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "Orchestrator request: independent review of the diff in the working tree; report blocking findings only.",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "so ive finished the refund export, can you go through the diff for problems then fix anything serious, tests first",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "audit this branch for regressions before it goes out",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "does my staged change look right?",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "critique the patch I just wrote",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "I'm about to open a pull request for this, check it over first",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "generated"
  },
  {
   "prompt": "retro time: what went well and badly in that change?",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "what should I do differently next time so you get it right first go?",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "let's do a retrospective on the export work we just finished",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "what lessons can we take from this session",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "how can I prompt you better for this kind of task",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "that took way too many rounds, why, and how do we avoid it",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "Reflect on the session and give me three things to change.",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "post-mortem on the refactor you just did, how could the process have been better",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "ok done. before we close out, any feedback on how I worked with you",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "what would have made this go smoother",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "run a retro on the VAT feature",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "looking back at that fix, where did we lose time",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "Session review: assess the loop we followed and recommend improvements for the next change.",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "so what did we learn from doing that",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "give me a debrief on how that build went and what to tell you next time",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "ive finished the feature, can you tell me how to get better results from you in future",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "we gave up on the async export, whats the takeaway",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "were my instructions clear enough or did they cause the rework",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "retrospektive on the last change plz",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "think about what went wrong in this session and how I could have steered you better",
-  "expected": "reflecting",
+  "expected": null,
   "source": "generated"
  },
  {
@@ -829,7 +829,7 @@
  },
  {
   "prompt": "Review the diff on this branch before I merge",
-  "expected": "reviewing",
+  "expected": "agent:reviewer",
   "source": "confusion"
  },
  {
@@ -839,7 +839,7 @@
  },
  {
   "prompt": "What did we learn from that export change, and how do I prompt you better?",
-  "expected": "reflecting",
+  "expected": null,
   "source": "confusion"
  },
  {
@@ -880,7 +880,7 @@
  },
  {
   "prompt": "Interview me for a PRD for the bakery website",
-  "expected": null,
+  "expected": "story",
   "source": "confusion"
  },
  {
@@ -890,7 +890,7 @@
  },
  {
   "prompt": "I have a rough idea for letting customers pre-order cakes, help me pin it down as a story",
-  "expected": null,
+  "expected": "story",
   "source": "confusion"
  }
 ]

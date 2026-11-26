@@ -53,5 +53,5 @@ Write each finding as it surfaces, in `docs/spikes/<question-slug>.md` or on the
 
 ## File one
 
-* **File it** as a ticket labelled `spike`, by the tracker skill, blocking the story or epic it unblocks, holding the 4 frame lines.
+* **File it** as a ticket labelled `spike` in the person's tracker, linked by its own blocking relation as blocking the story or epic it unblocks, holding the 4 frame lines.
 * **Schedule it** ahead of the story it feeds, in the same iteration. When the answer could kill the idea, write the epic's stories after it.
