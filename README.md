@@ -21,18 +21,22 @@ Then start a new session, or run `/reload-plugins`. If you had the old `sdlc` pl
 | **4. Verify** | "Done" on the agent's word is not done. | A hook runs your tests and linter every time the agent stops, and sends it back on failure. A commit that edits, deletes or skips an existing test asks you first. |
 | **5. Review** | An author misses their own mistakes, and an unchecked review is mostly noise. | The `reviewer` agent on every slice, then the `reviewer` and the `verifier`, which proves or drops each finding, on the whole story. A hook asks you before a pull request or merge no reviewer preceded. |
 
+## Pairing
+
+To write the code yourself, ask to pair. `pair-program` makes the agent your navigator: each time you prompt it, it reads what you changed, names the most important mistake as a hint rather than the fix, and explains the best practice behind it. It writes the failing tests and fixes the unit tests, and writes other code only when you ask.
+
 ## Hooks
 
 All in [`plugins/agentic-dev/hooks/guard.py`](plugins/agentic-dev/hooks/guard.py):
 
-* **Done check:** your `Definition of done:` command from `AGENTS.md`, else the repository's own test and lint commands, at every stop.
+* **Done check:** your `Definition of done:` command from `AGENTS.md`, else the repository's own test and lint commands, at every stop, except while you pair.
 * **Test-tamper gate:** a commit that changes or removes an assertion or a test the branch started with, or skips a test, asks you once per line.
 * **Dependency gate:** a package no manifest or lockfile holds asks you.
 * **Leftovers and silencer gates:** a commit that adds a debugger call, a TODO, commented-out code or a switched-off checker asks you.
 * **Size cap:** `AGENTS.md` and `CLAUDE.md` stay under 100 lines.
 * **Check gate:** a subagent's read, search or edit that reaches a task's held-out check is denied; it may only run the check.
 * **Slice cap:** merging a slice branch (`slice/...`) of a story that brings more than 200 lines of code is denied.
-* **Skill gate:** the first file edit in a session that loaded none of the task, story and spike skills asks you.
+* **Skill gate:** the first file edit in a session that loaded none of the task, story, spike and pair-program skills asks you.
 * **Review gate:** a pull request, or a merge into the default branch, of more than a few lines of code that no reviewer agent saw in the session asks you.
 
 House rules for how the agent talks, explains and asks you questions print at session start: [`working-agreement.md`](plugins/agentic-dev/hooks/working-agreement.md).

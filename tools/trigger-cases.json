@@ -892,5 +892,55 @@
   "prompt": "I have a rough idea for letting customers pre-order cakes, help me pin it down as a story",
   "expected": "story",
   "source": "confusion"
+ },
+ {
+  "prompt": "Let's pair on the retry logic. I'll write it, you check my work as I go.",
+  "expected": "pair-program",
+  "source": "generated"
+ },
+ {
+  "prompt": "I want to write the empty-cart fix myself. Coach me through it.",
+  "expected": "pair-program",
+  "source": "generated"
+ },
+ {
+  "prompt": "pair with me on export.py, i'm rusty at writing python by hand",
+  "expected": "pair-program",
+  "source": "generated"
+ },
+ {
+  "prompt": "I'm going to write total() from scratch. Look at each line I write and tell me what's wrong.",
+  "expected": "pair-program",
+  "source": "generated"
+ },
+ {
+  "prompt": "Be my navigator while I add the --dry-run flag.",
+  "expected": "pair-program",
+  "source": "generated"
+ },
+ {
+  "prompt": "ok I wrote the first two lines of the retry loop, how do they look? don't rewrite it",
+  "expected": "pair-program",
+  "source": "generated"
+ },
+ {
+  "prompt": "I haven't coded by hand in a year. Sit with me while I implement the VAT rule and keep me honest.",
+  "expected": "pair-program",
+  "source": "generated"
+ },
+ {
+  "prompt": "Don't do it for me — I want the practice. Tell me where my discount code goes wrong.",
+  "expected": "pair-program",
+  "source": "generated"
+ },
+ {
+  "prompt": "Write the retry mechanism for the database connection, I don't want to do it myself",
+  "expected": "task",
+  "source": "confusion"
+ },
+ {
+  "prompt": "What is pair programming and why do teams use it?",
+  "expected": null,
+  "source": "confusion"
  }
 ]

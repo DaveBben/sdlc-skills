@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """The agentic-dev plugin's hooks. Reads one hook event as JSON on stdin; `--self-test` runs its tests.
 
-  * Done check:      at Stop, runs the definition of done, as it was when the session began: the backticked
-                     `Definition of done:` (or `Check:`) command of the root AGENTS.md, else the repository's own
+  * Done check:      at Stop, outside a pair-program session, runs the definition of done, as it was when the
+                     session began: the backticked `Definition of done:` (or `Check:`) command of the root AGENTS.md,
+                     else the repository's own
                      test and lint commands, in the session's tree and in each other worktree of the repository
                      that changed during the turn, and blocks the stop on failure.
   * Size cap:        refuses an edit that leaves AGENTS.md or CLAUDE.md over 100 lines or 8 KB.
@@ -16,8 +17,8 @@
                      It and the leftovers and silencer gates read only the files the commit takes in.
   * Check gate:      denies a subagent any tool call that reaches a task's held-out check under the git directory's
                      task-checks/, except running its run command alone.
-  * Skill gate:      the first file edit in a repository in a session that loaded none of the task, story and spike
-                     skills asks the person, once per session.
+  * Skill gate:      the first file edit in a repository in a session that loaded none of the task, story, spike and
+                     pair-program skills asks the person, once per session.
   * Review gate:     opening a pull request, or merging a branch into the default branch, with more than REVIEW_LINES
                      lines of code and no reviewer agent launched in the session asks the person.
 """
@@ -193,7 +194,7 @@ def pre_edit(tool, inp, cwd):
     return None
 
 
-FRAMING_SKILLS = {"task", "story", "spike"}
+FRAMING_SKILLS = {"task", "story", "spike", "pair-program"}
 
 
 def tool_uses(transcript):
@@ -541,7 +542,8 @@ def new_turn(root):  # a tree only the person changed this turn runs no check
 
 
 def stop(root, transcript=None):
-    """Not implemented: a pairing session is not yet told apart."""
+    if "pair-program" in (skills_loaded(transcript) or set()):  # the person is mid-way through their own code
+        return None
     state = load(root)
     outs = [o for p in trees(root) for o in [stop_tree(p, state, state.setdefault("trees", {}).setdefault(p, {}))] if o]
     save(root, state)
@@ -608,7 +610,7 @@ def main():
     elif event == "UserPromptSubmit":
         new_turn(root)
     elif event == "Stop":
-        out = stop(root)
+        out = stop(root, inp.get("transcript_path"))
     if out:
         print(json.dumps(out))
 
