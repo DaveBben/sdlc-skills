@@ -19,10 +19,10 @@
                      task-checks/, except running its run command alone.
   * Skill gate:      the first file edit in a repository in a session that loaded none of the task, prototyping
                      and reviewing skills, nor an xp-templates skill, asks the person, once per session.
-  * Review gate:     opening a pull request, or merging a branch into the default branch, with more than RETRO_LINES
+  * Review gate:     opening a pull request, or merging a branch into the default branch, with more than REVIEW_LINES
                      lines of code and no reviewing skill loaded in the session asks the person.
   * Retro reminder:  once per branch, after a pull request is opened from it or it is merged, tells the agent to
-                     run the reflecting skill when the branch changed more than RETRO_LINES lines of code.
+                     run the reflecting skill when the branch changed more than REVIEW_LINES lines of code.
 """
 import fnmatch, hashlib, json, os, re, shlex, subprocess, sys, tempfile
 
@@ -69,7 +69,7 @@ ASSERTION = re.compile(r"\bassert|\bexpect\(|\.should\b|\braises\(|\bt\.(?:Error
 PROSE = (".md", ".txt", ".rst")
 CONFIG = (".json", ".toml", ".yaml", ".yml", ".ini", ".cfg", ".conf", ".env", ".lock")
 SLICE_CAP = 200  # the person's cap on one slice of a story: past it, split the slice
-RETRO_LINES = 20  # this plugin's guess at "more than a couple of lines"; tune it
+REVIEW_LINES = 20  # this plugin's guess at "more than a couple of lines"; tune it
 SHIP = re.compile(PREFIX + r"(?:gh\s+pr\s+create|glab\s+mr\s+create|tea\s+(?:pr|pulls?)\s+create)\b")
 INSTALLERS = {"pip", "setuptools", "wheel"}
 VALUE_FLAGS = {"-r", "-c", "-e", "-i", "-f", "-t", "-p", "--requirement", "--constraint", "--editable", "--index-url",
@@ -367,7 +367,7 @@ def retro_due(command, root):
     else:
         return None
     state = load(root)
-    if n <= RETRO_LINES or branch in state.get("retro", []):
+    if n <= REVIEW_LINES or branch in state.get("retro", []):
         return None
     state.setdefault("retro", []).append(branch)
     save(root, state)
@@ -476,7 +476,7 @@ def pre_bash(command, root, transcript=None):
             reasons.append(f"This branch changes {n} lines, over the {DIFF_CAP}-line cap for one pull request. "
                            "Approve only when it cannot be split.")
     n = unreviewed_lines(parts, root, transcript)
-    if n > RETRO_LINES:
+    if n > REVIEW_LINES:
         reasons.append(f"This ships {n} lines of code that the reviewing skill has not reviewed in this session. "
                        "Approve only when it was reviewed elsewhere; deny to have the agent load the reviewing skill first.")
     return ask(" ".join(reasons)) if reasons else None
@@ -798,7 +798,7 @@ def self_test():
 
     # Retro reminder
     run("git", "checkout", "-qb", "feat/r")
-    put("r.py", "x = 1\n" * (RETRO_LINES + 1)); put("r.json", "{}\n" * 50); put("R.md", "y\n" * 50)
+    put("r.py", "x = 1\n" * (REVIEW_LINES + 1)); put("r.json", "{}\n" * 50); put("R.md", "y\n" * 50)
     run("git", "add", "r.py", "r.json", "R.md"); run("git", "commit", "-qm", "r")
     assert not post_bash("git push", t), "a push is not a finished change"
     # Review gate
@@ -811,14 +811,14 @@ def self_test():
     assert not ship("git push", built), "a push ships nothing"
     assert not ship("git merge main", built), "merging the default branch into a feature branch passes"
     assert not pre_bash("gh pr create --fill", t), "an unreadable transcript passes"
-    assert str(RETRO_LINES + 1) in post_bash("gh pr create --fill", t)["reason"], "config and prose do not count"
+    assert str(REVIEW_LINES + 1) in post_bash("gh pr create --fill", t)["reason"], "config and prose do not count"
     assert not post_bash("gh pr create --fill", t), "once per branch"
     start(t)
     assert not post_bash("gh pr create --fill", t), "a new session remembers it"
     run("git", "checkout", "-qb", "feat/s", "main"); put("s.json", "{}\n" * 50)
     run("git", "add", "s.json"); run("git", "commit", "-qm", "s")
     assert not post_bash("gh pr create", t), "a config-only change is trivial"
-    run("git", "checkout", "-qb", "feat/u", "main"); put("u.py", "x = 1\n" * (RETRO_LINES + 5))
+    run("git", "checkout", "-qb", "feat/u", "main"); put("u.py", "x = 1\n" * (REVIEW_LINES + 5))
     run("git", "add", "u.py"); run("git", "commit", "-qm", "u"); run("git", "checkout", "-q", "main")
     assert decision(ship("git merge --no-ff feat/u", built)) == "ask", "merging an unreviewed branch into the default branch asks"
     assert not ship("git merge --no-ff feat/s", built), "a config-only branch is trivial"
