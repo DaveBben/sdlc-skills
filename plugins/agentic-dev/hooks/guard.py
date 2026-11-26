@@ -45,6 +45,7 @@ INSTALL = re.compile(PREFIX + r"(?:(?:python[\d.]*\s+-m\s+|uv\s+)?pip[\d.]*\s+in
                      r"|(?:npm|pnpm|bun)\s+(?:install|i|add)|go\s+get|gem\s+install|uv\s+tool\s+install|pipx\s+install)\s+(.*)$")
 # A runner fetches and executes its first argument at once.
 RUNNER = re.compile(PREFIX + r"(?:npx|uvx|bunx|pipx\s+run|pnpm\s+dlx|npm\s+exec|uv\s+tool\s+run)\s+(.*)$")
+MERGE_VALUE_FLAGS = {"-m", "-F", "-s", "-X", "--message", "--file", "--strategy", "--strategy-option", "--cleanup", "--into-name"}
 MERGE = re.compile(PREFIX + r"git\s+(?:-C\s+\S+\s+)?merge\s+(.*)$")
 COMMIT = re.compile(PREFIX + r"git\s+(?:-\S+\s+\S+\s+)*commit\b")
 ADD = re.compile(PREFIX + r"git\s+(?:-\S+\s+\S+\s+)*add\b")
@@ -318,9 +319,13 @@ def merge_ref(parts):
     """The branch the command's first `git merge` names, or None."""
     merges = [m.group(1) for part in parts for m in [MERGE.match(part)] if m]
     try:
-        return next((a for a in shlex.split(merges[0], comments=True) if not a.startswith("-")), None) if merges else None
+        words = shlex.split(merges[0], comments=True) if merges else []
     except ValueError:
         return None
+    for prev, w in zip([None] + words, words):
+        if not w.startswith("-") and prev not in MERGE_VALUE_FLAGS:
+            return w
+    return None
 
 
 def unreviewed_lines(parts, root, transcript):
