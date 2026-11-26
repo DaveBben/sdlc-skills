@@ -803,6 +803,7 @@ def self_test():
     run("git", "checkout", "-q", "story/x")
     assert decision(pre_bash("git merge --no-ff slice/x-1", t)) == "deny", "a slice over the cap is denied"
     assert SLICE_CAP + 1 == int(re.search(r"\d+", pre_bash("git merge slice/x-1", t)["hookSpecificOutput"]["permissionDecisionReason"]).group())
+    assert decision(pre_bash('git merge --no-ff -m "S1 slice 1" slice/x-1', t)) == "deny", "a message flag is not the branch"
     assert not pre_bash("git merge --no-ff slice/x-2", t), "a slice at the cap passes, its prose left out"
     assert not pre_bash("git merge feat/big", t), "a branch that is not a slice passes"
     run("git", "checkout", "-q", "main")
