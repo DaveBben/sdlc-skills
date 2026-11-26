@@ -9,7 +9,7 @@ metadata:
 
 A task is a change whose done one deterministic check proves. The check is a held-out test: the subagent that writes the code never sees it, so it cannot pass by special-casing the check or editing it.
 
-When the check already exists, such as a story's hidden tests for one slice, start at Hand off.
+When the check already exists, such as a story's hidden tests for one slice, start at Hand off, and leave the check hidden: the story moves its tests into the repository once every slice is in.
 
 ## Clarify
 
