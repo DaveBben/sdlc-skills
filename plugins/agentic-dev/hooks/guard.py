@@ -723,7 +723,7 @@ def self_test():
     bare = [msg("user", "Add a note to AGENTS.md that we merge straight to main.")]
     assert decision(sg(bare, "s1")) == "ask", "an edit no skill framed asks"
     assert not sg(bare, "s1"), "the same session is asked once"
-    assert not sg(bare + [use("Skill", skill="agentic-dev:building")], "s2"), "an edit after the building skill passes"
+    assert not sg(bare + [use("Skill", skill="agentic-dev:task")], "s2"), "an edit after the task skill passes"
     assert not sg(bare + [use("Skill", skill="reflecting"), use("Skill", skill="reviewing")], "s3"), "after the reviewing skill passes"
     assert not sg(bare + [use("Skill", skill="agentic-dev:prototyping")], "s6"), "an edit after the prototyping skill passes"
     assert decision(sg(bare + [use("Skill", skill="agentic-dev:reflecting")], "s4")) == "ask", "reflecting frames no change"
@@ -737,6 +737,24 @@ def self_test():
     for n in ("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10"):
         os.remove(os.path.join(t, n + ".jsonl"))
 
+    # Check gate
+    sub, checks = {"agent_id": "a1", "agent_type": "general-purpose"}, os.path.join(t, ".git", "task-checks", "retry")
+    cg = lambda tool, who=sub, **ti: decision(check_gate(who, tool, ti, t))
+    assert cg("Read", file_path=os.path.join(checks, "test_retry.py")) == "deny", "a subagent reading the check is denied"
+    assert not cg("Read", {}, file_path=os.path.join(checks, "test_retry.py")), "the main agent reads it"
+    assert not cg("Read", file_path=os.path.join(t, "tests/test_a.py")), "a subagent reads the repository"
+    assert not cg("Bash", command=os.path.join(checks, "run")), "a subagent runs the check"
+    assert not cg("Bash", command="sh " + os.path.join(checks, "run")), "through a shell too"
+    assert cg("Bash", command="cat " + os.path.join(checks, "run")) == "deny", "printing the runner is denied"
+    assert cg("Bash", command=os.path.join(checks, "run") + "; cat " + os.path.join(checks, "test_retry.py")) == "deny", \
+        "running it with a read on the side is denied"
+    assert cg("Bash", command="cat .git/task-checks/retry/run") == "deny", "a relative path is denied"
+    assert cg("Grep", pattern="retry", path=os.path.join(t, ".git")) == "deny", "searching the git directory is denied"
+    assert cg("Glob", pattern="**/task-checks/**") == "deny", "listing the checks is denied"
+    assert cg("Write", file_path=os.path.join(checks, "run"), content="exit 0\n") == "deny", "rewriting the check is denied"
+    assert not cg("Bash", command="git status"), "git commands pass"
+    assert not check_gate(sub, "Read", {"file_path": "/tmp/x"}, tempfile.mkdtemp()), "outside a repository passes"
+
     # Retro reminder
     run("git", "checkout", "-qb", "feat/r")
     put("r.py", "x = 1\n" * (RETRO_LINES + 1)); put("r.json", "{}\n" * 50); put("R.md", "y\n" * 50)
@@ -745,7 +763,7 @@ def self_test():
     # Review gate
     rv = os.path.join(tempfile.mkdtemp(), "review.jsonl")
     ship = lambda cmd, *lines: (open(rv, "w").write("\n".join(lines) + "\n"), pre_bash(cmd, t, rv))[1]
-    built = use("Skill", skill="agentic-dev:building")
+    built = use("Skill", skill="agentic-dev:task")
     assert "not reviewed" in ship("gh pr create --fill", built)["hookSpecificOutput"]["permissionDecisionReason"], \
         "a pull request no review preceded asks"
     assert not ship("gh pr create --fill", built, use("Skill", skill="agentic-dev:reviewing")), "after the reviewing skill it passes"
