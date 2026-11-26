@@ -25,11 +25,11 @@ A story is one vertical slice: a thin path through every layer that does one com
 ### Split
 
 * **Split the confirmed criteria into stories** by [references/split.md](references/split.md): the walking skeleton first, each criterion in exactly one story.
-* **Write each story in the template below.**
+* **Write each story in the template,** by [references/template.md](references/template.md).
 
 ### Verify
 
-* **Launch a fresh subagent** by [references/verify-stories.md](references/verify-stories.md), with the paths of the interview file and the stories and nothing of your reasoning.
+* **Launch a fresh subagent** by [references/verify-stories.md](references/verify-stories.md), with the paths of the interview file, the stories and [references/template.md](references/template.md), and nothing of your reasoning.
 * **Show the person its findings and ask before fixing them.** Fix, then verify again, for at most 3 rounds; then hand over what is still open.
 
 ### File
@@ -37,27 +37,6 @@ A story is one vertical slice: a thin path through every layer that does one com
 * **Ask where the stories go** when the person has not said: their tracker, such as GitHub Issues, Jira or Gitea, or files on disk at `docs/stories/<NN>-<slug>.md`, numbered in build order.
 * **Link the order with the tracker's own blocking relation** where it has one. Write `Depends on:` and `Blocks:` lines only into files on disk.
 * **Read each write back.**
-
-### Template
-
-```markdown
-As a <specific user>, I want <a capability>, so that <the benefit to them>.
-
-Context: <2 or 3 short plain-language sentences for a reader outside the team>
-
-## Acceptance criteria
-
-1. Given <how the state came about>, when <one action>, then <every result the rule decides>.
-   Example: <the same rule with real values in the product's terms>
-
-## UAT
-
-1. <a concrete step on the live system>
-   Expected: <what the person sees>
-
-Depends on: <story>
-Blocks: <story>
-```
 
 ## Build
 
