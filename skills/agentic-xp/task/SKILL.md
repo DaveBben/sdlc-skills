@@ -34,7 +34,7 @@ When the check already exists, such as a story's hidden tests for one slice, sta
 
 ## Hand off
 
-* **Launch a fresh subagent** with the goal as one sentence of behaviour, the interface when the check fixes one, the worktree it works in rather than one of its own, and the `run` command as its only way to the check. Where nothing hides the check, such as outside git, tell it never to read the check's directory.
+* **Launch a fresh subagent** with the goal as one sentence of behaviour, the interface when the check fixes one, the worktree it works in rather than one of its own, and the `run` command as its only way to the check, and tell it to write code a reviewer merges by [references/code.md](references/code.md). Where nothing hides the check, such as outside git, tell it never to read the check's directory.
 * **Tell it to start from the simplest solution that could pass,** and to try a harder one only after a failure the message explains.
 * **Tell it to keep the repository's existing checks green.**
 * **Tell it to stop when it sees no path left,** returning each approach it tried and the message that ruled it out.

@@ -15,7 +15,9 @@
   * Silencer gate:   a commit that adds a line switching a type checker or linter off asks the person.
   * Test-tamper gate: a commit that changes or removes an assertion or a test in a test file the branch started
                      with, or adds a skip or expected-failure marker to a test, asks the person, once per line per branch.
-                     It and the leftovers and silencer gates read only the files the commit takes in.
+                     It and the leftovers, silencer and weak-assertion gates read only the files the commit takes in.
+  * Weak-assertion gate: a commit that adds a test checking no exact value, only that a result exists, is truthy,
+                     matches a snapshot or that a mock was called, asks the person.
   * Check gate:      denies a subagent any tool call that reaches a task's held-out check under the git directory's
                      task-checks/, except running its run command alone.
   * Skill gate:      the first file edit in a repository in a session that loaded none of the task, story, spike and
@@ -64,6 +66,11 @@ SKIP = re.compile(r"@pytest\.mark\.(?:skip|xfail)|\bpytest\.(?:skip|xfail)\(|@un
 # shortcut: one line at a time, so an expected value inside a multi-line literal or a parametrize row passes.
 TEST_DEF = re.compile(r"\bdef test|\b(?:it|test|describe)\(|\bfunc Test|#\[test\]|@Test\b")
 ASSERTION = re.compile(r"\bassert|\bexpect\(|\.should\b|\braises\(|\bt\.(?:Error|Fatal|Fail)|" + TEST_DEF.pattern)
+# An assertion of an exact value or an error; existence, truthiness, a snapshot or a mock call is not one.
+# shortcut: by pattern per line, so a helper that asserts for the test reads as weak; the gate asks, it does not refuse.
+EXACT = re.compile(r"\b(?:assert|expect|should|t\.Error|t\.Fatal)\w*\b.*(?:==|!=|<=|>=|\s[<>]\s|\bin\s|\bis\s+(?!not\b))"
+                   r"|\braises\(|Raises\(|\.to(?:Equal|StrictEqual|Be|HaveLength|Contain|Throw|MatchObject)\("
+                   r"|\.(?:equal|eql|equals)\(|\bassert(?:Equals?|In|Is|Raises|Throws)\b|\bassert_(?:eq|ne)!|\bif\b.*(?:!=|==)")
 PROSE = (".md", ".txt", ".rst")
 # Files a tool writes, which a slice cannot be split by: IDE projects, scenes, assets, notebooks, generated code.
 SLICE_SKIP = (".pbxproj", ".xcscheme", ".storyboard", ".xib", ".unity", ".prefab", ".asset", ".meta", ".mat", ".tscn", ".tres",
@@ -433,6 +440,20 @@ def commit_paths(root, parts):
     return staged | {f for f in changed if any(f == n or f.startswith(n + "/") or fnmatch.fnmatch(f, n) for n in names)}
 
 
+def weak_tests(rows):
+    """The (path, line, text) of each test the added rows define, body included, whose added lines assert no exact value."""
+    tests = []  # [def row, asserts an exact value, last line, body lines]
+    for path, n, text in rows:
+        if not TEST_FILE.search(path):
+            continue
+        if TEST_DEF.search(text):
+            tests.append([(path, n, text), "describe(" in text or bool(EXACT.search(text)), n, 0])
+        elif tests and tests[-1][0][0] == path and tests[-1][2] == n - 1:
+            tests[-1][1] = tests[-1][1] or bool(EXACT.search(text))
+            tests[-1][2], tests[-1][3] = n, tests[-1][3] + bool(text.strip())
+    return [t[0] for t in tests if not t[1] and t[3]]
+
+
 def commit_gates(root, parts):
     paths = commit_paths(root, parts)
     rows = [r for r in added_lines(root) if paths is None or r[0] in paths]
@@ -445,6 +466,11 @@ def commit_gates(root, parts):
     if quiet:
         reasons.append(f"This commit switches a checker off: {show(quiet)}. Fix the type or lint finding instead; "
                        "approve only when it cannot be fixed.")
+    weak = weak_tests(rows)
+    if weak:
+        reasons.append(f"This commit adds tests that check no exact value: {show(weak)}. Assert the value the criterion's "
+                       "Then gives, not only that a result exists, is truthy, matches a snapshot or that a mock was called; "
+                       "approve only when a helper asserts it.")
     # Each line is keyed with the test it sits in, so two tests' identical `assert r.ok` lines stay apart.
     head = lambda f: (git(root, "show", f"HEAD:{f}") or "").splitlines()
     tree = lambda f: read(os.path.join(root, f)).splitlines()
@@ -753,6 +779,25 @@ def self_test():
     assert "changes, removes or skips" not in tamper(), "adding to a test file passes"
     assert SKIP.search("  xit('x', () => {})") and SKIP.search("    t.Skip(\"later\")") and not SKIP.search("def skip_rows():")
     run("git", "checkout", "-q", "--", "tests/test_a.py")
+
+    # Weak-assertion gate
+    rows = lambda path, src: [(path, i, l) for i, l in enumerate(src.splitlines(), 1)]
+    py = ("def test_none():\n    assert r is not None\n\ndef test_truthy():\n    assert r\n\ndef test_mock():\n"
+          "    m.assert_called_once()\n\ndef test_bare():\n    f(1)\n\ndef test_eq():\n    assert f(2) == 4\n\n"
+          "def test_raises():\n    with pytest.raises(ValueError):\n        f(-1)\n\ndef test_is():\n    assert f(0) is None\n")
+    assert [n for _, n, _ in weak_tests(rows("tests/test_w.py", py))] == [1, 4, 7, 10], "existence, truthiness, a mock call, nothing"
+    js = ("describe('f', () => {\n  beforeEach(() => { r = 1 })\n  it('truthy', () => {\n    expect(f(1)).toBeTruthy()\n  })\n  it('snap', () => {\n"
+          "    expect(f(1)).toMatchSnapshot()\n  })\n  it('eq', () => {\n    expect(f(1)).toEqual(3)\n  })\n})\n")
+    assert [n for _, n, _ in weak_tests(rows("src/f.test.js", js))] == [3, 6], "a describe block is not a test"
+    assert not weak_tests(rows("f_test.go", "func TestF(t *testing.T) {\n\tif got := f(1); got != 3 {\n\t\tt.Errorf(\"%d\", got)\n\t}\n}\n"))
+    assert not weak_tests(rows("tests/f.rs", "#[test]\nfn f_is_3() {\n    assert_eq!(f(1), 3);\n}\n"))
+    assert not weak_tests(rows("src/app.py", "def test_helper():\n    assert r\n")), "only test files"
+    assert not weak_tests([("tests/test_w.py", 3, "def test_a():"), ("tests/test_w.py", 9, "    assert r")]), \
+        "a line the test does not hold is not its assertion"
+    put("tests/test_w.py", "def test_none():\n    assert r is not None\n")
+    assert "tests/test_w.py:1" in tamper("git add tests/test_w.py && git commit -qm w"), "a commit adding a weak test asks"
+    os.remove(os.path.join(t, "tests/test_w.py"))
+
 
     msg = lambda kind, content, **kw: json.dumps({"type": kind, "message": {"content": content}, **kw})
     use = lambda name, **i: msg("assistant", [{"type": "tool_use", "name": name, "input": i}])
