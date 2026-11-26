@@ -683,21 +683,15 @@ def self_test():
     assert decision(p('"react": "^19.0.0"', '"react": "^19.0.0",\n    "left-pad": "^1.3.0"', "package.json")) == "ask"
     assert not p('"test": "vitest"', '"test": "vitest", "lint": "eslint ."', "package.json"), "a script passes"
 
-    # Pull request cap
+    # The pull request cap is gone
     run("git", "branch", "-q", "main") if not git(t, "rev-parse", "--verify", "-q", "main") else None
-    n0 = changed_lines(t)  # untracked files from the tests above
     run("git", "checkout", "-qb", "big")
-    put("big.py", "x = 1\n" * (DIFF_CAP + 1)); put("uv.lock", "y\n" * 900)
-    run("git", "add", "big.py", "uv.lock"); run("git", "commit", "-qm", "big")
-    assert changed_lines(t) == n0 + DIFF_CAP + 1, "lockfiles do not count"
-    assert decision(pre_bash("git add -A && gh pr create --fill", t)) == "ask"
+    put("big.py", "x = 1\n" * 401)
+    run("git", "add", "big.py"); run("git", "commit", "-qm", "big")
+    assert not pre_bash("git add -A && gh pr create --fill", t), "a big pull request passes"
     assert "reqeusts" in pre_bash("pip install reqeusts && git push", t)["hookSpecificOutput"]["permissionDecisionReason"]
-    put("more.py", "y = 2\n" * 10)
-    assert changed_lines(t) == n0 + DIFF_CAP + 11, "lines not yet committed count"
-    os.remove(os.path.join(t, "more.py"))
     assert not pre_bash("git status", t), "other commands pass"
     run("git", "checkout", "-q", "-"); run("git", "branch", "-qD", "big")
-    assert not pre_bash("git push", t), "a small diff passes"
 
     # Leftovers and silencer gates
     put("src/app.py", "def f(x):\n    breakpoint()\n    # return x + 1\n    return x  # TODO: real rule\n")
@@ -765,17 +759,18 @@ def self_test():
     assert decision(sg(bare, "s1")) == "ask", "an edit no skill framed asks"
     assert not sg(bare, "s1"), "the same session is asked once"
     assert not sg(bare + [use("Skill", skill="agentic-dev:task")], "s2"), "an edit after the task skill passes"
-    assert not sg(bare + [use("Skill", skill="reflecting"), use("Skill", skill="reviewing")], "s3"), "after the reviewing skill passes"
+    assert decision(sg(bare + [use("Skill", skill="reviewing")], "s3")) == "ask", "the old reviewing skill frames no change"
     assert not sg(bare + [use("Skill", skill="agentic-dev:prototyping")], "s6"), "an edit after the prototyping skill passes"
     assert decision(sg(bare + [use("Skill", skill="agentic-dev:reflecting")], "s4")) == "ask", "reflecting frames no change"
     assert decision(sg(bare + [use("Skill", skill="other-plugin:deploy")], "s5")) == "ask", "another plugin's skill frames no change"
-    assert not sg(bare + [use("Skill", skill="xp-templates:story")], "s7"), "an edit after an xp-templates skill passes"
-    assert not sg(bare + [use("Skill", skill="xp-templates:design")], "s8"), "an edit after the design skill passes"
-    assert not sg(bare + [use("Skill", skill="xp-templates:prd")], "s9"), "an edit after the prd skill passes"
-    assert not sg(bare + [use("Skill", skill="xp-templates:discovery")], "s10"), "an edit after the discovery skill passes"
+    assert not sg(bare + [use("Skill", skill="agentic-dev:story")], "s7"), "an edit after the story skill passes"
+    assert not sg(bare + [use("Skill", skill="xp-templates:spike")], "s11"), "an edit after the spike skill passes"
+    assert decision(sg(bare + [use("Skill", skill="xp-templates:design")], "s8")) == "ask", "the design skill is gone"
+    assert decision(sg(bare + [use("Skill", skill="xp-templates:prd")], "s9")) == "ask", "the prd skill is gone"
+    assert decision(sg(bare + [use("Skill", skill="xp-templates:discovery")], "s10")) == "ask", "the discovery skill is gone"
     assert not skill_gate({"transcript_path": os.path.join(t, "s1.jsonl")}, {"file_path": "/tmp/x.md"}, "/tmp"), \
         "outside a repository passes"
-    for n in ("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10"):
+    for n in ("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11"):
         os.remove(os.path.join(t, n + ".jsonl"))
 
     # Check gate
@@ -796,38 +791,52 @@ def self_test():
     assert not cg("Bash", command="git status"), "git commands pass"
     assert not check_gate(sub, "Read", {"file_path": "/tmp/x"}, tempfile.mkdtemp()), "outside a repository passes"
 
-    # Retro reminder
+    # Review gate
     run("git", "checkout", "-qb", "feat/r")
     put("r.py", "x = 1\n" * (REVIEW_LINES + 1)); put("r.json", "{}\n" * 50); put("R.md", "y\n" * 50)
     run("git", "add", "r.py", "r.json", "R.md"); run("git", "commit", "-qm", "r")
-    assert not post_bash("git push", t), "a push is not a finished change"
-    # Review gate
     rv = os.path.join(tempfile.mkdtemp(), "review.jsonl")
     ship = lambda cmd, *lines: (open(rv, "w").write("\n".join(lines) + "\n"), pre_bash(cmd, t, rv))[1]
-    built = use("Skill", skill="agentic-dev:task")
+    built = use("Skill", skill="agentic-dev:story")
+    reviewed = use("Agent", subagent_type="agentic-dev:reviewer", prompt="Review the diff in /tmp/r")
     assert "not reviewed" in ship("gh pr create --fill", built)["hookSpecificOutput"]["permissionDecisionReason"], \
         "a pull request no review preceded asks"
-    assert not ship("gh pr create --fill", built, use("Skill", skill="agentic-dev:reviewing")), "after the reviewing skill it passes"
+    assert not ship("gh pr create --fill", built, reviewed), "after the reviewer agent it passes"
+    assert decision(ship("gh pr create --fill", built, use("Agent", subagent_type="Explore", prompt="x"))) == "ask", \
+        "another agent is not a review"
+    assert decision(ship("gh pr create --fill", built, use("Skill", skill="agentic-dev:reviewing"))) == "ask", \
+        "the old reviewing skill is not a review"
     assert not ship("git push", built), "a push ships nothing"
     assert not ship("git merge main", built), "merging the default branch into a feature branch passes"
     assert not pre_bash("gh pr create --fill", t), "an unreadable transcript passes"
-    assert str(REVIEW_LINES + 1) in post_bash("gh pr create --fill", t)["reason"], "config and prose do not count"
-    assert not post_bash("gh pr create --fill", t), "once per branch"
-    start(t)
-    assert not post_bash("gh pr create --fill", t), "a new session remembers it"
+    assert not post_bash("gh pr create --fill", t), "the retro reminder is gone"
     run("git", "checkout", "-qb", "feat/s", "main"); put("s.json", "{}\n" * 50)
     run("git", "add", "s.json"); run("git", "commit", "-qm", "s")
-    assert not post_bash("gh pr create", t), "a config-only change is trivial"
     run("git", "checkout", "-qb", "feat/u", "main"); put("u.py", "x = 1\n" * (REVIEW_LINES + 5))
     run("git", "add", "u.py"); run("git", "commit", "-qm", "u"); run("git", "checkout", "-q", "main")
     assert decision(ship("git merge --no-ff feat/u", built)) == "ask", "merging an unreviewed branch into the default branch asks"
     assert not ship("git merge --no-ff feat/s", built), "a config-only branch is trivial"
-    run("git", "merge", "-q", "--no-ff", "-m", "m", "feat/u")
-    assert "reflecting skill" in post_bash("git merge --no-ff feat/u", t)["reason"], "a merge of a big branch reminds"
-    run("git", "reset", "-q", "--hard", "HEAD~1")
     run("git", "branch", "-qD", "feat/r", "feat/s", "feat/u")
     for f in ("r.py", "r.json", "R.md"):
         os.path.exists(os.path.join(t, f)) and os.remove(os.path.join(t, f))
+
+    # Slice cap
+    def branch(name, base, **files):
+        run("git", "checkout", "-qb", name, base)
+        [put(f, x) for f, x in files.items()]
+        run("git", "add", *files); run("git", "commit", "-qm", name)
+    branch("story/x", "main", **{"skel.py": "x = 1\n" * 300})
+    branch("slice/x-1", "story/x", **{"a.py": "x = 1\n" * (SLICE_CAP + 1)})
+    branch("slice/x-2", "story/x", **{"b.py": "x = 1\n" * SLICE_CAP, "b.md": "y\n" * 500})
+    branch("feat/big", "story/x", **{"c.py": "x = 1\n" * 500})
+    run("git", "checkout", "-q", "story/x")
+    assert decision(pre_bash("git merge --no-ff slice/x-1", t)) == "deny", "a slice over the cap is denied"
+    assert SLICE_CAP + 1 == int(re.search(r"\d+", pre_bash("git merge slice/x-1", t)["hookSpecificOutput"]["permissionDecisionReason"]).group())
+    assert not pre_bash("git merge --no-ff slice/x-2", t), "a slice at the cap passes, its prose left out"
+    assert not pre_bash("git merge feat/big", t), "a branch that is not a slice passes"
+    run("git", "checkout", "-q", "main")
+    assert not pre_bash("git merge --no-ff story/x", t), "a story into the default branch is not a slice"
+    run("git", "branch", "-qD", "story/x", "slice/x-1", "slice/x-2", "feat/big")
 
     # Done check
     start(t)
