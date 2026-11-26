@@ -234,6 +234,11 @@ def skill_gate(inp, ti, cwd):
                "written artifact such as a story or a bug report; deny to have the agent load the building skill first.")
 
 
+def check_gate(inp, tool, ti, cwd):
+    """Denies a subagent any tool call that reaches a task's held-out check, except running it."""
+    return None
+
+
 def state_path(root):
     d = (git(root, "rev-parse", "--absolute-git-dir") or "").strip()
     return os.path.join(d, "sdlc-guard.json") if d else None
