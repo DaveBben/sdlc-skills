@@ -30,7 +30,7 @@ When an agent using the plugin fails, add a check that catches the failure. Do n
 
 - **Skill paths** in `marketplace.json` are `./skills/<skill>`, relative to the plugin `source`, with no `..`.
 - **Version:** keep each plugin's version in its `plugin.json` equal to its `marketplace.json` entry, and bump both together.
-- **Runtime reach:** only `skills/` and the wrappers' `hooks/` reach an agent. This file, the READMEs, `docs/`, `research/` and `tools/` do not, so a term this repo coins is defined inside the skill that uses it.
-- **Portable skills:** name a tool as an example, never as a requirement. The hooks are Claude Code's, and the skill must still read correctly without them.
+- **Runtime reach:** only `skills/`, and the wrapper's `hooks/` and `agents/`, reach an agent. This file, the READMEs, `docs/`, `research/` and `tools/` do not, so a term this repo coins is defined inside the skill that uses it.
+- **Portable skills:** name a tool as an example, never as a requirement. The hooks and agents are Claude Code's, so a skill that launches an agent names the fallback, a fresh subagent briefed with that agent's prompt, and the skill must still read correctly without them.
 - **Skill format:** follow the [Agent Skills specification](docs/agent-skills-spec.md). Lead the `description` with the trigger.
 - **Wording:** write for the agent. Give it the knowledge it lacks, with no shouted words, no step-by-step procedure and no rule it would follow unprompted.

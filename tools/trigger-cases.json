@@ -942,5 +942,70 @@
   "prompt": "What is pair programming and why do teams use it?",
   "expected": null,
   "source": "confusion"
+ },
+ {
+  "prompt": "Add over-the-air firmware updates to the sensor node, with rollback if the new image fails to boot.",
+  "expected": "story",
+  "source": "generated"
+ },
+ {
+  "prompt": "Stand up a new Kubernetes cluster for the payments team with autoscaling, monitoring and alerting.",
+  "expected": "story",
+  "source": "generated"
+ },
+ {
+  "prompt": "Add a lobby to the game where players can create, join and leave matches.",
+  "expected": "story",
+  "source": "generated"
+ },
+ {
+  "prompt": "We need a settings screen in the Android app: theme, notifications on or off, and sign out.",
+  "expected": "story",
+  "source": "generated"
+ },
+ {
+  "prompt": "The UART driver drops the last byte of every frame. Fix it.",
+  "expected": "task",
+  "source": "generated"
+ },
+ {
+  "prompt": "Make the iOS login button disabled until both fields are filled in.",
+  "expected": "task",
+  "source": "generated"
+ },
+ {
+  "prompt": "Fix the off-by-one in the Rust ring buffer's wraparound.",
+  "expected": "task",
+  "source": "generated"
+ },
+ {
+  "prompt": "Raise the Helm chart's memory limit for the worker to 512Mi.",
+  "expected": "task",
+  "source": "generated"
+ },
+ {
+  "prompt": "Will the ESP32 stay under 50 µA in deep sleep with the radio off? Try it on the bench.",
+  "expected": "spike",
+  "source": "generated"
+ },
+ {
+  "prompt": "Is the avatar upload vulnerable to path traversal? Try it against our staging copy.",
+  "expected": "spike",
+  "source": "generated"
+ },
+ {
+  "prompt": "How much would moving the nightly batch jobs to Graviton save us? Run a short trial.",
+  "expected": "spike",
+  "source": "generated"
+ },
+ {
+  "prompt": "How hard would upgrading the frontend to React 19 be? Have a go in a throwaway copy.",
+  "expected": "spike",
+  "source": "generated"
+ },
+ {
+  "prompt": "Does the game hold 60 fps on the Steam Deck with 200 enemies on screen? Measure it.",
+  "expected": "spike",
+  "source": "generated"
  }
 ]

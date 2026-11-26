@@ -37,6 +37,13 @@ Each item below in the plan is a design choice: bring it to the person with the 
 * Handling secrets, tokens, credentials or personal data
 * Deciding which input is trusted or which validation is skipped
 
+## Platform and budgets
+
+* Raising a minimum OS, browser, runtime, language or hardware version
+* A new app or OS permission
+* Changing a memory, flash, battery, frame, bundle-size or cost budget
+* A change that destroys and recreates live infrastructure, or changes how devices or installs update
+
 ## Product scope
 
 * Behaviour the story does not define: edge cases, empty states, limits, cancellations

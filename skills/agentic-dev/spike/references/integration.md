@@ -1,13 +1,13 @@
-# A new third-party API
+# A new third-party web API or SaaS integration
 
-Docs say what the vendor intends, not what a customer's setup does, so end each row with its evidence: `read docs`, `seen in sandbox` or `seen in production`.
+Docs say what the vendor intends, not what a customer's setup does, so give each row its evidence: `read docs`, `seen in sandbox` or `seen in production`.
 
 ## Read the contract first
 
-Read the vendor's auth, quota, webhook and sync pages. Turn each stated behaviour into a question only the business can answer, such as "push notifications can be dropped" into "how stale may our copy be before it is a defect?":
+Read the vendor's auth, quota, webhook, sync and versioning pages. Turn each stated behaviour into a question only the business can answer, such as "push notifications can be dropped" into "how stale may our copy be before it is a defect?". Record each fact or risk that could change the plan in the finding, in one table:
 
 ```text
-Fact (quote, URL, date read) | Question for the business | Owner | Answer | Proved in sandbox on
+Fact or risk (quote, URL, date read) | Question for the business | Owner | Answer | Evidence: read docs, seen in sandbox or seen in production
 ```
 
 ## Checklist
@@ -18,14 +18,9 @@ Fact (quote, URL, date read) | Question for the business | Owner | Answer | Prov
 4. **Change delivery:** webhook, poll or both; whether a message carries data; documented delay; lost messages; subscription expiry and renewal; recovering a gap.
 5. **Sync:** full or incremental, what invalidates a sync token or cursor, how deletes arrive, paging, ordering, conflicts and duplicates.
 6. **Data shape:** IDs on both sides, time zones, missing fields.
-7. **Failure:** outages, SLA, what our users see, the support channel.
+7. **Failure:** outages, SLA, what our users see, the support channel, and retry safety: idempotency keys for writes, so a retried payment does not charge twice.
+8. **Versioning:** the version we pin, how the vendor versions, the deprecation notice, and how breaking changes are announced.
 
 ## The thin path
 
-The finish line is an end-to-end spike through the real sandbox: connect and refresh a token, write one record, receive one vendor-side change by webhook and by poll, and measure the delay. List what it leaves out. Its code is thrown away like any spike's; a path meant to be kept and grown is a story's walking skeleton. Timebox in attempts.
-
-Record each row that could change the plan in the findings file:
-
-```text
-Risk | Why it could change the build | Evidence | Spike or question | Owner | Result | Proved on
-```
+The finish line is the thinnest end-to-end path through the real sandbox that touches each risk the checklist raised, such as connecting and refreshing a token, writing one record, and receiving one vendor-side change by webhook and by poll with its delay. List what it leaves out. Its code is thrown away like any spike's; a path meant to be kept and grown is a story's walking skeleton. Timebox in attempts.
