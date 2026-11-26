@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The agentic-dev plugin's hooks. Reads one hook event as JSON on stdin; `--self-test` runs its tests.
 
-  * Done check:      at Stop, outside a pair-program session, runs the definition of done, as it was when the
+  * Done check:      at Stop, unless pair-program is the last skill loaded, runs the definition of done, as it was when the
                      session began: the backticked `Definition of done:` (or `Check:`) command of the root AGENTS.md,
                      else the repository's own
                      test and lint commands, in the session's tree and in each other worktree of the repository
@@ -9,7 +9,8 @@
   * Size cap:        refuses an edit that leaves AGENTS.md or CLAUDE.md over 100 lines or 8 KB.
   * Dependency gate: an install command or manifest edit naming a package that no manifest or
                      lockfile in the repository holds asks the person (slopsquatting).
-  * Slice cap:       denies merging a slice branch (`slice/...`) that brings more than SLICE_CAP lines of code.
+  * Slice cap:       denies merging a slice branch (`slice/...`) that brings more than SLICE_CAP lines a person
+                     wrote; project files, scenes, notebooks and files .gitattributes marks generated do not count.
   * Leftovers gate:  a commit that adds a debugger call, a TODO or commented-out code asks the person.
   * Silencer gate:   a commit that adds a line switching a type checker or linter off asks the person.
   * Test-tamper gate: a commit that changes or removes an assertion or a test in a test file the branch started
@@ -64,6 +65,9 @@ SKIP = re.compile(r"@pytest\.mark\.(?:skip|xfail)|\bpytest\.(?:skip|xfail)\(|@un
 TEST_DEF = re.compile(r"\bdef test|\b(?:it|test|describe)\(|\bfunc Test|#\[test\]|@Test\b")
 ASSERTION = re.compile(r"\bassert|\bexpect\(|\.should\b|\braises\(|\bt\.(?:Error|Fatal|Fail)|" + TEST_DEF.pattern)
 PROSE = (".md", ".txt", ".rst")
+# Files a tool writes, which a slice cannot be split by: IDE projects, scenes, assets, notebooks, generated code.
+SLICE_SKIP = (".pbxproj", ".xcscheme", ".storyboard", ".xib", ".unity", ".prefab", ".asset", ".meta", ".mat", ".tscn", ".tres",
+              ".uasset", ".ipynb", ".csv", ".svg", ".snap", ".pb.go", "_pb2.py", "_pb2_grpc.py", ".g.dart", ".min.js", ".map")
 CONFIG = (".json", ".toml", ".yaml", ".yml", ".ini", ".cfg", ".conf", ".env", ".lock")
 SLICE_CAP = 200  # the person's cap on one slice of a story: past it, split the slice
 REVIEW_LINES = 20  # this plugin's guess at "more than a couple of lines"; tune it
@@ -262,7 +266,8 @@ def check_gate(inp, tool, ti, cwd):
     # upgrade to a sandbox that cannot see the git directory if one does.
     paths = [os.path.realpath(os.path.join(cwd, ti[k])) for k in ("file_path", "path") if ti.get(k)]
     text = json.dumps(ti)
-    if "task-checks" not in text and common not in text and not any(p == common or p.startswith(common + os.sep) for p in paths):
+    in_git_dir = re.search(re.escape(common) + r"(?![\w.-])", text)  # the git directory itself, not a sibling such as .github
+    if "task-checks" not in text and not in_git_dir and not any(p == common or p.startswith(common + os.sep) for p in paths):
         return None
     if tool == "Bash" and runs_check(ti.get("command", "")):
         return None
@@ -347,10 +352,31 @@ def agents_launched(transcript):
     return None if calls is None else {str(i.get("subagent_type", "")).split(":")[-1] for n, i in calls if n in ("Agent", "Task")}
 
 
+def generated(root, ref):
+    """fnmatch patterns the ref's .gitattributes marks generated (linguist-generated, -diff or binary)."""
+    # shortcut: reads only the root .gitattributes, not nested ones or macros; upgrade to `git check-attr --source` if one bites.
+    pats = []
+    for line in (git(root, "show", f"{ref}:.gitattributes") or "").splitlines():
+        words = line.split()
+        if len(words) > 1 and not words[0].startswith("#") and \
+                any(a in ("linguist-generated", "linguist-generated=true", "-diff", "binary") for a in words[1:]):
+            pats.append(words[0].lstrip("/"))
+    return pats
+
+
+def slice_lines(root, spec, ref):
+    """Lines added plus removed by `git diff spec` that a person wrote: prose, lockfiles, project files and generated files left out."""
+    pats = generated(root, ref)
+    rows = (l.split("\t") for l in (git(root, "diff", "--numstat", spec, "--") or "").splitlines())
+    return sum(int(r[0]) + int(r[1]) for r in rows if len(r) == 3 and r[0].isdigit() and r[1].isdigit()
+               and not r[2].endswith(PROSE + SLICE_SKIP) and os.path.basename(r[2]) not in LOCKFILES
+               and not any(fnmatch.fnmatch(r[2], p) or fnmatch.fnmatch(os.path.basename(r[2]), p) for p in pats))
+
+
 def slice_cap(parts, root):
-    """Lines of code a merge of a slice branch into a story branch brings, when over SLICE_CAP, else 0."""
+    """Lines a merge of a slice branch into a story branch brings, when over SLICE_CAP, else 0."""
     ref = merge_ref(parts)
-    n = code_lines(root, f"HEAD...{ref}") if ref and ref.startswith("slice/") else 0
+    n = slice_lines(root, f"HEAD...{ref}", ref) if ref and ref.startswith("slice/") else 0
     return n if n > SLICE_CAP else 0
 
 
@@ -542,7 +568,9 @@ def new_turn(root):  # a tree only the person changed this turn runs no check
 
 
 def stop(root, transcript=None):
-    if "pair-program" in (skills_loaded(transcript) or set()):  # the person is mid-way through their own code
+    framing = [str(i.get("skill", "")).split(":")[-1] for n, i in tool_uses(transcript) or [] if n == "Skill"]
+    framing = [f for f in framing if f in FRAMING_SKILLS]
+    if framing and framing[-1] == "pair-program":  # the person is mid-way through their own code
         return None
     state = load(root)
     outs = [o for p in trees(root) for o in [stop_tree(p, state, state.setdefault("trees", {}).setdefault(p, {}))] if o]
@@ -836,7 +864,7 @@ def self_test():
     handed = os.path.join(tempfile.mkdtemp(), "handed.jsonl")
     open(handed, "w").write(use("Skill", skill="agentic-dev:pair-program") + "\n" + use("Skill", skill="agentic-dev:task") + "\n")
     assert stop(t, handed)["decision"] == "block", "once the person hands the work to a task, the check runs again"
-    start(t); put("flag", "no")
+    put("flag", "ok"); start(t); put("flag", "no")  # a fresh baseline, so the next stop is a first failure again
     assert stop(t)["decision"] == "block", "a failing check blocks the stop"
     assert "systemMessage" in stop(t), "stopping again with nothing changed is allowed, and the person is told"
     put("flag", "ok"); put("fix.py", "x = 1\n")
