@@ -1,74 +1,74 @@
 [
  {
   "prompt": "I want to add an additional criteria to the pricing total. In order for a line to count, it needs to also have a quantity of at least 10",
-  "expected": "building",
+  "expected": "task",
   "source": "mined"
  },
  {
   "prompt": "I want to store a checksum of each order that enters orders.csv for the first time.",
-  "expected": "building",
+  "expected": "task",
   "source": "mined"
  },
  {
   "prompt": "In this repo I want to create a new python script for exporting the orders from export.py to a JSON file",
-  "expected": "building",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "I actually want to lower the bar from 50% to 20% or greater in pricing.py. The reason being is the following order should have been discounted but wasn't",
-  "expected": "building",
+  "expected": "task",
   "source": "mined"
  },
  {
   "prompt": "Let’s actually remove the 25 row limit and export all the orders",
-  "expected": "building",
+  "expected": "task",
   "source": "mined"
  },
  {
   "prompt": "Fix that bug. Then commit all changes and merge branch into main.",
-  "expected": "building",
+  "expected": "task",
   "source": "mined",
   "needs_context": true
  },
  {
   "prompt": "Handle the following bug: the export_orders crashes on an empty order list",
-  "expected": "building",
+  "expected": "task",
   "source": "mined"
  },
  {
   "prompt": "Implement the following story: docs/stories/export.md",
-  "expected": "building",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "Install gitleaks",
-  "expected": "building",
+  "expected": "task",
   "source": "mined"
  },
  {
   "prompt": "I merged into main. In the SPEC.md make a note that we do not need a PR workflow for this repo and can merge straight to main",
-  "expected": "building",
+  "expected": "task",
   "source": "mined",
   "needs_context": true
  },
  {
   "prompt": "Implement the remaining story",
-  "expected": "building",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "build the export story",
-  "expected": "building",
+  "expected": null,
   "source": "mined"
  },
  {
   "prompt": "Build this as a fix, but we still have 68% of the orders not being exported?",
-  "expected": "building",
+  "expected": "task",
   "source": "mined"
  },
  {
   "prompt": "No need to add the extra ceremony, just fix it now. Post the PR, I'll merge it.",
-  "expected": "building",
+  "expected": "task",
   "source": "mined",
   "needs_context": true
  },
@@ -211,150 +211,156 @@
  },
  {
   "prompt": "add a CSV export for refunds too",
-  "expected": "building",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "the export crashes on an empty order list",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "rename total to order_total everywhere",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "bump the requests dependency",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "implement the story in docs/stories/export.md",
-  "expected": "building",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "pricing.total gives the wrong answer when a line has quantity 0, sort it out",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "can you make export_orders skip cancelled orders",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "add a --dry-run flag to the export",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "refactor pricing.py so the discount logic isnt inline",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "um so i want the export to also include the customer email column and maybe sort by date but only if its not too hard just go and do it",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "Please implement the changes described in SPEC.md section 3.",
-  "expected": "building",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "export.py shuld quote fields that contain commas",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "upgrade to python 3.13 and fix whatever breaks",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "total() ignores tax, fix",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "We need VAT support in pricing. Make it so.",
-  "expected": "building",
+  "expected": null,
   "source": "generated"
  },
  {
   "prompt": "remove the dead code in export.py",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "add type hints to pricing.py",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "hey the csv has windows line endings, i need unix ones, can you change that",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "Task from orchestrator: implement ticket EXP-14 (export orders as UTF-8 with BOM). Start now.",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "make total() round to 2 decimals half-up instead of banker's rounding",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
   "prompt": "the plan above is agreed, go ahead and build it",
-  "expected": "building",
-  "source": "generated"
+  "expected": "task",
+  "source": "generated",
+  "needs_context": true
  },
  {
-  "prompt": "Framing is done; use the building skill to implement the agreed change.",
-  "expected": "building",
-  "source": "generated"
+  "prompt": "Framing is done; use the task skill to implement the agreed change.",
+  "expected": "task",
+  "source": "generated",
+  "needs_context": true
  },
  {
   "prompt": "agreed, proceed with the implementation as framed",
-  "expected": "building",
+  "expected": "task",
   "source": "generated",
   "needs_context": true
  },
  {
   "prompt": "Framing complete. Acceptance criteria are in the conversation above. Hand over to building and implement the change now.",
-  "expected": "building",
-  "source": "generated"
- },
- {
-  "prompt": "Orchestrator: the frame for the empty-export fix is signed off. Build it in a worktree and report when the checks pass.",
-  "expected": "building",
-  "source": "generated"
- },
- {
-  "prompt": "The agreed change stands as written above; implement it.",
-  "expected": "building",
+  "expected": "task",
   "source": "generated",
   "needs_context": true
  },
  {
-  "prompt": "Subtask 2 of 2: framing finished, implement what was agreed using the building skill.",
-  "expected": "building",
+  "prompt": "Orchestrator: the frame for the empty-export fix is signed off. Build it in a worktree and report when the checks pass.",
+  "expected": "task",
   "source": "generated"
+ },
+ {
+  "prompt": "The agreed change stands as written above; implement it.",
+  "expected": "task",
+  "source": "generated",
+  "needs_context": true
+ },
+ {
+  "prompt": "Subtask 2 of 2: framing finished, implement what was agreed using the task skill.",
+  "expected": "task",
+  "source": "generated",
+  "needs_context": true
  },
  {
   "prompt": "ship it as framed, start the build",
-  "expected": "building",
-  "source": "generated"
+  "expected": "task",
+  "source": "generated",
+  "needs_context": true
  },
  {
   "prompt": "Plan accepted. Proceed to build, pre-mortem first.",
-  "expected": "building",
-  "source": "generated"
+  "expected": "task",
+  "source": "generated",
+  "needs_context": true
  },
  {
   "prompt": "review my changes",
@@ -768,7 +774,7 @@
  },
  {
   "prompt": "format pricing.py with black",
-  "expected": "building",
+  "expected": "task",
   "source": "generated"
  },
  {
@@ -818,7 +824,7 @@
  },
  {
   "prompt": "The empty-export crash: fix it",
-  "expected": "building",
+  "expected": "task",
   "source": "confusion"
  },
  {
@@ -843,12 +849,13 @@
  },
  {
   "prompt": "The plan above is agreed, go ahead and build it",
-  "expected": "building",
-  "source": "confusion"
+  "expected": "task",
+  "source": "confusion",
+  "needs_context": true
  },
  {
   "prompt": "the orjson spike proved it, now switch export_orders to orjson for real",
-  "expected": "building",
+  "expected": "task",
   "source": "confusion"
  },
  {

@@ -3,7 +3,7 @@ name: reflecting
 description: "Use whenever the person looks back on work just done with you, and once a non-trivial code change is finished, after its review, or given up: a retro or post-mortem, what went well or wrong, lessons from the session, where time was lost, why it took so many rounds, whether their instructions caused rework, or how to prompt or steer you better next time, however casually asked, such as 'what's the takeaway?'. Not after a one- or two-line edit, and not for reviewing the code itself. Reviews the session against the loop (Frame, Explore, Build, Verify, Review) and tells the person what to do next time to get better output from you."
 license: MIT
 metadata:
-  version: "8.1.3"
+  version: "10.0.0"
 ---
 # Reflecting
 

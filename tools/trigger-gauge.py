@@ -14,14 +14,14 @@ outside the system temp directory, where skills do not load. Each run is a short
 API money. Usage:
 
     python3 tools/trigger-gauge.py                       # every case once, on Sonnet
-    python3 tools/trigger-gauge.py --only building --runs 3
+    python3 tools/trigger-gauge.py --only task --runs 3
     python3 tools/trigger-gauge.py --self-test
 """
 import argparse, concurrent.futures as cf, json, os, shutil, subprocess, sys, time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLUGIN, RUNS = os.path.join(REPO, "plugins", "agentic-dev"), os.path.expanduser("~/.sdlc-trigger-runs")
-SKILLS = {"building", "prototyping", "reflecting", "reviewing"}
+SKILLS = {"task", "prototyping", "reflecting", "reviewing"}
 AGENTS = set()  # the plugin ships no agents; reviewers are reference files its skills launch
 
 FIXTURE = {
@@ -65,19 +65,19 @@ CASES = [
     # Talk about review, with no finished change to review, gets none.
     ("What should a good code review checklist cover?", None),
     ("Summarise what my uncommitted change does, for a pull request description.", None),
-    # Any change to code, a story or a chore, starts at the building skill.
-    ("Bump the requests dependency to the latest version.", "building"),
-    ("Add a CSV export to the orders page.", "building"),
-    ("The export crashes on an empty order list. Fix it.", "building"),
-    ("Rename total to order_total everywhere.", "building"),
-    ("Implement the story in docs/stories/export.md.", "building"),
-    ("Make the export async.", "building"),
-    ("total returns 9.99 for a 10.00 cart. Find the cause and patch it.", "building"),
-    ("Would streaming the export keep memory flat at a million orders? Try it and see.", "building"),
+    # A change whose done one check proves starts at the task skill; a feature that needs a spec has no build skill yet.
+    ("Bump the requests dependency to the latest version.", "task"),
+    ("Add a CSV export to the orders page.", None),
+    ("The export crashes on an empty order list. Fix it.", "task"),
+    ("Rename total to order_total everywhere.", "task"),
+    ("Implement the story in docs/stories/export.md.", None),
+    ("Make the export async.", "task"),
+    ("total returns 9.99 for a 10.00 cart. Find the cause and patch it.", "task"),
+    ("Would streaming the export keep memory flat at a million orders? Try it and see.", "prototyping"),
     # Held out.
-    ("Can you wire up a new endpoint that returns order totals as JSON?", "building"),
-    ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "building"),
-    ("Before we commit to sqlite, knock together something disposable to find out if it copes with our order volume.", "building"),
+    ("Can you wire up a new endpoint that returns order totals as JSON?", None),
+    ("pricing.py is a mess of nested ifs, tidy it up without changing what it does.", "task"),
+    ("Before we commit to sqlite, knock together something disposable to find out if it copes with our order volume.", "prototyping"),
     # A question gets no skill: the working agreement's Explain lines cover it.
     ("Why does total give 9.999999 instead of 10 for some carts? I want to understand it before anything changes.", None),
     ("How does the export decide which columns to write?", None),

@@ -15,7 +15,9 @@
   * Test-tamper gate: a commit that changes or removes an assertion or a test in a test file the branch started
                      with, or adds a skip or expected-failure marker to a test, asks the person, once per line per branch.
                      It and the leftovers and silencer gates read only the files the commit takes in.
-  * Skill gate:      the first file edit in a repository in a session that loaded none of the building, prototyping
+  * Check gate:      denies a subagent any tool call that reaches a task's held-out check under the git directory's
+                     task-checks/, except running its run command alone.
+  * Skill gate:      the first file edit in a repository in a session that loaded none of the task, prototyping
                      and reviewing skills, nor an xp-templates skill, asks the person, once per session.
   * Review gate:     opening a pull request, or merging a branch into the default branch, with more than RETRO_LINES
                      lines of code and no reviewing skill loaded in the session asks the person.
@@ -194,7 +196,7 @@ def pre_edit(tool, inp, cwd):
     return None
 
 
-FRAMING_SKILLS = {"building", "prototyping", "reviewing",  # frame a change, run a throwaway experiment, fix findings
+FRAMING_SKILLS = {"task", "prototyping", "reviewing",  # build a task, run a throwaway experiment, fix findings
                   "story", "spike", "bug", "tracker", "design", "prd", "discovery"}  # xp-templates: write an artifact
 
 
@@ -230,13 +232,39 @@ def skill_gate(inp, ti, cwd):
         return None
     state.setdefault("skill_asked", []).append(transcript)
     save(root, state)
-    return ask("This edit changes a file before the building skill framed the change. Allow to edit anyway, as for a "
-               "written artifact such as a story or a bug report; deny to have the agent load the building skill first.")
+    return ask("This edit changes a file before the task skill framed the change. Allow to edit anyway, as for a "
+               "written artifact such as a story or a bug report; deny to have the agent load the task skill first.")
+
+
+RUN_CHECK = re.compile(r"/task-checks/[^/\s]+/run$")
+
+
+def runs_check(command):
+    try:
+        words = shlex.split(command)
+    except ValueError:
+        return False
+    words = words[1:] if words[:1] in (["sh"], ["bash"]) else words
+    return len(words) == 1 and bool(RUN_CHECK.search(words[0]))
 
 
 def check_gate(inp, tool, ti, cwd):
     """Denies a subagent any tool call that reaches a task's held-out check, except running it."""
-    return None
+    if not inp.get("agent_id"):
+        return None
+    common = (git(cwd, "rev-parse", "--path-format=absolute", "--git-common-dir") or "").strip()
+    if not common:
+        return None
+    # shortcut: matches the call's text and paths; a subagent that builds the path from pieces gets through,
+    # upgrade to a sandbox that cannot see the git directory if one does.
+    paths = [os.path.realpath(os.path.join(cwd, ti[k])) for k in ("file_path", "path") if ti.get(k)]
+    text = json.dumps(ti)
+    if "task-checks" not in text and common not in text and not any(p == common or p.startswith(common + os.sep) for p in paths):
+        return None
+    if tool == "Bash" and runs_check(ti.get("command", "")):
+        return None
+    return deny("This reaches the task's held-out check, which the agent doing the task never reads or changes. "
+                "Run the check only by its run command, alone, and work from the message it prints.")
 
 
 def state_path(root):
@@ -575,8 +603,10 @@ def main():
     event, tool, ti = inp.get("hook_event_name"), inp.get("tool_name"), inp.get("tool_input") or {}
     cwd = inp.get("cwd") or os.getcwd()
     root = (git(cwd, "rev-parse", "--show-toplevel") or "").strip()
-    out = None
-    if event == "PreToolUse" and tool in ("Edit", "Write", "MultiEdit"):
+    out = check_gate(inp, tool, ti, cwd) if event == "PreToolUse" else None
+    if out or tool in ("Read", "Grep", "Glob"):
+        pass
+    elif event == "PreToolUse" and tool in ("Edit", "Write", "MultiEdit"):
         out = pre_edit(tool, ti, cwd) or skill_gate(inp, ti, cwd)
     elif not root:
         return

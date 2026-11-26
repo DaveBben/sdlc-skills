@@ -1,5 +1,5 @@
 {
-  "description": "Done check, AGENTS.md size cap, dependency gate, pull request size cap, leftovers gate, silencer gate, test-tamper gate, skill gate, review gate and retro reminder, plus the working agreement printed at session start.",
+  "description": "Done check, AGENTS.md size cap, dependency gate, pull request size cap, leftovers gate, silencer gate, test-tamper gate, check gate, skill gate, review gate and retro reminder, plus the working agreement printed at session start.",
   "hooks": {
     "SessionStart": [
       {
@@ -17,7 +17,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Edit|Write|MultiEdit|Bash",
+        "matcher": "Edit|Write|MultiEdit|Bash|Read|Grep|Glob",
         "hooks": [
           {
             "type": "command",

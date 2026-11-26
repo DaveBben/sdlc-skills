@@ -11,7 +11,7 @@ Whoever made it, someone else attacks it, and a machine decides when it's done. 
 
 ## Tests and done
 
-5. **Criteria first:** write testable acceptance criteria before the build. The building agent never defines done.
+5. **Criteria first:** write testable acceptance criteria before the build. The agent doing the work never defines done.
 6. **Definition of done:** give the agent a `Definition of done:` command, every test and the linter, that says when any change is done.
 7. **Running app:** check the change in the browser, the command line or a real request, as well as the test suite.
 8. **Locked tests:** the agent can't change a test to make it pass.
@@ -45,8 +45,8 @@ Whoever made it, someone else attacks it, and a machine decides when it's done. 
 
 | Principle | Enforced by |
 |---|---|
-| 1, 2 | The `building` skill's pre-mortem and fresh design review of a large plan |
-| 5 | The `discovery` skill's interview and the `story` skill's acceptance criteria rules; the `building` skill asks for criteria when none were brought |
+| 5 | The `discovery` skill's interview and the `story` skill's acceptance criteria rules; the `task` skill asks for a done check when none was brought |
+| 9, in part | The `task` skill's held-out check, and the check gate hook |
 | 3 | The `reviewing` skill: a fresh reviewer and a fresh verifier, and the review gate hook |
 | 6 | Done-check hook at every stop |
 | 8 | The `reviewing` skill's reviewer, and the test-tamper gate hook |
@@ -57,4 +57,4 @@ Whoever made it, someone else attacks it, and a machine decides when it's done. 
 | 13 | Size-cap hook, 100 lines or 8 KB |
 | 16 | Pull request cap hook, 400 changed lines |
 | 17 | `tools/baseline.py` |
-| 4, 7, 9, 14, 15, 18 | You |
+| 1, 2, 4, 7, 9, 14, 15, 18 | You |

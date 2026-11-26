@@ -16,7 +16,7 @@ A loaded skill's own rules win where they differ.
 
 ## Work
 
-* Load the building skill before any change to code, configuration, dependencies or tooling.
+* Load the task skill before any change to code, configuration, dependencies or tooling whose done one check proves.
 * Never ask the user for a fact a tool can reach.
 * Brief a subagent with the objective, scope limits and a return shape: the answer, file:line per claim, a "Not verified" list. Spot-check what returns.
 * Answer "why this?" in one line and add no work (pushback narrows the work).

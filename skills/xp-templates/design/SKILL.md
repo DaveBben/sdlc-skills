@@ -1,9 +1,9 @@
 ---
 name: design
-description: "Use when the person is weighing technical design options or an architecture decision, or a design is to be written down, reviewed or filed for others to read later, not built now: 'help me decide between Leiden and HDBSCAN for grouping tickets', 'I'm thinking a static site or WordPress for the bakery, poke holes in it', 'write a design doc for the ticket-clustering pipeline', 'draft an ADR for moving to Postgres', 'review this RFC' or 'what is missing from this design doc'. Not for planning a change about to be built in this session, which the building skill plans, nor for business requirements, which are the discovery, prd and story skills'. A dialog where the person brings the options and decides, and the agent draws out each option, grounds it in the code and the data, and surfaces the unknowns; then the design doc and ADR templates and the checks a design is reviewed against."
+description: "Use when the person is weighing technical design options or an architecture decision, or a design is to be written down, reviewed or filed for others to read later, not built now: 'help me decide between Leiden and HDBSCAN for grouping tickets', 'I'm thinking a static site or WordPress for the bakery, poke holes in it', 'write a design doc for the ticket-clustering pipeline', 'draft an ADR for moving to Postgres', 'review this RFC' or 'what is missing from this design doc'. Not for planning a change about to be built in this session, which the task skill builds, nor for business requirements, which are the discovery, prd and story skills'. A dialog where the person brings the options and decides, and the agent draws out each option, grounds it in the code and the data, and surfaces the unknowns; then the design doc and ADR templates and the checks a design is reviewed against."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 # Design
 
