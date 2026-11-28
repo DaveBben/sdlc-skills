@@ -32,8 +32,6 @@ All in [`plugins/agentic-xp/hooks/guard.py`](plugins/agentic-xp/hooks/guard.py):
 * **Done check:** your `Definition of done:` command from `AGENTS.md`, else the repository's own test and lint commands, at every stop, except while you pair.
 * **Test-tamper gate:** a commit that changes or removes an assertion or a test the branch started with, or skips a test, asks you once per line.
 * **Weak-assertion gate:** a commit that adds a test checking no exact value, only that a result exists, is truthy, matches a snapshot or that a mock was called, asks you.
-* **Weak-assertion gate:** a commit that adds a test checking no exact value, only that a result exists, is truthy, matches a snapshot or that a mock was called, asks you.
-* **Already-passing gate:** a `test(red)` commit adding a pytest test that already passes asks you, unless the message names it as `already passing`.
 * **Dependency gate:** a package no manifest or lockfile holds asks you.
 * **Leftovers and silencer gates:** a commit that adds a debugger call, a TODO, commented-out code or a switched-off checker asks you.
 * **Size cap:** `AGENTS.md` and `CLAUDE.md` stay under 100 lines.
@@ -41,7 +39,8 @@ All in [`plugins/agentic-xp/hooks/guard.py`](plugins/agentic-xp/hooks/guard.py):
 * **Slice cap:** merging a slice branch (`slice/...`) of a story that brings more than 200 lines of code is denied.
 * **Skill gate:** the first file edit in a session that loaded none of the task, story, spike and pair-program skills asks you.
 * **Review gate:** a pull request, or a merge into the default branch, of more than a few lines of code that no reviewer agent saw in the session asks you.
+* **Lean gate:** outside the task, story and spike skills, a multiple-choice question with an option marked "(Recommended)" is denied: the pick is yours, so the agent asks with the options as equals.
 
-House rules for how the agent talks, explains and asks you questions print at session start: [`working-agreement.md`](plugins/agentic-xp/hooks/working-agreement.md).
+House rules for how the agent talks, coaches, explains and asks you questions print at session start, and the Coach section is sent again with every prompt: the agent gives you the general knowledge and leaves applying it to your situation to you, then pokes holes in what you propose. Say "just tell me" for the full answer. [`working-agreement.md`](plugins/agentic-xp/hooks/working-agreement.md).
 
 MIT license.

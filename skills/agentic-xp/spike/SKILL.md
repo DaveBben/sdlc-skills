@@ -3,7 +3,7 @@ name: spike
 description: "Use first, before writing any code, when a question is to be answered by building something throwaway: a spike, a prototype, a proof of concept, a feasibility try, an ML or eval experiment, a test on a real board or phone, a benchmark or load test, a race or failure test, an exploit proof of concept, a cloud cost trial, a check of how a library or third-party API really behaves, or a clickable mock to react to, such as 'does fine-tuning beat prompting on our labelled tickets', 'will the sensor read reliably at 3.3 V', 'does background fetch still fire on iOS after the app is killed', 'does the Gmail API return threads in date order? try it' or 'write a spike for whether Postgres full-text search is fast enough'. Not for the real change, nor a benchmark or test suite to keep, which are the task or story skill's. Frames the question, runs it now or logs it, answers it with the least throwaway code outside the repository, and records the finding."
 license: MIT
 metadata:
-  version: "10.0.0"
+  version: "10.1.0"
 ---
 # Spike
 

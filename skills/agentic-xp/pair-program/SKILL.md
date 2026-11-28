@@ -3,7 +3,7 @@ name: pair-program
 description: "Use when the person wants to write the code themselves with you beside them as a pair, coach or navigator, not to have you write it, such as 'let's pair on this', 'pair with me on the retry logic', 'ping-pong pairing', 'I want to write this myself, check my work as I go', 'don't write it for me', 'coach me through writing this', 'I'm learning Rust, watch me write this' or 'look at each line I write and tell me what's wrong'. Not for a change you are to make yourself, which is the task or story skill's, nor for reviewing a finished change all at once, nor for a question about code. Coaches one mistake at a time with hints while they write the code; writes only the failing tests and the chores."
 license: MIT
 metadata:
-  version: "10.0.0"
+  version: "10.1.0"
 ---
 # Pair program
 

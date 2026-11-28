@@ -3,7 +3,7 @@ name: story
 description: "Use first, before writing requirements or any code, for a feature or anything bigger than one check can prove done: a capability with several rules, a new script, report or export, support for a new kind of rule such as tax or discounts, a whole app or product idea, an existing PRD, or a written story to build, such as 'add a CSV export', 'add offline mode to the iOS app', 'add a weekly churn model to the dbt project', 'implement the spec in SPEC.md', 'I want to build a booking site for my bakery', 'turn this PRD into stories', 'interview me for a story about refunds', 'implement docs/stories/02-export.md' or 'build the next story'. Not for a change one check proves done, which is the task skill's, nor for a throwaway experiment, which is the spike skill's. Interviews the person and writes stories as vertical slices, or builds one story from hidden failing tests to a merged, accepted change."
 license: MIT
 metadata:
-  version: "10.0.0"
+  version: "10.1.0"
 ---
 # Story
 
@@ -69,7 +69,7 @@ One story per run.
 * **Create the story branch without checking it out,** such as `git branch story/<slug>`, so the person's working copy stays as it is.
 * **Explore what the story touches:** the code, its callers, its tests and the data.
 * **Write a plan for the whole story:** the components and how they connect, the interfaces, and the build slices in order, each a set of the story's tests it makes green in at most 200 lines of related change. Generated files, IDE project files and scenes do not count; where the repository's generated files are not marked `linguist-generated` in `.gitattributes`, say so in the plan.
-* **Bring each design choice in the plan to the person** by [references/design-choices.md](references/design-choices.md), with the options, your pick and why. Push back where you disagree or the field's practice says otherwise, and agree the approach together.
+* **Bring each design choice in the plan to the person** by [references/design-choices.md](references/design-choices.md), with the options and their trade-offs. Ask for their pick before giving yours and why. Push back where you disagree or the field's practice says otherwise, and agree the approach together.
 * **Have a fresh subagent review the plan** by [references/plan-review.md](references/plan-review.md), and settle each blocking finding before the tests.
 
 ### Tests

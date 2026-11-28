@@ -1,6 +1,6 @@
 # Design choices
 
-Each item below in the plan is a design choice: bring it to the person with the options, your pick and why, and agree it before the tests. The implementation choices at the end you make yourself, within these rules.
+Each item below in the plan is a design choice: bring it to the person with the options and their trade-offs, ask for their pick before giving yours and why, and agree it before the tests. The implementation choices at the end you make yourself, within these rules.
 
 ## Data
 
