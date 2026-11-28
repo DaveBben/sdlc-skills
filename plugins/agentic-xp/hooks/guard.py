@@ -24,6 +24,9 @@
                      pair-program skills asks the person, once per session.
   * Review gate:     opening a pull request, or merging a branch into the default branch, with more than REVIEW_LINES
                      lines of code and no reviewer agent launched in the session asks the person.
+  * Coach prompt:    each prompt gets the working agreement's Coach section again, so it outlasts the session start.
+  * Lean gate:       denies an AskUserQuestion that labels an option "(Recommended)" unless task, story or spike is the
+                     last skill loaded: in conversation and in pair-program the pick is the person's.
 """
 import fnmatch, hashlib, json, os, re, shlex, subprocess, sys, tempfile
 
@@ -225,6 +228,29 @@ def tool_uses(transcript):
             if isinstance(b, dict) and b.get("type") == "tool_use":
                 calls.append((b.get("name"), b.get("input") or {}))
     return calls
+
+
+def last_framing(calls):
+    """The last of the framing skills these tool calls load, or None."""
+    framing = [s for n, i in calls if n == "Skill" for s in [str(i.get("skill", "")).split(":")[-1]] if s in FRAMING_SKILLS]
+    return framing[-1] if framing else None
+
+
+def lean_gate(ti, transcript):
+    """Denies a question that recommends an option, unless a skill that sets its own rules for asking framed the work."""
+    labels = [str(o.get("label", "")) for q in ti.get("questions") or [] for o in q.get("options") or []]
+    calls = tool_uses(transcript)
+    if calls is None or not any("(recommended)" in l.lower() for l in labels) or last_framing(calls) in ("task", "story", "spike"):
+        return None
+    return deny("The pick is the person's. Ask with the options as equals, none marked (Recommended), and give your own "
+                "pick in text only after they state their lean.")
+
+
+def coach():
+    """The working agreement's Coach section, re-sent with each prompt."""
+    text = read(os.path.join(os.path.dirname(os.path.abspath(__file__)), "working-agreement.md"))
+    m = re.search(r"^## Coach\n.*?(?=^## |\Z)", text, re.M | re.S)
+    return m and {"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": m.group().rstrip()}}
 
 
 def skills_loaded(transcript):
@@ -594,9 +620,7 @@ def new_turn(root):  # a tree only the person changed this turn runs no check
 
 
 def stop(root, transcript=None):
-    framing = [str(i.get("skill", "")).split(":")[-1] for n, i in tool_uses(transcript) or [] if n == "Skill"]
-    framing = [f for f in framing if f in FRAMING_SKILLS]
-    if framing and framing[-1] == "pair-program":  # the person is mid-way through their own code
+    if last_framing(tool_uses(transcript) or []) == "pair-program":  # the person is mid-way through their own code
         return None
     state = load(root)
     outs = [o for p in trees(root) for o in [stop_tree(p, state, state.setdefault("trees", {}).setdefault(p, {}))] if o]
@@ -652,6 +676,12 @@ def main():
         pass
     elif event == "PreToolUse" and tool in ("Edit", "Write", "MultiEdit"):
         out = pre_edit(tool, ti, cwd) or skill_gate(inp, ti, cwd)
+    elif event == "PreToolUse" and tool == "AskUserQuestion":
+        out = lean_gate(ti, inp.get("transcript_path"))
+    elif event == "UserPromptSubmit":
+        if root:
+            new_turn(root)
+        out = coach()
     elif not root:
         return
     elif event == "PreToolUse" and tool == "Bash":
@@ -661,8 +691,6 @@ def main():
     elif event == "SessionStart":
         if inp.get("source") in (None, "startup", "clear"):
             start(root)
-    elif event == "UserPromptSubmit":
-        new_turn(root)
     elif event == "Stop":
         out = stop(root, inp.get("transcript_path"))
     if out:
@@ -844,6 +872,37 @@ def self_test():
     assert not cg("Bash", command="git status"), "git commands pass"
     assert not cg("Read", file_path=os.path.join(t, ".github", "workflows", "ci.yml")), ".github is not the git directory"
     assert not check_gate(sub, "Read", {"file_path": "/tmp/x"}, tempfile.mkdtemp()), "outside a repository passes"
+
+    # Lean gate
+    pg = lambda name, *lines, labels=("A", "B (Recommended)"): (
+        open(os.path.join(t, name), "w").write("\n".join(lines) + "\n"),
+        decision(lean_gate({"questions": [{"options": [{"label": "X"}]}, {"options": [{"label": l} for l in labels]}]},
+                           os.path.join(t, name))))[1]
+    talk = msg("user", "Should I use Postgres or SQLite?")
+    assert pg("p1.jsonl", talk) == "deny", "a recommended option in conversation, in the second question, is denied"
+    assert "pick is the person's" in lean_gate({"questions": [{"options": [{"label": "a (recommended)"}]}]},
+                                               os.path.join(t, "p1.jsonl"))["hookSpecificOutput"]["permissionDecisionReason"]
+    assert not pg("p2.jsonl", talk, labels=("A", "B")), "options as equals pass"
+    assert not lean_gate({"questions": [{"options": [{"label": "A", "description": "(Recommended)"}]}]},
+                         os.path.join(t, "p2.jsonl")), "only labels count"
+    assert not pg("p3.jsonl", talk, use("Skill", skill="agentic-xp:story")), "story sets its own rules for asking"
+    assert pg("p4.jsonl", talk, use("Skill", skill="agentic-xp:pair-program")) == "deny", "pair-program: the person is learning"
+    assert pg("p5.jsonl", talk, use("Skill", skill="agentic-xp:task"), use("Skill", skill="agentic-xp:pair-program")) == "deny"
+    assert not lean_gate({"questions": [{"options": [{"label": "A (Recommended)"}]}]}, None), "an unreadable transcript passes"
+    for n in ("p1", "p2", "p3", "p4", "p5"):
+        os.remove(os.path.join(t, n + ".jsonl"))
+
+    # Lean gate and Coach prompt through main(), inside and outside a repository
+    hook = lambda **inp: json.loads(subprocess.run([sys.executable, os.path.abspath(__file__)], input=json.dumps(inp),
+                                                   capture_output=True, text=True, cwd=tempfile.gettempdir()).stdout or "null")
+    open(os.path.join(t, "p6.jsonl"), "w").write(talk + "\n")
+    for where in (t, tempfile.mkdtemp()):
+        ctx = hook(hook_event_name="UserPromptSubmit", cwd=where)["hookSpecificOutput"]["additionalContext"]
+        assert ctx.startswith("## Coach") and "\n## " not in ctx, "each prompt gets the Coach section alone"
+        asked = hook(hook_event_name="PreToolUse", tool_name="AskUserQuestion", cwd=where, transcript_path=os.path.join(t, "p6.jsonl"),
+                     tool_input={"questions": [{"options": [{"label": "A (Recommended)"}, {"label": "B"}]}]})
+        assert decision(asked) == "deny", "an AskUserQuestion recommending an option is denied"
+    os.remove(os.path.join(t, "p6.jsonl"))
 
     # Review gate
     run("git", "checkout", "-qb", "feat/r")

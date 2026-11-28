@@ -56,4 +56,5 @@ Whoever made it, someone else attacks it, and a machine decides when it's done. 
 | 12 | Dependency-gate hook |
 | 13 | Size-cap hook, 100 lines or 8 KB |
 | 17 | `tools/baseline.py` |
+| 4, in part | The working agreement's Coach section, sent with every prompt, and the lean gate hook |
 | 4, 7, 14, 15, 16, 18 | You |

@@ -3,7 +3,7 @@ name: task
 description: "Use first, before editing any file, for a change to code, configuration, dependencies or tooling whose done one simple check can prove, user-facing or not, however small or casually phrased: a fix, a retry, a new column, a changed colour, limit, flag or format, a refactor, a rename, a dependency bump, CI or dev-tool setup, like 'retry the database connection when it times out', 'make the submit button blue', 'the LED blinks twice too fast', 'bump the Terraform AWS provider', 'rename total to order_total everywhere'. Not for a feature that needs a written specification first, such as a new export or a new page, nor for reviewing a finished change, a question about code, a throwaway experiment, which is the spike skill's, or code the person wants to write themselves, which is the pair-program skill's. Holds a done check back from the subagent that writes the code, and commits to a branch, or logs the task for later."
 license: MIT
 metadata:
-  version: "10.0.0"
+  version: "10.1.0"
 ---
 # Task
 
